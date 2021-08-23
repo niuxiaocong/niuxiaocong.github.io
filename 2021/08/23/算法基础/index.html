@@ -20,7 +20,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
   <meta name="renderer" content="webkit">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no", user-scalable=no">
-  <title>Hexo部署到GithubHexo</title>
+  <title>算法基础Hexo</title>
   <link rel="shortcut icon" href="">
   
     
@@ -112,18 +112,12 @@
             </header>
                 
 <header class="blog-post-page-title">
-    <h4>Hexo部署到Github</h4>
-    <time datetime="2021-08-23T00:46:53.000Z"><i class="fa fa-clock-o"></i>2021-08-23</time>
+    <h4>算法基础</h4>
+    <time datetime="2021-08-23T09:13:20.000Z"><i class="fa fa-clock-o"></i>2021-08-23</time>
     
     
     
     
-	
-        <span><i class="fa fa-folder-o"></i>
-    		
-    	       <a href="/categories/%E5%89%8D%E7%AB%AF/" rel="categories" data-toggle="tooltip" data-placement="top" title="Linux">前端</a>
-    		
-        </span>
 	
     
 </header>
@@ -131,80 +125,35 @@
     <article class="blog-post-block blog-post-page-content">
         <section>
             
-                <h1 id="使用Hexo搭建一个网站"><a href="#使用Hexo搭建一个网站" class="headerlink" title="使用Hexo搭建一个网站"></a>使用Hexo搭建一个网站</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">需要环境</span><br><span class="line">Node.js  14.17.5 (建议在12版本以上都可以)</span><br></pre></td></tr></table></figure>
+                <p>异或操作规律</p>
+<p>性质1</p>
+<p>0^N = N，N^N = 0</p>
+<p>性质2</p>
+<p>异或运算满足交换律和结合律</p>
+<p>a^b = b^a </p>
+<p>a^b^c = a^(b^c)</p>
+<h3 id="题目：在一个数组中，已知只有一个数出现了奇数次，其他的数出现了偶数次，请找出这个出现奇数次的数"><a href="#题目：在一个数组中，已知只有一个数出现了奇数次，其他的数出现了偶数次，请找出这个出现奇数次的数" class="headerlink" title="题目：在一个数组中，已知只有一个数出现了奇数次，其他的数出现了偶数次，请找出这个出现奇数次的数"></a>题目：在一个数组中，已知只有一个数出现了奇数次，其他的数出现了偶数次，请找出这个出现奇数次的数</h3><h3>那么有两种出现了奇数次，剩余的数出现了偶数次，应该怎么找</h3>
 
-<p>Node.js 安装略</p>
-<p>Git 安装略</p>
-<h2 id="安装Hexo的脚手架"><a href="#安装Hexo的脚手架" class="headerlink" title="安装Hexo的脚手架"></a>安装Hexo的脚手架</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.java1;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QuestOneDemo</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">int</span>[] arr = &#123;<span class="number">1</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">2</span>,<span class="number">2</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">3</span>,<span class="number">3</span>,<span class="number">4</span>&#125;;</span><br><span class="line">		<span class="comment">//printOddTiemsNumsOne(arr);</span></span><br><span class="line">		printOddTiemsNumsTwo(arr);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//第一個問題</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">printOddTiemsNumsOne</span><span class="params">(<span class="keyword">int</span>[] arr)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">int</span> eor = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> cur : arr) &#123;</span><br><span class="line">			eor ^= cur;</span><br><span class="line">		&#125;</span><br><span class="line">		System.out.println(eor);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 第二个问题</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">printOddTiemsNumsTwo</span><span class="params">(<span class="keyword">int</span>[] arr)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">int</span> eor = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> cur : arr) &#123;</span><br><span class="line">			eor ^= cur;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//eor = a^b</span></span><br><span class="line">		<span class="comment">//eor != 0</span></span><br><span class="line">		<span class="comment">//eor 位置上必然有一個是1</span></span><br><span class="line">		<span class="keyword">int</span> rightOne = eor &amp; (~eor + <span class="number">1</span>);</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">int</span> onlyOne = <span class="number">0</span>; <span class="comment">//eor&#x27;</span></span><br><span class="line">		</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> cur : arr) &#123;</span><br><span class="line">			<span class="keyword">if</span>((cur &amp; rightOne) == <span class="number">1</span>) &#123;</span><br><span class="line">				onlyOne ^= cur;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		System.out.println(onlyOne + <span class="string">&quot; &quot;</span> + (eor ^ onlyOne));</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210823090843614.png" alt="image-20210823090843614"></p>
-<h2 id="执行初始化命令"><a href="#执行初始化命令" class="headerlink" title="执行初始化命令"></a>执行初始化命令</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo init</span><br><span class="line">他会从github上下载模板，速度会有点慢，也可能会下载失败，多下载几次既可以了</span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210822181109062.png" alt="image-20210822181109062"></p>
-<h2 id="生成"><a href="#生成" class="headerlink" title="生成"></a>生成</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo g 或者</span><br><span class="line">hexo generate</span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210822181408143.png" alt="image-20210822181408143"></p>
-<p>执行以上命令之后，hexo就会在public文件夹生成相关html文件，这些文件将来都是要提交到github去的：</p>
-<h2 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo s</span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210822181445442.png" alt="image-20210822181445442"></p>
-<p>默认的端口是4000</p>
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210822181538026.png" alt="image-20210822181538026"></p>
-<p>一个简单的网站就搭建完毕了。接下来是发布到GitHub上</p>
-<h1 id="发布到GitHub"><a href="#发布到GitHub" class="headerlink" title="发布到GitHub"></a>发布到GitHub</h1><p>创建gitHub账户略</p>
-<h2 id="创建GitHub仓库"><a href="#创建GitHub仓库" class="headerlink" title="创建GitHub仓库"></a>创建GitHub仓库</h2><p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210822182336588.png" alt="image-20210822182336588"></p>
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210822182513150.png" alt="image-20210822182513150"></p>
-<h2 id="配置-config-yml中有关deploy的部分"><a href="#配置-config-yml中有关deploy的部分" class="headerlink" title="配置_config.yml中有关deploy的部分"></a>配置<code>_config.yml</code>中有关deploy的部分</h2><p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210822182905468.png" alt="image-20210822182905468"></p>
-<h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><p>在部署的时候一定要用git bash，会省去很多不必要的麻烦</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo d</span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210822183235152.png" alt="image-20210822183235152"></p>
-<p>出现这个不要慌，因为后面一种写法是hexo2.x的写法，现在已经不行了，无论是哪种写法，此时直接执行<code>hexo d</code>的话一般会报上面的这个错误。</p>
-<p>安装一个插件即可</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-deployer-git</span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210822183444479.png" alt="image-20210822183444479"></p>
-<p>提交到GitHub仓库</p>
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210822183850300.png" alt="image-20210822183850300"></p>
-<p>部署命令</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo d</span><br><span class="line">或者</span><br><span class="line">hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210822213357819.png" alt="image-20210822213357819"></p>
-<p>总结：部署的步骤</p>
-<p>hexo clean  清空一下生成的html</p>
-<p>hexo generate 重新生成html</p>
-<p>hexo deploy 部署</p>
-<h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">hexo new &quot;postName&quot; #新建文章</span><br><span class="line">hexo new page &quot;pageName&quot; #新建页面</span><br><span class="line">hexo generate #生成静态页面至public目录</span><br><span class="line">hexo server #开启预览访问端口（默认端口4000，&#x27;ctrl + c&#x27;关闭server）</span><br><span class="line">hexo deploy #将.deploy目录部署到GitHubhexo help  # 查看帮助hexo version  #查看Hexo的版本</span><br><span class="line"></span><br><span class="line">简写</span><br><span class="line">hexo n == hexo new</span><br><span class="line">hexo g == hexo generate</span><br><span class="line">hexo s == hexo server</span><br><span class="line">hexo d == hexo deploy</span><br></pre></td></tr></table></figure>
-
-<h1 id="更换主题"><a href="#更换主题" class="headerlink" title="更换主题"></a>更换主题</h1><h2 id="找主题克隆到本地"><a href="#找主题克隆到本地" class="headerlink" title="找主题克隆到本地"></a>找主题克隆到本地</h2><p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210823062446217.png" alt="image-20210823062446217"></p>
-<p>进入Github以后将他Clone到本地，克隆到本地的themes文件夹下，然后重命名为上图左下角GitHub链接名Life，可能会受到网络的影响，一次克隆不下来，多克隆几次就好</p>
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210823062703453.png" alt="image-20210823062703453"></p>
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210823063451936.png" alt="image-20210823063451936"></p>
-<h2 id="修改Hexo的配置"><a href="#修改Hexo的配置" class="headerlink" title="修改Hexo的配置"></a>修改Hexo的配置</h2><p>找到 _config.yml文件夹</p>
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210823063752179.png" alt="image-20210823063752179"></p>
-<h2 id="重新生成代码"><a href="#重新生成代码" class="headerlink" title="重新生成代码"></a>重新生成代码</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br></pre></td></tr></table></figure>
+<h3 id="题目：二分查找法"><a href="#题目：二分查找法" class="headerlink" title="题目：二分查找法"></a>题目：二分查找法</h3><ul>
+<li>在一个有序的数组中，寻找某个数是否存在</li>
+</ul>
+<p>两种思路递归和非递归</p>
+<h4 id="非递归方式"><a href="#非递归方式" class="headerlink" title="非递归方式"></a>非递归方式</h4><p>代码实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//非递归的方式</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">doubleBranch</span><span class="params">(<span class="keyword">int</span>[] arr,<span class="keyword">int</span> target)</span> </span>&#123;	</span><br><span class="line">	<span class="keyword">if</span>(arr == <span class="keyword">null</span> || arr.length == <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">int</span> right = arr.length-<span class="number">1</span>;	<span class="comment">//右侧的指针</span></span><br><span class="line">	<span class="keyword">int</span> left = <span class="number">0</span>;			   <span class="comment">//左侧指针</span></span><br><span class="line">	<span class="keyword">int</span> mid = <span class="number">0</span>;			   <span class="comment">//中间指针</span></span><br><span class="line">	<span class="keyword">boolean</span> isFind = <span class="keyword">false</span>;		<span class="comment">//是否找到target目标元素</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">while</span>(right&gt;=left) &#123;		<span class="comment">//左侧指针如果大于右侧指针则结束循环</span></span><br><span class="line">		mid = (right + left) / <span class="number">2</span>;	<span class="comment">//找到中间元素的坐标</span></span><br><span class="line">		<span class="keyword">if</span>(arr[mid] == target) &#123;	<span class="comment">//找到 将isFind 置为true</span></span><br><span class="line">			isFind = <span class="keyword">true</span>;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;<span class="keyword">else</span> <span class="keyword">if</span>(arr[mid] &gt; target) &#123;	<span class="comment">//证明目标元素在左侧</span></span><br><span class="line">			right = mid -<span class="number">1</span>;</span><br><span class="line">		&#125;<span class="keyword">else</span> &#123;						   <span class="comment">//证明目标元素在这个数组中间位置的右侧</span></span><br><span class="line">			left = mid + <span class="number">1</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> isFind;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 
 
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo g</span><br></pre></td></tr></table></figure>
+<h4 id="递归方式"><a href="#递归方式" class="headerlink" title="递归方式"></a>递归方式</h4><p>代码实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//递归方式实现</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">doubleBranchDiGui</span><span class="params">(<span class="keyword">int</span>[] arr,<span class="keyword">int</span> left,<span class="keyword">int</span> right,<span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">int</span> L = left;				</span><br><span class="line">	<span class="keyword">int</span> R = right;</span><br><span class="line">	<span class="keyword">int</span> Mid = (R - L)/<span class="number">2</span> + L;</span><br><span class="line">	<span class="keyword">boolean</span> isFind = <span class="keyword">false</span>;</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span>(arr[Mid] &gt; target) &#123;</span><br><span class="line">		<span class="keyword">return</span> doubleBranchDiGui(arr, L, Mid-<span class="number">1</span>,target);</span><br><span class="line">	&#125;<span class="keyword">else</span> <span class="keyword">if</span>(arr[Mid] &lt; target) &#123;</span><br><span class="line">		<span class="keyword">return</span> doubleBranchDiGui(arr, Mid+<span class="number">1</span>,R,target);</span><br><span class="line">	&#125;<span class="keyword">else</span> <span class="keyword">if</span>(arr[Mid] == target)&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo s</span><br></pre></td></tr></table></figure>
-
-<p> 重新跑起来以后出现如下这种情况，缺少hexo-renderer-swig这个依赖</p>
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210823064814169.png" alt="image-20210823064814169"></p>
-<p>使用以下命令解决</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i hexo-renderer-swig</span><br></pre></td></tr></table></figure>
-
-<p>下载完成 以后重新 hexo clean 清除缓存 hexo g 重新生成 hexo s 重新启动，如此一来更换主题就完成了</p>
-<p><img src="/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/image-20210823065744360.png" alt="image-20210823065744360"></p>
-<p>如果想要部署到GitHub 直接hexo d即可</p>
-<h1 id="解决图片显示不了的问题"><a href="#解决图片显示不了的问题" class="headerlink" title="解决图片显示不了的问题"></a>解决图片显示不了的问题</h1><p>1.首先安装一下依赖</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install https://github.com/CodeFalling/hexo-asset-image --save</span><br></pre></td></tr></table></figure>
-
-<p>2.然后把_config.yml中的post_asset_folder设为true，这个配置的意思是每次new post一个博客，会增加一个和博客同名的文件夹。</p>
-<p>3.最后重新发布就行</p>
+<ul>
+<li>在一个有序的数组中，找&gt;=某个数最左侧的位置</li>
+</ul>
+<ul>
+<li>局部最小值问题</li>
+</ul>
 
             
         </section>
@@ -212,7 +161,7 @@
         
 			
 				
-			<a href="/tags/Hexo/" rel="tag" data-toggle="tooltip" data-placement="top" title="Linux">Hexo</a>
+			<a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag" data-toggle="tooltip" data-placement="top" title="Linux">数据结构</a>
 				
 			
 		
@@ -222,10 +171,10 @@
     	
     	
 		
-			<a href="/2021/08/23/%E6%A0%88/" class="blog-post-page-readmore-prev" data-toggle="tooltip" data-placement="top" title="栈">上一篇</a>
-		
 
 		
+		
+			<a href="/2021/08/23/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" class="blog-post-page-readmore-next" data-toggle="tooltip" data-placement="top" title="排序算法">下一篇</a>
 		
 
         <div style="clear: both;"></div>
@@ -328,7 +277,7 @@
                 return out;
             }
             // 生成
-            var qrcode= $('.post-qrcode-content-canvas').qrcode({width: 150,height: 150,text: toUtf8("https://niuxiaocong.github.io/2021/08/23/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0Github/")}).hide();
+            var qrcode= $('.post-qrcode-content-canvas').qrcode({width: 150,height: 150,text: toUtf8("https://niuxiaocong.github.io/2021/08/23/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/")}).hide();
             var canvas=qrcode.find('canvas').get(0);
             $('.post-qrcode-content-img').attr('src',canvas.toDataURL('image/jpg'));
         </script>
