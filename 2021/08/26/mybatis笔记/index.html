@@ -1,0 +1,700 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no", user-scalable=no">
+  <title>mybatis笔记牛小聪</title>
+  <link rel="shortcut icon" href="https://gulishop-niu.oss-cn-beijing.aliyuncs.com/pikaqiu.jpg">
+  
+    
+    
+      <link rel="stylesheet" href="/css/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="/css/font-awesome.min.css">
+    
+      <link rel="stylesheet" href="/css/atom-one-dark.css">
+    
+      <link rel="stylesheet" href="/css/jquery.fancybox.css">
+    
+      <link rel="stylesheet" href="/css/nprogress.min.css">
+    
+      <link rel="stylesheet" href="/css/valine.css">
+    
+      <link rel="stylesheet" href="/css/life.css">
+    
+  
+
+  
+
+  <!-- jQuery first, then Tether, then Bootstrap JS. -->
+  
+  
+  
+    <script src="/js/jquery-2.2.4.min.js"></script>
+  
+    <script src="https://cdn1.lncld.net/static/js/3.1.0/av-min.js"></script>
+  
+    <script src="/js/jquery.pjax.js"></script>
+  
+    <script src="/js/nprogress.min.js"></script>
+  
+    <script src="/js/tether.min.js"></script>
+  
+    <script src="/js/bootstrap.min.js"></script>
+  
+    <script src="/js/highlight.min.js"></script>
+  
+    <script src="/js/highlightjs-line-numbers.min.js"></script>
+  
+    <script src="/js/jquery.fancybox.js"></script>
+  
+    <script src="/js/jquery.qrcode.min.js"></script>
+  
+    <script src="/js/Valine.min.js"></script>
+  
+  
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="牛小聪" type="application/atom+xml">
+</head>
+<body>
+<script>AV.init({appId:'',appKey:''});</script>
+<script type="text/javascript">
+      var config = {
+            ClasS: 'Counter',
+            el:'.views',
+            elP: '.views-post'
+      }
+</script>
+<div class="container">
+    <div class="row blog-box-shadow">
+        <!--博客主栏开始-->
+        <div class="col-xl-9 col-lg-12 blog-main" id="pjax-box">
+            <header class="blog-header">
+                <a href="https://niuxiaocong.github.io" class="blog-header-mobile-title">牛小聪</a>
+                <a href="javascript:;" class="blog-header-navbar-btn"><i class="fa fa-bars"></i></a>
+                <nav class="blog-header-navbar blog-header-fixed">
+                    <ul class="blog-navbar-links">
+                        
+                          <li class="blog-nav-item"><a href="/" class="transition">首页</a></li>
+                        
+                          <li class="blog-nav-item"><a href="/about/" class="transition">关于</a></li>
+                        
+                          <li class="blog-nav-item"><a href="/links/" class="transition">链接</a></li>
+                        
+                          <li class="blog-nav-item"><a href="/categories" class="transition">分类</a></li>
+                        
+                        <div class="blog-navbar-right">
+                            <form action="">
+                                <div class="input-group">
+                                    <input type="text" class="blog-header-search" placeholder="search...">
+                                    <buttn type="submit" class="blog-header-search-btn"><i class="fa fa-search"></i></buttn>
+                                </div>
+                            </form>
+                        </div>
+                    </ul>
+                </nav>
+            </header>
+                
+<header class="blog-post-page-title">
+    <h4>mybatis笔记</h4>
+    <time datetime="2021-08-26T01:29:59.000Z"><i class="fa fa-clock-o"></i>2021-08-26 09:29:59</time>
+    
+    
+    
+    
+	
+        <span><i class="fa fa-folder-o"></i>
+    		
+    	       <a href="/categories/%E5%90%8E%E5%8F%B0%E6%A1%86%E6%9E%B6/" rel="categories" data-toggle="tooltip" data-placement="top" title="Linux">后台框架</a>
+    		
+        </span>
+	
+    
+</header>
+<div class="blog-main-post blog-post-page-box">
+    <article class="blog-post-block blog-post-page-content">
+        <section>
+            
+                <h1 id="Mybatis快速开始"><a href="#Mybatis快速开始" class="headerlink" title="Mybatis快速开始"></a>Mybatis快速开始</h1><ul>
+<li><p>1、创建maven工程</p>
+</li>
+<li><p>2、导入相应的pom文件</p>
+<pre><code class="xml">   &lt;dependencies&gt;
+       &lt;!--mybatis--&gt;
+       &lt;dependency&gt;
+           &lt;groupId&gt;org.mybatis&lt;/groupId&gt;
+           &lt;artifactId&gt;mybatis&lt;/artifactId&gt;
+           &lt;version&gt;3.4.1&lt;/version&gt;
+       &lt;/dependency&gt;
+       &lt;!--mysql 连接--&gt;
+       &lt;dependency&gt;
+           &lt;groupId&gt;mysql&lt;/groupId&gt;
+           &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+       &lt;/dependency&gt;
+        &lt;!--lombok 插件，可有可无--&gt;
+       &lt;dependency&gt;
+           &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+           &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+       &lt;/dependency&gt;&lt;dependency&gt;
+       &lt;groupId&gt;junit&lt;/groupId&gt;
+       &lt;artifactId&gt;junit&lt;/artifactId&gt;
+   &lt;/dependency&gt;
+   &lt;/dependencies&gt;
+</code></pre>
+</li>
+<li><p>3、创建mybatis的配置文件</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;!DOCTYPE configuration
+        PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
+        &quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;
+&lt;configuration&gt;
+    &lt;!--
+    引入外部配置文件的两个参数
+    url=&quot;&quot;    这个可以引用磁盘路径下的配置文件
+    resource=&quot;&quot; 这个只能引用类路径下的配置文件
+     --&gt;
+    &lt;properties resource=&quot;dbconfig.properties&quot;&gt;&lt;/properties&gt;
+    &lt;environments default=&quot;development&quot;&gt;
+        &lt;environment id=&quot;development&quot;&gt;
+            &lt;transactionManager type=&quot;JDBC&quot;/&gt;
+            &lt;dataSource type=&quot;POOLED&quot;&gt;
+                &lt;property name=&quot;driver&quot; value=&quot;$&#123;jdbc.driverClass&#125;&quot;/&gt;
+                &lt;property name=&quot;url&quot; value=&quot;$&#123;jdbc.jdbcUrl&#125;&quot;/&gt;
+                &lt;property name=&quot;username&quot; value=&quot;$&#123;jdbc.username&#125;&quot;/&gt;
+                &lt;property name=&quot;password&quot; value=&quot;$&#123;jdbc.password&#125;&quot;/&gt;
+            &lt;/dataSource&gt;
+        &lt;/environment&gt;
+    &lt;/environments&gt;
+    &lt;mappers&gt;
+        &lt;!--resource:表示从类路径下找资源  --&gt;
+        &lt;mapper resource=&quot;EmployeeDao.xml&quot;/&gt;
+    &lt;/mappers&gt;
+&lt;/configuration&gt;
+</code></pre>
+<p>引用的外部文件内容</p>
+<pre><code class="properties">jdbc.username=root
+jdbc.password=root
+jdbc.jdbcUrl=jdbc:mysql://localhost:3306/mybatis01?characterEncoding=utf8&amp;useSSL=false&amp;serverTimezone=UTC&amp;rewriteBatchedStatements=true
+jdbc.driverClass=com.mysql.cj.jdbc.Driver
+</code></pre>
+</li>
+<li><p>4、创建JavaBean</p>
+<pre><code class="java">//get set 有参 无参 略
+public class Employee &#123;
+    private Integer id;
+    private String empname;
+    private String email;
+    private Integer gender;
+&#125;
+</code></pre>
+</li>
+<li><p>5、创建接口</p>
+<pre><code class="java">public interface EmployeeDao &#123;
+    public Employee getEmpById(Integer id);
+&#125;
+</code></pre>
+</li>
+<li><p>6、创建实体类的映射文件</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;!DOCTYPE mapper
+        PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+        &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+&lt;!--
+    namespace:名称空间，写接口的全类名。告诉mybatis这个配置文件是哪一个接口实现
+  --&gt;
+&lt;mapper namespace=&quot;com.niuxiaoniu.dao.EmployeeDao&quot;&gt;
+    &lt;!--
+        id=&quot;&quot; 这里的id对应的是方法名
+        resultType=&quot;&quot; 对应的是返回值类型(查询操作必须指定)
+        #&#123;id&#125;：代表取出传递过来的某个参数值
+     --&gt;
+    &lt;select id=&quot;getEmpById&quot; resultType=&quot;com.niuxiaoniu.bean.Employee&quot;&gt;
+      select * from t_employee where id=#&#123;id&#125;
+    &lt;/select&gt;
+&lt;/mapper&gt;
+</code></pre>
+</li>
+<li><p>7、创建测试方法</p>
+<pre><code class="java">    @Test
+    public void mybatisTest() throws IOException &#123;
+        //1.根据全局配置文件创建出一个SqlSessionFactory
+        //SqlSessionFactory：是SqlSession工厂，负责创建SqlSession对象
+        //SqlSession：sql会话（代表和数据库的一次会话）
+        String resource = &quot;mybatis_conf.xml&quot;;
+        InputStream inputStream = Resources.getResourceAsStream(resource);
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+
+        //2.获取和数据库的一次会话：getConnection();
+        SqlSession openSession = sqlSessionFactory.openSession();
+        //3.使用SqlSession操作数据库
+        EmployeeDao mapper = openSession.getMapper(EmployeeDao.class);
+        Employee emp = mapper.getEmpById(1);
+        System.out.println(emp);
+    &#125;
+</code></pre>
+<p>注意：在Idea中默认的源码文件目录是resources文件夹</p>
+</li>
+</ul>
+<h1 id="Mybatis的CRUD"><a href="#Mybatis的CRUD" class="headerlink" title="Mybatis的CRUD"></a>Mybatis的CRUD</h1><ul>
+<li><p>1~4步骤略</p>
+</li>
+<li><p>5、指定接口</p>
+<pre><code class="java">public interface EmployeeDao &#123;
+
+    public Employee getEmpById(Integer id);
+
+    public boolean delEmpById(Integer id);
+
+    public boolean insertEmp(Employee employee);
+
+    public boolean updEmp(Employee employee);
+&#125;
+</code></pre>
+</li>
+<li><p>6、创建实体类的映射文件</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;!DOCTYPE mapper
+        PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+        &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+&lt;!--
+    namespace:名称空间，写接口的全类名。告诉mybatis这个配置文件是哪一个接口实现
+  --&gt;
+&lt;mapper namespace=&quot;com.niuxiaoniu.dao.EmployeeDao&quot;&gt;
+    &lt;!--
+        id=&quot;&quot; 这里的id对应的是方法名
+        resultType=&quot;&quot; 对应的是返回值类型(查询操作必须指定)
+        #&#123;id&#125;：代表取出传递过来的某个参数值
+     --&gt;
+    &lt;select id=&quot;getEmpById&quot; resultType=&quot;com.niuxiaoniu.bean.Employee&quot;&gt;
+      select * from t_employee where id=#&#123;id&#125;
+    &lt;/select&gt;
+    &lt;delete id=&quot;delEmpById&quot;&gt;
+        delete from t_employee where id=#&#123;id&#125;
+    &lt;/delete&gt;
+    &lt;update id=&quot;updEmp&quot;&gt;
+        update t_employee set empname=#&#123;empname&#125;,gender=#&#123;gender&#125;,email=#&#123;email&#125; where id = #&#123;id&#125;
+    &lt;/update&gt;
+    &lt;insert id=&quot;insertEmp&quot;&gt;
+        insert into t_employee(empname,gender,email) values(#&#123;empname&#125;,#&#123;gender&#125;,#&#123;email&#125;)
+    &lt;/insert&gt;
+&lt;/mapper&gt;
+</code></pre>
+</li>
+<li><p>7、测试方法略</p>
+</li>
+</ul>
+<h1 id="Mybatis全局配置文件"><a href="#Mybatis全局配置文件" class="headerlink" title="Mybatis全局配置文件"></a>Mybatis全局配置文件</h1><ul>
+<li><p><a target="_blank" rel="noopener" href="https://mybatis.org/mybatis-3/zh/configuration.html#properties">properties（属性）</a></p>
+<p>通常用来引用外部的配置文件</p>
+<pre><code class="xml">&lt;!-- 
+        引入外部配置文件的两个参数
+        url=&quot;&quot;    这个可以引用磁盘路径下的配置文件
+        resource=&quot;&quot; 这个只能引用类路径下的配置文件
+     --&gt;
+    &lt;properties resource=&quot;外部文件位置的路径&quot;&gt;&lt;/properties&gt;
+</code></pre>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://mybatis.org/mybatis-3/zh/configuration.html#settings">settings（设置）</a></p>
+<pre><code class="xml">&lt;!--具体属性的美容请参考官方文档--&gt;
+&lt;settings&gt;
+    &lt;setting name=&quot;属性名&quot; value=&quot;属性值&quot;/&gt;
+&lt;/settings&gt;
+</code></pre>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://mybatis.org/mybatis-3/zh/configuration.html#typeAliases">typeAliases（类型别名）</a></p>
+<pre><code class="xml">&lt;typeAliases&gt;
+        &lt;!-- 别名默认就是类名 alias=&quot;emp&quot; 指定新的别名 不区分大小写--&gt;
+        &lt;!-- &lt;typeAlias type=&quot;com.niu.bean.Employee&quot; alias=&quot;emp&quot;/&gt; --&gt;
+        &lt;!-- 批量起别名  指定包名，类名默认就是这个包下的类名--&gt;
+        &lt;package name=&quot;com.niu.bean&quot;/&gt;
+&lt;/typeAliases&gt;
+</code></pre>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://mybatis.org/mybatis-3/zh/configuration.html#typeHandlers">typeHandlers（类型处理器）</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://mybatis.org/mybatis-3/zh/configuration.html#objectFactory">objectFactory（对象工厂）</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://mybatis.org/mybatis-3/zh/configuration.html#plugins">plugins（插件）</a></p>
+</li>
+<li><p>environments（环境配置）</p>
+<ul>
+<li>environment（环境变量）<ul>
+<li>transactionManager（事务管理器）</li>
+<li>dataSource（数据源）</li>
+</ul>
+</li>
+</ul>
+<pre><code class="xml"> 
+
+&lt;!--
+    environment标签：配置一个具体的环境，都需要一个事务管理器和一个数据源 transactionManager dataSource
+--&gt;
+
+&lt;!--
+    default=&quot;development&quot; 默认的情况下使用那个环境
+--&gt;
+&lt;environments default=&quot;development&quot;&gt;
+    &lt;environment id=&quot;development&quot;&gt;
+      &lt;transactionManager type=&quot;JDBC&quot;/&gt;
+      &lt;!-- 配置数据源 --&gt;
+      &lt;dataSource type=&quot;POOLED&quot;&gt;
+        &lt;property name=&quot;driver&quot; value=&quot;$&#123;jdbc.driverClass&#125;&quot;/&gt;
+        &lt;property name=&quot;url&quot; value=&quot;$&#123;jdbc.jdbcUrl&#125;&quot;/&gt;
+        &lt;property name=&quot;username&quot; value=&quot;$&#123;jdbc.username&#125;&quot;/&gt;
+        &lt;property name=&quot;password&quot; value=&quot;$&#123;jdbc.password&#125;&quot;/&gt;
+      &lt;/dataSource&gt;
+    &lt;/environment&gt;
+  &lt;/environments&gt;
+</code></pre>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://mybatis.org/mybatis-3/zh/configuration.html#databaseIdProvider">databaseIdProvider（数据库厂商标识）</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://mybatis.org/mybatis-3/zh/configuration.html#mappers">mappers（映射器）</a></p>
+<pre><code class="xml">&lt;mappers&gt;
+    
+     &lt;!-- 
+            class=&quot;&quot;    :直接引用接口的全类名，可以将xml放在和dao接口同目录下面    
+            resource=&quot;&quot;    :在类路径下找sql的映射文件
+            url=&quot;&quot;        :在磁盘路径上找sql的映射文件
+     --&gt;
+    &lt;!-- &lt;mapper resource=&quot;EmployeeDao.xml&quot;/&gt; --&gt;
+
+    &lt;!-- &lt;mapper class=&quot;com.niu.dao.EmployeeDaoAnnotation&quot;/&gt; --&gt;
+    
+    &lt;!--
+        批量注册
+        name=&quot;&quot;dao所在的包名
+     --&gt;
+     &lt;package name=&quot;com.niu.dao&quot;/&gt;                                                            
+  &lt;/mappers&gt;
+</code></pre>
+</li>
+</ul>
+<h1 id="Mybatis-SQL映射文件"><a href="#Mybatis-SQL映射文件" class="headerlink" title="Mybatis SQL映射文件"></a>Mybatis SQL映射文件</h1><pre><code>SQL映射标签
+cache – 该命名空间的缓存配置。
+cache-ref – 引用其它命名空间的缓存配置。
+resultMap – 描述如何从数据库结果集中加载对象，是最复杂也是最强大的元素。
+parameterMap – 老式风格的参数映射。此元素已被废弃，并可能在将来被移除！请使用行内参数映射。文档中不会介绍此元素。
+sql – 可被其它语句引用的可重用语句块。
+insert – 映射插入语句。
+update – 映射更新语句。
+delete – 映射删除语句。
+select – 映射查询语句。
+</code></pre>
+<h2 id="Insert，Update，Delete元素的相关属性"><a href="#Insert，Update，Delete元素的相关属性" class="headerlink" title="Insert，Update，Delete元素的相关属性"></a>Insert，Update，Delete元素的相关属性</h2><p><img src="/2021/08/26/mybatis%E7%AC%94%E8%AE%B0/image-20210826173915556.png" alt="image-20210826173915556"></p>
+<h2 id="Select-元素的相关属性"><a href="#Select-元素的相关属性" class="headerlink" title="Select 元素的相关属性"></a>Select 元素的相关属性</h2><p><img src="/2021/08/26/mybatis%E7%AC%94%E8%AE%B0/image-20210826174050750.png" alt="image-20210826174050750"></p>
+<h2 id="获取自增主键"><a href="#获取自增主键" class="headerlink" title="获取自增主键"></a>获取自增主键</h2><pre><code class="xml">    &lt;!--
+        useGeneratedKeys=&quot;true&quot; 用来动态的获取Insert update的列值
+        keyProperty=&quot;id&quot;  指定对象唯一识别的属性
+    --&gt;
+    &lt;insert id=&quot;insertEmp&quot;  useGeneratedKeys=&quot;true&quot; keyProperty=&quot;id&quot;&gt;
+        insert into t_employee(empname,gender,email) values(#&#123;empname&#125;,#&#123;gender&#125;,#&#123;email&#125;)
+    &lt;/insert&gt;
+</code></pre>
+<h2 id="参数的获取"><a href="#参数的获取" class="headerlink" title="参数的获取"></a>参数的获取</h2><ul>
+<li><p>单个参数</p>
+<ul>
+<li><p>基本数据类型</p>
+<p>取值：#{随便写}</p>
+</li>
+<li><p>JavaBean对象</p>
+</li>
+</ul>
+</li>
+<li><p>多个参数</p>
+<p>传递多个参数#{参数名} 会失效</p>
+<p>可以使用 0，1或者param1，param2 …. 等等来指带</p>
+<p>原因：出现这种现象的原因是，只要是传递了多个参数Mybatis会自动的把他封装在一个map中，封装时候使用的key就是参数的索引和参数的第几个表示</p>
+</li>
+</ul>
+<p>​        自己指定key 使用@Param参数自己指定key</p>
+<p>​        <img src="/2021/08/26/mybatis%E7%AC%94%E8%AE%B0/image-20210826181959721.png" alt="image-20210826181959721"></p>
+<p><img src="/2021/08/26/mybatis%E7%AC%94%E8%AE%B0/image-20210826182018751.png" alt="image-20210826182018751"></p>
+<ul>
+<li><p>传入Map</p>
+<p>将多个参数使用map集合封装起来</p>
+<p>取值方式：#{key}</p>
+</li>
+<li><p>传入了JavaBean</p>
+<p>取值方式：#{bean 的属性名}</p>
+</li>
+</ul>
+<h2 id="和-取值的区别"><a href="#和-取值的区别" class="headerlink" title="#{ } 和  ${ } 取值的区别"></a>#{ } 和  ${ } 取值的区别</h2><h2 id="得瑟得瑟"><a href="#得瑟得瑟" class="headerlink" title="得瑟得瑟"></a>得瑟得瑟</h2><h1 id="SQL动态标签"><a href="#SQL动态标签" class="headerlink" title="SQL动态标签"></a>SQL动态标签</h1><h1 id><a href="#" class="headerlink" title></a></h1><h1 id="Mybatis缓存机制"><a href="#Mybatis缓存机制" class="headerlink" title="Mybatis缓存机制"></a>Mybatis缓存机制</h1>
+            
+        </section>
+        <footer class="blog-post-page-tags">
+        
+			
+				
+			<a href="/tags/mybatis/" rel="tag" data-toggle="tooltip" data-placement="top" title="Linux">mybatis</a>
+				
+			<a href="/tags/%E5%90%8E%E5%8F%B0%E6%A1%86%E6%9E%B6/" rel="tag" data-toggle="tooltip" data-placement="top" title="Linux">后台框架</a>
+				
+			
+		
+        </footer>
+    </article>
+    <article class="blog-post-page-readmore">
+    	
+    	
+		
+
+		
+		
+			<a href="/2021/08/26/mybatis-plus%E7%AC%94%E8%AE%B0/" class="blog-post-page-readmore-next" data-toggle="tooltip" data-placement="top" title="mybatis_plus笔记">下一篇</a>
+		
+
+        <div style="clear: both;"></div>
+    </article>
+
+    <article class="blog-post-block blog-post-page-content">
+            <div class="row">
+            
+                <div class="col-md-4 col-sm-4 post-page-more-btn">
+                    <span class="post-comments-btn btn btn-info btn-block" data-toggle="tooltip" data-placement="top" title="本站采用Disqus评论组件，若您没有科学上网可能会无法查看并评论">加载评论</span>
+                </div>
+            
+                <div class="col-md-4 col-sm-4 post-page-more-btn">
+                    <span  data-toggle="modal" data-target="#post-donate-content">
+                        <span id="post-donate-btn" class="btn btn-danger btn-block" data-toggle="tooltip" data-placement="top" title="如果您觉得本文还不错或者对您有帮助，可以考虑打赏一下作者哦">打赏本文</span>
+                    </span>
+                </div>
+                <div class="col-md-4 col-sm-4 post-page-more-btn">
+                    <span  data-toggle="modal" data-target="#post-qrcode-content">
+                        <span><span id="post-qrcode-btn" class="btn btn-success btn-block" data-toggle="tooltip" data-placement="top" title="微信扫描二维码手机端查看本文及分享本文">二维码</span></span>
+                    </span>
+                </div>
+            </div>
+        <div class="post-more-function-br"></div>
+
+        <div class="modal fade" id="post-donate-content" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">打赏本文</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row post-donate-content">
+                            <div class="col-md-4">
+                                <p>支付宝</p>
+                                <img class="post-donate-content-img no-lightbox" src="http://dl.weic96.cn/logo.png"/>
+                            </div>
+                            <div class="col-md-4">
+                                <p>微信</p>
+                                <img class="post-donate-content-img no-lightbox" src="http://dl.weic96.cn/logo.png"/>
+                            </div>
+                            <div class="col-md-4">
+                                <p>财付通</p>
+                                <img class="post-donate-content-img no-lightbox" src="http://dl.weic96.cn/logo.png"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="post-qrcode-content" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">文章二维码</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row post-qrcode-content">
+                            <span class="post-qrcode-content-canvas"></span>
+                            <img class="post-qrcode-content-img no-lightbox" src=""/>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            // post QRcode
+            // 中文转码
+            function toUtf8(str) {
+                var out, i, len, c;
+                out = "";
+                len = str.length;
+                for (i = 0; i < len; i++) {
+                    c = str.charCodeAt(i);
+                    if ((c >= 0x0001) && (c <= 0x007F)) {
+                        out += str.charAt(i);
+                    } else if (c > 0x07FF) {
+                        out += String.fromCharCode(0xE0 | ((c >> 12) & 0x0F));
+                        out += String.fromCharCode(0x80 | ((c >> 6) & 0x3F));
+                        out += String.fromCharCode(0x80 | ((c >> 0) & 0x3F));
+                    } else {
+                        out += String.fromCharCode(0xC0 | ((c >> 6) & 0x1F));
+                        out += String.fromCharCode(0x80 | ((c >> 0) & 0x3F));
+                    }
+                }
+                return out;
+            }
+            // 生成
+            var qrcode= $('.post-qrcode-content-canvas').qrcode({width: 150,height: 150,text: toUtf8("https://niuxiaocong.github.io/2021/08/26/mybatis%E7%AC%94%E8%AE%B0/")}).hide();
+            var canvas=qrcode.find('canvas').get(0);
+            $('.post-qrcode-content-img').attr('src',canvas.toDataURL('image/jpg'));
+        </script>
+
+        
+    </article>
+    
+</div>
+
+                
+            <footer class="blog-footer">
+                <p class="blog-footer-left">Copyright ©  2021 <a href="https://niuxiaocong.github.io">牛小聪</a></p>
+                <p class="blog-footer-right">Powered by <a href="https://hexo.io" target="_blank">Hexo</a>,Theme <a href="https://note.isweic.com/themes-life/" target="_blank">Life</a></p>
+            </footer>
+        </div><!--博客主栏结束-->
+        <!--博客侧边栏开始-->
+        <div class="col-xl-3 blog-sidebar">
+            <div class="blog-sidebar-title">
+                <a href="">牛小聪</a>
+            </div>
+            <div class="blog-sidebar-logo">
+                <img src="https://gulishop-niu.oss-cn-beijing.aliyuncs.com/pikaqiu.jpg">
+            </div>
+            <div class="blog-sidebar-count blog-sidebar-padding">
+                <div class="blog-sidebar-count-left">
+                    <p class="blog-sidebar-count-p">8</p>
+                    <span class="blog-sidebar-count-span">文章</span>
+                </div>
+                <div class="blog-sidebar-count-right">
+                    <p class="blog-sidebar-count-p">7</p>
+                    <span class="blog-sidebar-count-span">标签</span>
+                </div>
+                <div style="clear: both;"></div>
+            </div>
+            <div class="blog-sidebar-icon blog-sidebar-padding">
+                <ul>
+                    <li><a href="" class="icon-github" target="_blank" data-toggle="tooltip" data-placement="top" title="Github"><i class="fa fa-github"></i></a></li>
+                    <li><a href="" class="icon-weibo" target="_blank" data-toggle="tooltip" data-placement="top" title="新浪微博"><i class="fa fa-weibo"></i></a></li>
+                    <li><a href="" class="icon-twitter" target="_blank" data-toggle="tooltip" data-placement="top" title="Twitter"><i class="fa fa-twitter"></i></a></li>
+                    <!--<li><a href="" class="icon-facebook" target="_blank" data-toggle="tooltip" data-placement="top" title="FaceBook"><i class="fa fa-facebook"></i></a></li>-->
+                    <li><a href="mailto:2691778746@qq.com" class="icon-email" data-toggle="tooltip" data-placement="top" title="E-Mail"><i class="fa fa-envelope"></i></a></li>
+                    <li><a href="" class="icon-rss" data-toggle="tooltip" target="_blank" data-placement="top" title="RSS"><i class="fa fa-rss"></i></a></li>
+                </ul>
+            </div>
+            <div class="blog-sidebar-categories">
+                <h4 class="blog-sidebar-h4"><i class="fa fa-folder-open"></i>&nbsp;文章分类</h4>
+                <ul class="list-group blog-sidebar-padding">
+                  
+                    
+                      <li class="list-group-item justify-content-between">
+                          <a href="/categories/%E5%89%8D%E7%AB%AF/">前端</a>
+                          <span class="badge badge-default badge-pill">1</span>
+                      </li>
+                    
+                      <li class="list-group-item justify-content-between">
+                          <a href="/categories/Git%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6%E5%B7%A5%E5%85%B7/">Git版本控制工具</a>
+                          <span class="badge badge-default badge-pill">1</span>
+                      </li>
+                    
+                      <li class="list-group-item justify-content-between">
+                          <a href="/categories/%E5%90%8E%E7%AB%AF%E6%A1%86%E6%9E%B6/">后端框架</a>
+                          <span class="badge badge-default badge-pill">1</span>
+                      </li>
+                    
+                      <li class="list-group-item justify-content-between">
+                          <a href="/categories/%E5%90%8E%E5%8F%B0%E6%A1%86%E6%9E%B6/">后台框架</a>
+                          <span class="badge badge-default badge-pill">1</span>
+                      </li>
+                    
+                      <li class="list-group-item justify-content-between">
+                          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/">数据结构和算法</a>
+                          <span class="badge badge-default badge-pill">3</span>
+                      </li>
+                    
+                  
+                </ul>
+            </div>
+            <div class="blog-sidebar-tags">
+                <h4 class="blog-sidebar-h4"><i class="fa fa-tag"></i>&nbsp;标签云</h4>
+                <ul class="blog-sidebar-tags-ul blog-sidebar-padding">
+                  
+                    
+                      <li><a href="/tags/Hexo/" class="tag-could" data-toggle="tooltip" data-placement="top" title="Hexo">Hexo</a></li>
+                    
+                      <li><a href="/tags/Git/" class="tag-could" data-toggle="tooltip" data-placement="top" title="Git">Git</a></li>
+                    
+                      <li><a href="/tags/mybatis-plus/" class="tag-could" data-toggle="tooltip" data-placement="top" title="mybatis_plus">mybatis_plus</a></li>
+                    
+                      <li><a href="/tags/mybatis/" class="tag-could" data-toggle="tooltip" data-placement="top" title="mybatis">mybatis</a></li>
+                    
+                      <li><a href="/tags/%E5%90%8E%E5%8F%B0%E6%A1%86%E6%9E%B6/" class="tag-could" data-toggle="tooltip" data-placement="top" title="后台框架">后台框架</a></li>
+                    
+                      <li><a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="tag-could" data-toggle="tooltip" data-placement="top" title="数据结构">数据结构</a></li>
+                    
+                      <li><a href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" class="tag-could" data-toggle="tooltip" data-placement="top" title="排序算法">排序算法</a></li>
+                    
+                  
+                </ul>
+            </div>
+            <script>
+              // 博客侧栏标签云随机色
+              var tag_cloud = $('.tag-could');
+              tag_cloud.each(function () {
+                  var Cnum = 9;
+                  var Crand = parseInt(Math.random() * Cnum);
+                  $(this).addClass("tag-could" + Crand);
+              })
+            </script>
+            <!--返回顶部按钮-->
+            <div class="retop">
+                <i class="fa fa-angle-up"></i>
+            </div>
+        </div><!--博客侧边栏结束-->
+    </div>
+</div>
+<script src="/js/LeanStatistics.min.js"></script>
+<script src="/js/Life.js"></script>
+<script type="text/javascript">
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+    otherF();
+    LeanStatistics();
+    $(document).pjax('a', '#pjax-box', {fragment:'#pjax-box', timeout:8000}).on('pjax:complete', function() {
+      $('pre code').each(function(i, block){
+        hljs.highlightBlock(block);
+      })
+      $('code.hljs').each(function(i, block) {
+        hljs.lineNumbersBlock(block);
+      });
+      LeanStatistics();
+    }).on('pjax:start', function() { NProgress.start(); }).on('pjax:end',   function() {
+      NProgress.done();
+      otherF();
+    });
+</script>
+</body>
+</html>
