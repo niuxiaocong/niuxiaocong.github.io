@@ -186,13 +186,6 @@
 
   
   <url>
-    <loc>https://niuxiaocong.github.io/tags/Hexo/</loc>
-    <lastmod>2021-09-08</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://niuxiaocong.github.io/tags/javascrip/</loc>
     <lastmod>2021-09-08</lastmod>
     <changefreq>daily</changefreq>
@@ -201,6 +194,13 @@
   
   <url>
     <loc>https://niuxiaocong.github.io/tags/Git/</loc>
+    <lastmod>2021-09-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://niuxiaocong.github.io/tags/Hexo/</loc>
     <lastmod>2021-09-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -221,6 +221,13 @@
   </url>
   
   <url>
+    <loc>https://niuxiaocong.github.io/tags/java/</loc>
+    <lastmod>2021-09-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://niuxiaocong.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</loc>
     <lastmod>2021-09-08</lastmod>
     <changefreq>daily</changefreq>
@@ -229,13 +236,6 @@
   
   <url>
     <loc>https://niuxiaocong.github.io/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/</loc>
-    <lastmod>2021-09-08</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://niuxiaocong.github.io/tags/java/</loc>
     <lastmod>2021-09-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -279,14 +279,14 @@
 
   
   <url>
-    <loc>https://niuxiaocong.github.io/categories/%E5%89%8D%E7%AB%AF/</loc>
+    <loc>https://niuxiaocong.github.io/categories/%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6%E5%B7%A5%E5%85%B7/</loc>
     <lastmod>2021-09-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://niuxiaocong.github.io/categories/%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6%E5%B7%A5%E5%85%B7/</loc>
+    <loc>https://niuxiaocong.github.io/categories/%E5%89%8D%E7%AB%AF/</loc>
     <lastmod>2021-09-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -314,14 +314,14 @@
   </url>
   
   <url>
-    <loc>https://niuxiaocong.github.io/categories/%E5%90%8E%E7%AB%AF/</loc>
+    <loc>https://niuxiaocong.github.io/categories/%E5%90%8E%E5%8F%B0%E6%A1%86%E6%9E%B6/</loc>
     <lastmod>2021-09-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://niuxiaocong.github.io/categories/%E5%90%8E%E5%8F%B0%E6%A1%86%E6%9E%B6/</loc>
+    <loc>https://niuxiaocong.github.io/categories/%E5%90%8E%E7%AB%AF/</loc>
     <lastmod>2021-09-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
