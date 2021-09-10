@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://niuxiaocong.github.io/2021/09/10/Consul/</loc>
+    
+    <lastmod>2021-09-10</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://niuxiaocong.github.io/2021/09/10/Ribbon/</loc>
+    
+    <lastmod>2021-09-10</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://niuxiaocong.github.io/2021/09/10/Eureka/</loc>
     
     <lastmod>2021-09-10</lastmod>
@@ -193,7 +207,7 @@
 
   
   <url>
-    <loc>https://niuxiaocong.github.io/tags/Eureka/</loc>
+    <loc>https://niuxiaocong.github.io/tags/consul/</loc>
     <lastmod>2021-09-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -207,7 +221,21 @@
   </url>
   
   <url>
+    <loc>https://niuxiaocong.github.io/tags/Eureka/</loc>
+    <lastmod>2021-09-10</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://niuxiaocong.github.io/tags/Hexo/</loc>
+    <lastmod>2021-09-10</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://niuxiaocong.github.io/tags/Ribbon/</loc>
     <lastmod>2021-09-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -228,13 +256,6 @@
   </url>
   
   <url>
-    <loc>https://niuxiaocong.github.io/tags/svn/</loc>
-    <lastmod>2021-09-10</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://niuxiaocong.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</loc>
     <lastmod>2021-09-10</lastmod>
     <changefreq>daily</changefreq>
@@ -243,6 +264,13 @@
   
   <url>
     <loc>https://niuxiaocong.github.io/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/</loc>
+    <lastmod>2021-09-10</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://niuxiaocong.github.io/tags/svn/</loc>
     <lastmod>2021-09-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
