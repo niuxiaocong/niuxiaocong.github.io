@@ -34,6 +34,16 @@
 
 
 
+   <style>
+    body{
+       background-image: url(https://bgpnyc.oss-cn-beijing.aliyuncs.com/bokePicture/bg.jpg?Expires=1631088595&OSSAccessKeyId=TMP.3Kgvb3587xqoAEh5uEAToKzYnJkW2nXPoc3HZ65MzeFmQkF7W8zcPfJSQYDmq3uecFDq5hbfiuiA9uXC21CKF82DABCZpT&Signature=3gr%2BE3Wf28UPUqpeCa7T8ekOm7g%3D);
+       background-repeat:no-repeat;
+       background-size:cover;
+       background-attachment:fixed;
+    }
+</style>
+
+
 
 <body>
     <header class="navbar-fixed">
@@ -432,14 +442,23 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/java/">
-                                <span class="chip bg-color">java</span>
+                            <a href="/tags/%E6%B3%9B%E5%9E%8B/">
+                                <span class="chip bg-color">泛型</span>
                             </a>
                         
                     </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/java/" class="post-category">
+                                java
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -478,7 +497,8 @@
             System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>score<span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token punctuation">}</span>
 </code></pre>
-<h1 id="自定义泛型结构"><a href="#自定义泛型结构" class="headerlink" title="自定义泛型结构"></a>自定义泛型结构</h1><h2 id="自定义泛型类"><a href="#自定义泛型类" class="headerlink" title="自定义泛型类"></a>自定义泛型类</h2><pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Order</span><span class="token operator">&lt;</span>T<span class="token operator">></span> <span class="token punctuation">{</span>
+<h1 id="自定义泛型结构"><a href="#自定义泛型结构" class="headerlink" title="自定义泛型结构"></a>自定义泛型结构</h1><h2 id="自定义泛型类"><a href="#自定义泛型类" class="headerlink" title="自定义泛型类"></a>自定义泛型类</h2><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//泛型类</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Order</span><span class="token operator">&lt;</span>T<span class="token operator">></span> <span class="token punctuation">{</span>
     String orderName<span class="token punctuation">;</span>
     <span class="token keyword">int</span> orderId<span class="token punctuation">;</span>
 
@@ -492,11 +512,11 @@
         <span class="token keyword">this</span><span class="token punctuation">.</span>orderId <span class="token operator">=</span> orderId<span class="token punctuation">;</span>
         <span class="token keyword">this</span><span class="token punctuation">.</span>orderT <span class="token operator">=</span> orderT<span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
-
+    <span class="token comment" spellcheck="true">//泛型方法</span>
     <span class="token keyword">public</span> T <span class="token function">getOrderT</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token keyword">return</span> orderT<span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
-
+    <span class="token comment" spellcheck="true">//泛型方法</span>
     <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setOrderT</span><span class="token punctuation">(</span>T orderT<span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token keyword">this</span><span class="token punctuation">.</span>orderT <span class="token operator">=</span> orderT<span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
@@ -505,7 +525,67 @@
 <p>实例化指明泛型的类型</p>
 <pre class=" language-java"><code class="language-java">  Order<span class="token operator">&lt;</span>String<span class="token operator">></span> order <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Order</span><span class="token operator">&lt;</span>String<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
-<h2 id="自定义泛型接口"><a href="#自定义泛型接口" class="headerlink" title="自定义泛型接口"></a>自定义泛型接口</h2><h2 id="自定义泛型方法"><a href="#自定义泛型方法" class="headerlink" title="自定义泛型方法"></a>自定义泛型方法</h2>
+<h2 id="自定义泛型接口"><a href="#自定义泛型接口" class="headerlink" title="自定义泛型接口"></a>自定义泛型接口</h2><h2 id="自定义泛型方法"><a href="#自定义泛型方法" class="headerlink" title="自定义泛型方法"></a>自定义泛型方法</h2><p>泛型方法：在方法中出现了泛型的结构，泛型参数与类的泛型参数没有任何关系</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> <span class="token operator">&lt;</span>E<span class="token operator">></span> List<span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token function">copyFromArrayToList</span><span class="token punctuation">(</span>E<span class="token punctuation">[</span><span class="token punctuation">]</span> arr<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        ArrayList<span class="token operator">&lt;</span>E<span class="token operator">></span> list <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>E e<span class="token operator">:</span>arr<span class="token punctuation">)</span><span class="token punctuation">{</span>
+            list<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> list<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>泛型方法，可以声明成静态的，原因是：泛型参数是在调用方法时候确定的，并非是在实例化时候确定</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> <span class="token keyword">static</span>  <span class="token operator">&lt;</span>E<span class="token operator">></span> List<span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token function">copyFromArrayToList</span><span class="token punctuation">(</span>E<span class="token punctuation">[</span><span class="token punctuation">]</span> arr<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        ArrayList<span class="token operator">&lt;</span>E<span class="token operator">></span> list <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>E e<span class="token operator">:</span>arr<span class="token punctuation">)</span><span class="token punctuation">{</span>
+            list<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> list<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<h1 id="声明泛型的时候需要注意以下几点"><a href="#声明泛型的时候需要注意以下几点" class="headerlink" title="声明泛型的时候需要注意以下几点"></a>声明泛型的时候需要注意以下几点</h1><p>1、静态方法不能使用类的泛型</p>
+<p><img src="/2021/09/06/%E6%B3%9B%E5%9E%8B%E6%9C%BA%E5%88%B6/image-20210908163951094.png"></p>
+<p>2、 异常类不能是泛型的</p>
+<p><img src="/2021/09/06/%E6%B3%9B%E5%9E%8B%E6%9C%BA%E5%88%B6/image-20210908164049965.png" alt="image-20210908164049965"></p>
+<p>3、声明泛型数组</p>
+<p><img src="/2021/09/06/%E6%B3%9B%E5%9E%8B%E6%9C%BA%E5%88%B6/image-20210908164527845.png" alt="image-20210908164527845"></p>
+<p>4、父类有泛型，子类可以选择保留泛型也可以选择指定泛型类型</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">class</span> <span class="token class-name">Father</span><span class="token operator">&lt;</span>T1<span class="token punctuation">,</span> T2<span class="token operator">></span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">// 子类不保留父类的泛型</span>
+<span class="token comment" spellcheck="true">// 1)没有类型 擦除</span>
+<span class="token keyword">class</span> <span class="token class-name">Son1</span> <span class="token keyword">extends</span> <span class="token class-name">Father</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">// 等价于class Son extends Father&lt;Object,Object>{</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">// 2)具体类型</span>
+<span class="token keyword">class</span> <span class="token class-name">Son2</span> <span class="token keyword">extends</span> <span class="token class-name">Father</span><span class="token operator">&lt;</span>Integer<span class="token punctuation">,</span> String<span class="token operator">></span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">// 子类保留父类的泛型</span>
+<span class="token comment" spellcheck="true">// 1)全部保留</span>
+<span class="token keyword">class</span> <span class="token class-name">Son3</span><span class="token operator">&lt;</span>T1<span class="token punctuation">,</span> T2<span class="token operator">></span> <span class="token keyword">extends</span> <span class="token class-name">Father</span><span class="token operator">&lt;</span>T1<span class="token punctuation">,</span> T2<span class="token operator">></span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">// 2)部分保留</span>
+<span class="token keyword">class</span> <span class="token class-name">Son4</span><span class="token operator">&lt;</span>T2<span class="token operator">></span> <span class="token keyword">extends</span> <span class="token class-name">Father</span><span class="token operator">&lt;</span>Integer<span class="token punctuation">,</span> T2<span class="token operator">></span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">class</span> <span class="token class-name">Father</span><span class="token operator">&lt;</span>T1<span class="token punctuation">,</span> T2<span class="token operator">></span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">// 子类不保留父类的泛型</span>
+<span class="token comment" spellcheck="true">// 1)没有类型 擦除</span>
+<span class="token keyword">class</span> <span class="token class-name">Son</span><span class="token operator">&lt;</span>A<span class="token punctuation">,</span> B<span class="token operator">></span> <span class="token keyword">extends</span> <span class="token class-name">Father</span><span class="token punctuation">{</span><span class="token comment" spellcheck="true">//等价于class Son extends Father&lt;Object,Object>{</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">// 2)具体类型</span>
+<span class="token keyword">class</span> <span class="token class-name">Son2</span><span class="token operator">&lt;</span>A<span class="token punctuation">,</span> B<span class="token operator">></span> <span class="token keyword">extends</span> <span class="token class-name">Father</span><span class="token operator">&lt;</span>Integer<span class="token punctuation">,</span> String<span class="token operator">></span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">// 子类保留父类的泛型</span>
+<span class="token comment" spellcheck="true">// 1)全部保留</span>
+<span class="token keyword">class</span> <span class="token class-name">Son3</span><span class="token operator">&lt;</span>T1<span class="token punctuation">,</span> T2<span class="token punctuation">,</span> A<span class="token punctuation">,</span> B<span class="token operator">></span> <span class="token keyword">extends</span> <span class="token class-name">Father</span><span class="token operator">&lt;</span>T1<span class="token punctuation">,</span> T2<span class="token operator">></span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">// 2)部分保留</span>
+<span class="token keyword">class</span> <span class="token class-name">Son4</span><span class="token operator">&lt;</span>T2<span class="token punctuation">,</span> A<span class="token punctuation">,</span> B<span class="token operator">></span> <span class="token keyword">extends</span> <span class="token class-name">Father</span><span class="token operator">&lt;</span>Integer<span class="token punctuation">,</span> T2<span class="token operator">></span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span>
+</code></pre>
+
                 
             </div>
             <hr/>
@@ -569,8 +649,8 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/java/">
-                                    <span class="chip bg-color">java</span>
+                                <a href="/tags/%E6%B3%9B%E5%9E%8B/">
+                                    <span class="chip bg-color">泛型</span>
                                 </a>
                             
                         </div>
@@ -1235,6 +1315,8 @@ $(function () {
 
     
 
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
     
 
     
