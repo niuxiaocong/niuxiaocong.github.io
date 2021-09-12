@@ -492,8 +492,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>s</p>
-<h2 id="Ribbon介绍"><a href="#Ribbon介绍" class="headerlink" title="Ribbon介绍"></a>Ribbon介绍</h2><p>Ribbon github官网：<a target="_blank" rel="noopener" href="https://github.com/Netflix/ribbon">https://github.com/Netflix/ribbon</a></p>
+                <h2 id="Ribbon介绍"><a href="#Ribbon介绍" class="headerlink" title="Ribbon介绍"></a>Ribbon介绍</h2><p>Ribbon github官网：<a target="_blank" rel="noopener" href="https://github.com/Netflix/ribbon">https://github.com/Netflix/ribbon</a></p>
 <p>什么是ribbon？</p>
 <pre><code>springCloud Ribbon 是基于Netfix Ribbon实现的一套客户端，负载均衡的工具。
 Ribbon是Netfix发布的开源项目，主要的功能是提供客户端的软件负载均衡算法和服务调用。Ribbon客户端组件提供一系列完善的配置项例如链接超时，重试等。简单来说，就是在配置文件中列出Load Balancer （简称LB）后面所有的机器Ribbon会自动的帮助你基于某种规则（例如：简单轮询，随机链接等）去链接这些机器，我们很容易使用Ribbon实现自定义的负载均衡算法
@@ -597,6 +596,66 @@ Ribbon是本地负载均衡，在调用微服务接口时候，会在注册中�
 <p><img src="/2021/09/10/Ribbon/image-20210910224357701.png" alt="image-20210910224357701"></p>
 <h2 id="默认负载均衡轮询算法"><a href="#默认负载均衡轮询算法" class="headerlink" title="默认负载均衡轮询算法"></a>默认负载均衡轮询算法</h2><p>负载均衡算法：rest接口第几次请求 % 服务器集群的总量 = 实际调用服务器位置下标，每一次服务重新启动后rest接口从1开始计数</p>
 <p><img src="/2021/09/10/Ribbon/image-20210910225338669.png" alt="image-20210910225338669"></p>
+<h2 id="自定义轮询算法"><a href="#自定义轮询算法" class="headerlink" title="自定义轮询算法"></a>自定义轮询算法</h2><p>分别在cloud-provider-payment8001模块和cloud-provider-payment8002模块中的controller中加入如下内容</p>
+<pre class=" language-java"><code class="language-java">    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span>value <span class="token operator">=</span> <span class="token string">"/payment/lb"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> String <span class="token function">getPayMentLB</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">return</span> serverPort<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>1、在cloud-consumer-order80消费服务模块配置中注释掉@LoadBalanced </p>
+<p><img src="/2021/09/10/Ribbon/image-20210911081106299.png" alt="image-20210911081106299"></p>
+<p>2、新建LoadBalance接口</p>
+<p>这个接口的作用是收集服务的实例</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">LoadBalancer</span> <span class="token punctuation">{</span>
+    ServiceInstance <span class="token function">instances</span><span class="token punctuation">(</span>List<span class="token operator">&lt;</span>ServiceInstance<span class="token operator">></span> serviceInstances<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>实现Loadbalancer接口</p>
+<pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@Component</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MyLB</span> <span class="token keyword">implements</span> <span class="token class-name">LoadBalancer</span> <span class="token punctuation">{</span>
+
+    <span class="token comment" spellcheck="true">//默认是从0开始的</span>
+    <span class="token keyword">private</span> AtomicInteger atomicInteger <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AtomicInteger</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//计算得出第几次访问</span>
+    <span class="token keyword">public</span> <span class="token keyword">final</span> <span class="token keyword">int</span> <span class="token function">getAndIncrement</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">int</span> current<span class="token punctuation">;</span>
+        <span class="token keyword">int</span> next<span class="token punctuation">;</span>
+        <span class="token keyword">do</span> <span class="token punctuation">{</span>
+            current <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>atomicInteger<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            next <span class="token operator">=</span> current<span class="token operator">>=</span> Integer<span class="token punctuation">.</span>MAX_VALUE <span class="token operator">?</span> <span class="token number">0</span><span class="token operator">:</span>current<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token keyword">while</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">this</span><span class="token punctuation">.</span>atomicInteger<span class="token punctuation">.</span><span class="token function">compareAndSet</span><span class="token punctuation">(</span>current<span class="token punctuation">,</span>next<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"*******Next:"</span><span class="token operator">+</span>next<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> next<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//实现负载均衡算法</span>
+    <span class="token comment" spellcheck="true">//rest接口第几次请求 % 服务器集群的总量 = 实际调用服务器位置下标，每一次服务重新启动后rest接口从1开始计数</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> ServiceInstance <span class="token function">instances</span><span class="token punctuation">(</span>List<span class="token operator">&lt;</span>ServiceInstance<span class="token operator">></span> serviceInstances<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">int</span> index <span class="token operator">=</span> <span class="token function">getAndIncrement</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">%</span>serviceInstances<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> serviceInstances<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>消费者的controller</p>
+<pre class=" language-java"><code class="language-java">    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span>value <span class="token operator">=</span> <span class="token string">"/consumer/payment/lb"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> String <span class="token function">getPaymentLB</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        List<span class="token operator">&lt;</span>ServiceInstance<span class="token operator">></span> instances <span class="token operator">=</span> discoveryClient<span class="token punctuation">.</span><span class="token function">getInstances</span><span class="token punctuation">(</span><span class="token string">"CLOUD-PAYMENT-SERVICE"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>instances <span class="token operator">==</span> null <span class="token operator">||</span> instances<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">&lt;=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        ServiceInstance serviceInstance <span class="token operator">=</span> loadBalancer<span class="token punctuation">.</span><span class="token function">instances</span><span class="token punctuation">(</span>instances<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        URI uri <span class="token operator">=</span> serviceInstance<span class="token punctuation">.</span><span class="token function">getUri</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> restTemplate<span class="token punctuation">.</span><span class="token function">getForObject</span><span class="token punctuation">(</span>uri<span class="token operator">+</span><span class="token string">"/payment/lb"</span><span class="token punctuation">,</span>String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>启动测试</p>
+<p>两个端口交替执行</p>
+<p><img src="/2021/09/10/Ribbon/image-20210911085751558.png" alt="image-20210911085751558"></p>
+<p><img src="/2021/09/10/Ribbon/image-20210911085800821.png" alt="image-20210911085800821"></p>
 
                 
             </div>
@@ -838,18 +897,17 @@ Ribbon是本地负载均衡，在调用微服务接口时候，会在注册中�
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;Current
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;Previous</div>
             <div class="card">
-                <a href="/2021/09/10/Ribbon/">
+                <a href="/2021/09/11/OpenFeign/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="Ribbon">
+                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="OpenFeign">
                         
-                        <span class="card-title">Ribbon</span>
+                        <span class="card-title">OpenFeign</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -859,9 +917,9 @@ Ribbon是本地负载均衡，在调用微服务接口时候，会在注册中�
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-10 20:24:06
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-09-11 09:01:23
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -874,7 +932,6 @@ Ribbon是本地负载均衡，在调用微服务接口时候，会在注册中�
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
@@ -882,8 +939,8 @@ Ribbon是本地负载均衡，在调用微服务接口时候，会在注册中�
                         <span class="chip bg-color">微服务</span>
                     </a>
                     
-                    <a href="/tags/Ribbon/">
-                        <span class="chip bg-color">Ribbon</span>
+                    <a href="/tags/OpenFeign/">
+                        <span class="chip bg-color">OpenFeign</span>
                     </a>
                     
                 </div>
@@ -931,12 +988,12 @@ Ribbon是本地负载均衡，在调用微服务接口时候，会在注册中�
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/consul/">
-                        <span class="chip bg-color">consul</span>
-                    </a>
-                    
                     <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">
                         <span class="chip bg-color">微服务</span>
+                    </a>
+                    
+                    <a href="/tags/consul/">
+                        <span class="chip bg-color">consul</span>
                     </a>
                     
                 </div>
