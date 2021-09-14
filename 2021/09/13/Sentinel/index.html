@@ -1039,7 +1039,46 @@ Sentinel熔断降级会在调用链路中某个资源出现不稳定状态时候
 <p><img src="/2021/09/13/Sentinel/image-20210914134336827.png" alt="image-20210914134336827"></p>
 <p>运行测试</p>
 <p><img src="/2021/09/13/Sentinel/image-20210914133900994.png" alt="image-20210914133900994"></p>
-<h2 id="Sentinel服务熔断OpenFeign"><a href="#Sentinel服务熔断OpenFeign" class="headerlink" title="Sentinel服务熔断OpenFeign"></a>Sentinel服务熔断OpenFeign</h2>
+<h2 id="Sentinel服务熔断OpenFeign"><a href="#Sentinel服务熔断OpenFeign" class="headerlink" title="Sentinel服务熔断OpenFeign"></a>Sentinel服务熔断OpenFeign</h2><p>添加OpenFeign的starter</p>
+<pre class=" language-xml"><code class="language-xml">        <span class="token comment" spellcheck="true">&lt;!--OpenFeign--></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.springframework.cloud<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>spring-cloud-starter-openfeign<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>2.2.1.RELEASE<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
+</code></pre>
+<p>yaml配置</p>
+<p>激活对OpenFeign的配置</p>
+<pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">feign</span><span class="token punctuation">:</span>
+  <span class="token key atrule">sentinel</span><span class="token punctuation">:</span>
+    <span class="token key atrule">enabled</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+</code></pre>
+<p>主启动</p>
+<p>@EnableFeignClients添加这个注解激活OpenFeign</p>
+<pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@SpringBootApplication</span>
+<span class="token annotation punctuation">@EnableDiscoveryClient</span>
+<span class="token annotation punctuation">@EnableFeignClients</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">NacosOrderMain84</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        SpringApplication<span class="token punctuation">.</span><span class="token function">run</span><span class="token punctuation">(</span>NacosOrderMain84<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span>args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>service</p>
+<pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@FeignClient</span>
+<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">PaymentService</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span>value <span class="token operator">=</span> <span class="token string">"/paymentSQL/{id}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> CommonResult <span class="token function">paymentSQL</span><span class="token punctuation">(</span><span class="token annotation punctuation">@PathVariable</span><span class="token punctuation">(</span><span class="token string">"id"</span><span class="token punctuation">)</span>Long id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>启动84，9003，9004 运行测试</p>
+<p>测试地址：<a target="_blank" rel="noopener" href="http://localhost:84/consumers/paymentSQL/1">http://localhost:84/consumers/paymentSQL/1</a></p>
+<p>测试结果</p>
+<p><img src="/2021/09/13/Sentinel/image-20210914150127635.png" alt="image-20210914150127635"></p>
+<p><img src="/2021/09/13/Sentinel/image-20210914150227696.png" alt="image-20210914150227696"></p>
+<p>当9003、9004都宕机以后</p>
+<p><img src="/2021/09/13/Sentinel/image-20210914150304342.png" alt="image-20210914150304342"></p>
+<h2 id="sentinel持久化规则"><a href="#sentinel持久化规则" class="headerlink" title="sentinel持久化规则"></a>sentinel持久化规则</h2>
                 
             </div>
             <hr/>
@@ -1280,18 +1319,17 @@ Sentinel熔断降级会在调用链路中某个资源出现不稳定状态时候
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;Current
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;Previous</div>
             <div class="card">
-                <a href="/2021/09/13/Sentinel/">
+                <a href="/2021/09/14/Seata%E5%A4%84%E7%90%86%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="Sentinel">
+                        <img src="/medias/featureimages/6.jpg" class="responsive-img" alt="Seata处理分布式事务">
                         
-                        <span class="card-title">Sentinel</span>
+                        <span class="card-title">Seata处理分布式事务</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -1301,9 +1339,9 @@ Sentinel熔断降级会在调用链路中某个资源出现不稳定状态时候
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-09-13 16:21:31
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-09-14 15:24:45
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -1316,7 +1354,6 @@ Sentinel熔断降级会在调用链路中某个资源出现不稳定状态时候
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
@@ -1324,8 +1361,8 @@ Sentinel熔断降级会在调用链路中某个资源出现不稳定状态时候
                         <span class="chip bg-color">微服务</span>
                     </a>
                     
-                    <a href="/tags/Sentinel/">
-                        <span class="chip bg-color">Sentinel</span>
+                    <a href="/tags/Seata/">
+                        <span class="chip bg-color">Seata</span>
                     </a>
                     
                 </div>
