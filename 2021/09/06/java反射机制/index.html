@@ -440,12 +440,29 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">No tag</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/java/">
+                                <span class="chip bg-color">java</span>
+                            </a>
+                        
+                            <a href="/tags/%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6/">
+                                <span class="chip bg-color">反射机制</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/java%E9%AB%98%E7%BA%A7/" class="post-category">
+                                java高级
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -475,7 +492,93 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h2 id="Java反射机制"><a href="#Java反射机制" class="headerlink" title="Java反射机制"></a>Java反射机制</h2><h3 id="反射的概述"><a href="#反射的概述" class="headerlink" title="反射的概述"></a>反射的概述</h3><p>Reflection（反射）是被视为动态语言的关键，反射机制允许程序在执行期 借助于Reflection API取得任何类的内部信息，并能直接操作任意对象的内 部属性及方法。</p>
+<p>加载完类之后，在堆内存的方法区中就产生了一个Class类型的对象（一个 类只有一个Class对象），这个对象就包含了完整的类的结构信息。我们可 以通过这个对象看到类的结构。这个对象就像一面镜子，透过这个镜子看 到类的结构，所以，我们形象的称之为：反射。</p>
+<p>正常实例化和反射实例化之间的区别</p>
+<p><img src="/2021/09/06/java%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6/image-20210916194406746.png" alt="image-20210916194406746"></p>
+<h3 id="反射所提供的功能"><a href="#反射所提供的功能" class="headerlink" title="反射所提供的功能"></a>反射所提供的功能</h3><p>在运行时判断任意一个对象所属的类 </p>
+<p>在运行时构造任意一个类的对象 </p>
+<p>在运行时判断任意一个类所具有的成员变量和方法 </p>
+<p>在运行时获取泛型信息 </p>
+<p>在运行时调用任意一个对象的成员变量和方法 </p>
+<p>在运行时处理注解 生成动态代理</p>
+<h3 id="反射相关的主要API"><a href="#反射相关的主要API" class="headerlink" title="反射相关的主要API"></a>反射相关的主要API</h3><p> java.lang.Class:代表一个类 </p>
+<p> java.lang.reflect.Method:代表类的方法 </p>
+<p> java.lang.reflect.Field:代表类的成员变量 </p>
+<p>java.lang.reflect.Constructor:代表类的构造器</p>
+<h3 id="Class类"><a href="#Class类" class="headerlink" title="Class类"></a>Class类</h3><p>Class本身也是一个类</p>
+<p>Class 对象只能由系统建立对象</p>
+<p>一个加载的类在 JVM 中只会有一个Class实例</p>
+<p>一个Class对象对应的是一个加载到JVM中的一个.class文件</p>
+<p>每个类的实例都会记得自己是由哪个 Class 实例所生成</p>
+<p>通过Class可以完整地得到一个类中的所有被加载的结构</p>
+<p>Class类是Reflection的根源，针对任何你想动态加载、运行的类，唯有先获得相应的 Class对象</p>
+<h4 id="Class类的常用方法"><a href="#Class类的常用方法" class="headerlink" title="Class类的常用方法"></a>Class类的常用方法</h4><p><img src="/2021/09/06/java%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6/image-20210916195235548.png" alt="image-20210916195235548"></p>
+<h2 id="反射应用举例"><a href="#反射应用举例" class="headerlink" title="反射应用举例"></a>反射应用举例</h2><p>首先准备好一个JavaBean</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>niu<span class="token punctuation">.</span>entity<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Person</span> <span class="token punctuation">{</span>
+     <span class="token keyword">private</span> String name<span class="token punctuation">;</span>
+     <span class="token keyword">public</span> <span class="token keyword">int</span> age<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token function">Person</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token function">Person</span><span class="token punctuation">(</span>String name<span class="token punctuation">,</span> <span class="token keyword">int</span> age<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>age <span class="token operator">=</span> age<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> <span class="token function">Person</span><span class="token punctuation">(</span>String name<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> String <span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setName</span><span class="token punctuation">(</span>String name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">getAge</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> age<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setAge</span><span class="token punctuation">(</span><span class="token keyword">int</span> age<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>age <span class="token operator">=</span> age<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> String <span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token string">"Person{"</span> <span class="token operator">+</span>
+                <span class="token string">"name='"</span> <span class="token operator">+</span> name <span class="token operator">+</span> <span class="token string">'\''</span> <span class="token operator">+</span>
+                <span class="token string">", age="</span> <span class="token operator">+</span> age <span class="token operator">+</span>
+                <span class="token string">'}'</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"你好我是一个人"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> String <span class="token function">showNation</span><span class="token punctuation">(</span>String nation<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"我的国籍是："</span> <span class="token operator">+</span> nation<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> nation<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>测试代码1</p>
+<p>通过反射创建对象</p>
+<pre class=" language-java"><code class="language-java">        Class <span class="token class-name">clazz</span> <span class="token operator">=</span>  Person<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">;</span>
+        Constructor cons <span class="token operator">=</span> clazz<span class="token punctuation">.</span><span class="token function">getConstructor</span><span class="token punctuation">(</span>String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Object obj <span class="token operator">=</span> cons<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token string">"tom"</span><span class="token punctuation">,</span> <span class="token number">15</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>执行结果</p>
+<p><img src="/2021/09/06/java%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6/image-20210916201347984.png" alt="image-20210916201347984"></p>
+<p>测试代码2</p>
+<p>通过反射调用对象指定的属性、方法</p>
+
                 
             </div>
             <hr/>
@@ -538,7 +641,15 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">No tag</span>
+                            
+                                <a href="/tags/java/">
+                                    <span class="chip bg-color">java</span>
+                                </a>
+                            
+                                <a href="/tags/%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6/">
+                                    <span class="chip bg-color">反射机制</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
