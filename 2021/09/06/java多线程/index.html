@@ -496,8 +496,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>d</p>
-<h2 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h2><h3 id="程序、进程、线程的概念"><a href="#程序、进程、线程的概念" class="headerlink" title="程序、进程、线程的概念"></a>程序、进程、线程的概念</h3><p>程序：程序是是为完成特定任务、用某种语言编写的一组指令的集合</p>
+                <h2 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h2><h3 id="程序、进程、线程的概念"><a href="#程序、进程、线程的概念" class="headerlink" title="程序、进程、线程的概念"></a>程序、进程、线程的概念</h3><p>程序：程序是是为完成特定任务、用某种语言编写的一组指令的集合</p>
 <p>进程：是程序的一次执行过程，或是正在运行的一个程序。是一个动态 的过程：有它自身的产生、存在和消亡的过程。——生命周期。简单来理解就是一个正在运行的程序。</p>
 <p>线程：进程可进一步细化为线程，是一个程序内部的一条执行路径，每一条线程可以执行不同的任务。</p>
 <h3 id="并行和并发的概念"><a href="#并行和并发的概念" class="headerlink" title="并行和并发的概念"></a>并行和并发的概念</h3><p>并行：多个CPU执行执行多个任务称之为并行</p>
@@ -820,7 +819,38 @@
 </code></pre>
 <p><img src="/2021/09/06/java%E5%A4%9A%E7%BA%BF%E7%A8%8B/image-20210918224815586.png" alt="image-20210918224815586"></p>
 <p>以上的代码出现的问题是重复出售车票，相当于开启了4个线程main主线程，w1,w2,w3线程，其中w1,w2,w3线程每一个线程都出售了100张也就是300张，而我现在总量就是100张，所以在这里出现了线程的安全问题</p>
-<h3 id="线程锁"><a href="#线程锁" class="headerlink" title="线程锁"></a>线程锁</h3><h3 id="Thread类中相关的方法"><a href="#Thread类中相关的方法" class="headerlink" title="Thread类中相关的方法"></a>Thread类中相关的方法</h3><p>void start(): 启动线程，并执行对象的run()方法 </p>
+<p>如何解决线程的安全问题，可以加锁，也就是同步机制</p>
+<p>解决方式1、使用同步代码</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//同步监视器：要求，可以是任意类型的对象，但是必须是多个线程操作同一把锁</span>
+<span class="token keyword">synchronized</span><span class="token punctuation">(</span>同步监视器<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//同步代码</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>解决方式2、使用同步方法</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">synchronized</span> <span class="token keyword">void</span> <span class="token function">method</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//同步代码</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>关于同步方法的知识：</p>
+<p>​    同步方法仍然涉及到同步监视器，只是不用我们显示的声明</p>
+<p>​    非静态的同步方法，同步监视器是this</p>
+<p>​    静态的同步方法，同步监视器是类的本身</p>
+<h3 id="线程锁"><a href="#线程锁" class="headerlink" title="线程锁"></a>线程锁</h3><p>死锁的概念：不同的线程分别占用对方需要的同步资源不放弃，都在等待对方放弃 自己需要的同步资源，就形成了线程的死锁 出现死锁后，不会出现异常，不会出现提示，只是所有的线程都处于 阻塞状态，无法继续</p>
+<p>线程安全的三种解决方式</p>
+<p>使用同步代码块</p>
+<p>使用同步方法</p>
+<p>使用Lock锁</p>
+<p>synchronized 与 Lock 的对比</p>
+<ol>
+<li><p>Lock是显式锁（手动开启和关闭锁，别忘记关闭锁），synchronized是 隐式锁，出了作用域自动释放 </p>
+</li>
+<li><p>Lock只有代码块锁，synchronized有代码块锁和方法锁 </p>
+</li>
+<li><p>使用Lock锁，JVM将花费较少的时间来调度线程，性能更好。并且具有 更好的扩展性（提供更多的子类） 优先使用顺序：</p>
+<p>Lock同步代码块（已经进入了方法体，分配了相应资源）  同步方法 （在方法体之外）</p>
+</li>
+</ol>
+<h3 id="Thread类中相关的方法"><a href="#Thread类中相关的方法" class="headerlink" title="Thread类中相关的方法"></a>Thread类中相关的方法</h3><p>void start(): 启动线程，并执行对象的run()方法 </p>
 <p>run(): 线程在被调度时执行的操作 </p>
 <p>String getName(): 返回线程的名称 </p>
 <p>void setName(String name):设置该线程名称 </p>
