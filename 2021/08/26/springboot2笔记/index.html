@@ -650,8 +650,6 @@
 <pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">spring</span><span class="token punctuation">:</span>
  <span class="token comment" spellcheck="true"># mvc:</span>
   <span class="token comment" spellcheck="true">#  static-path-pattern: /res/**            //会导致welcome功能失效</span>
-
-
   <span class="token key atrule">web</span><span class="token punctuation">:</span>
     <span class="token key atrule">resources</span><span class="token punctuation">:</span>
       <span class="token key atrule">static-locations</span><span class="token punctuation">:</span> classpath<span class="token punctuation">:</span>/haha/
@@ -732,7 +730,11 @@
 <p><img src="/2021/08/26/springboot2%E7%AC%94%E8%AE%B0/image-20210829232156501.png" alt="image-20210829232156501"></p>
 <h2 id="Import-类名-class-导入组件"><a href="#Import-类名-class-导入组件" class="headerlink" title="@Import({类名.class})导入组件"></a>@Import({类名.class})导入组件</h2><p><img src="/2021/08/26/springboot2%E7%AC%94%E8%AE%B0/image-20210829234402399.png" alt="image-20210829234402399"></p>
 <p><img src="/2021/08/26/springboot2%E7%AC%94%E8%AE%B0/image-20210829234535641.png" alt="image-20210829234535641"></p>
-<h2 id="Conditional注解，条件装配"><a href="#Conditional注解，条件装配" class="headerlink" title="@Conditional注解，条件装配"></a>@Conditional注解，条件装配</h2><p><img src="/2021/08/26/springboot2%E7%AC%94%E8%AE%B0/image-20210829234900235.png" alt="image-20210829234900235"></p>
+<h2 id="Conditional注解，条件装配"><a href="#Conditional注解，条件装配" class="headerlink" title="@Conditional注解，条件装配"></a>@Conditional注解，条件装配</h2><p>条件装配注解标注在方法上面，只有当条件成立了以后才会被注册。</p>
+<p>条件装配注解标注在类上面，只有当条件成立了以后，这个类下面的相关组件才会被注册</p>
+<p><img src="/2021/08/26/springboot2%E7%AC%94%E8%AE%B0/image-20210829234900235.png" alt="image-20210829234900235"></p>
+<p><img src="/2021/08/26/springboot2%E7%AC%94%E8%AE%B0/image-20210925173101243.png" alt="image-20210925173101243"></p>
+<p><img src="/2021/08/26/springboot2%E7%AC%94%E8%AE%B0/image-20210925173154537.png" alt="image-20210925173154537"></p>
 <h2 id="ImportResource导入资源"><a href="#ImportResource导入资源" class="headerlink" title="@ImportResource导入资源"></a>@ImportResource导入资源</h2><p>用法@ImportResource(“资源路径”)</p>
 <h2 id="ConfigurationProperties-prefix-“前缀名”-配置绑定"><a href="#ConfigurationProperties-prefix-“前缀名”-配置绑定" class="headerlink" title="@ConfigurationProperties(prefix = “前缀名”)配置绑定"></a>@ConfigurationProperties(prefix = “前缀名”)配置绑定</h2><p>配置文件application.properties</p>
 <p><img src="/2021/08/26/springboot2%E7%AC%94%E8%AE%B0/image-20210830000417146.png" alt="image-20210830000417146"></p>
@@ -759,7 +761,7 @@
 <p>@ComponentScan 扫描注解</p>
 <p>@EnableAutoConfiguration    自动配置注解</p>
 <p>​        @AutoConfigurationPackage</p>
-<p>​                @Import({Registrar.class})</p>
+<p>​        @Import({Registrar.class})</p>
 <p>导入一系列的组件</p>
 <p><img src="/2021/08/26/springboot2%E7%AC%94%E8%AE%B0/image-20210901093038661.png" alt="image-20210901093038661"></p>
 <p>​        @Import({AutoConfigurationImportSelector.class})</p>
@@ -768,7 +770,7 @@
         <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">isEnabled</span><span class="token punctuation">(</span>annotationMetadata<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
             <span class="token keyword">return</span> NO_IMPORTS<span class="token punctuation">;</span>
         <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-            AutoConfigurationImportSelector<span class="token punctuation">.</span>AutoConfigurationEntry autoConfigurationEntry <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getAutoConfigurationEntry</span><span class="token punctuation">(</span>annotationMetadata<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            AutoConfigurationImportSelector<span class="token punctuation">.</span>AutoConfigurationEntry autoConfigurationEntry <span class="token operator">=</span>                     <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getAutoConfigurationEntry</span><span class="token punctuation">(</span>annotationMetadata<span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token keyword">return</span> StringUtils<span class="token punctuation">.</span><span class="token function">toStringArray</span><span class="token punctuation">(</span>autoConfigurationEntry<span class="token punctuation">.</span><span class="token function">getConfigurations</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token punctuation">}</span>
     <span class="token punctuation">}</span>
