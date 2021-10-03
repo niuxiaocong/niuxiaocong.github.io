@@ -601,10 +601,20 @@
 <pre class=" language-bash"><code class="language-bash"><span class="token function">git</span> push origin master
 </code></pre>
 <p><img src="/2021/08/25/git%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6%E5%B7%A5%E5%85%B7/image-20210826072322113.png" alt="image-20210826072322113"></p>
-<h1 id="Git远程库的拉取操作"><a href="#Git远程库的拉取操作" class="headerlink" title="Git远程库的拉取操作"></a>Git远程库的拉取操作</h1><pre class=" language-bash"><code class="language-bash"><span class="token function">git</span> fetch origin master
+<h1 id="Git远程库的拉取操作"><a href="#Git远程库的拉取操作" class="headerlink" title="Git远程库的拉取操作"></a>Git远程库的拉取操作</h1><p>远程库拉取方式一、通过fetch + merge操作</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">#从远程库进行</span>
+<span class="token function">git</span> fetch 远程库地址 远程库上面的分支
 </code></pre>
-<p>他只是会将远程库的内容 抓取到本地，但是工作区并不更新。</p>
-<p>pull操作相当于fetch和merge操作的合并</p>
+<p>fetch 他只是会将远程库的内容 抓取到本地，但是工作区并不更新。</p>
+<p>抓取完毕以后可以切换到远程库看看里面的内容</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">git</span> checkout 远程库地址/远程库分支
+</code></pre>
+<p>最后将远程库的内容和本地库的内容进行合并</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">git</span> merge 远程库的地址/远程库的分支
+</code></pre>
+<p>远程库拉取方式二、pull操作相当于fetch和merge操作的合并</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">git</span> pull 远程库地址 远程库分支:本地分支
+</code></pre>
 <h1 id="Git常用命令操作"><a href="#Git常用命令操作" class="headerlink" title="Git常用命令操作"></a>Git常用命令操作</h1><ol>
 <li><p>设置签名</p>
 <pre class=" language-bash"><code class="language-bash"><span class="token function">git</span> config --global user.name <span class="token string">"签名"</span>
@@ -689,6 +699,22 @@
 </code></pre>
 </li>
 </ol>
+<ol start="20">
+<li><p>远程库的抓取操作</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">git</span> fetch 远程库地址
+</code></pre>
+</li>
+<li><p>将本地库和远程库合并操作（前提是先从远程库抓取fetch）</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">git</span> merge 远程库地址/远程库分支
+</code></pre>
+</li>
+<li><p>拉取操作pull</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">git</span> pull 远程库地址 远程库分支:本地分支
+</code></pre>
+</li>
+</ol>
+<p>​    </p>
+<p>dfdf</p>
 
                 
             </div>
