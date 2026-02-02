@@ -203,7 +203,7 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/2026/02/02/%E4%BB%8E0%E5%88%B01%E8%AE%A4%E8%AF%86%E7%B4%A2%E5%BC%95%EF%BC%9AMySQL%E7%B4%A2%E5%BC%95%E5%9F%BA%E7%A1%80%E5%85%A8%E8%A7%A3%E6%9E%90/" aria-label="从0到1认识索引：MySQL索引基础全解析" title="从0到1认识索引：MySQL索引基础全解析"></a>
+      <a class="post-link" href="/2026/02/02/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%BB%8E0%E5%88%B01%E8%AE%A4%E8%AF%86%E7%B4%A2%E5%BC%95%EF%BC%9AMySQL%E7%B4%A2%E5%BC%95%E5%9F%BA%E7%A1%80%E5%85%A8%E8%A7%A3%E6%9E%90/" aria-label="从0到1认识索引：MySQL索引基础全解析" title="从0到1认识索引：MySQL索引基础全解析"></a>
     <div class="post-cover left">
           <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="从0到1认识索引：MySQL索引基础全解析" class="lazyload">
     </div>
@@ -225,25 +225,31 @@
 </div>
       <div class="post-wrapper">
   <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/2026/02/02/hello-world/" aria-label="Hello World" title="Hello World"></a>
+      <a class="post-link" href="/2026/02/02/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8FMySQL%E5%9B%9E%E8%A1%A8/" aria-label="一文讲透MySQL回表" title="一文讲透MySQL回表"></a>
     <div class="post-cover right">
-          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="Hello World" class="lazyload">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="一文讲透MySQL回表" class="lazyload">
     </div>
     <div class="post-info">
       <div class="post-meta">
         <span><span class="icon-calendar"></span>2026-02-02</span>
-        <span><span class="icon-pencil"></span>80 字</span>
-        <span><span class="icon-clock"></span>1 分钟</span>
+        <span><span class="icon-pencil"></span>1.8k 字</span>
+        <span><span class="icon-clock"></span>7 分钟</span>
       </div>
-      <h2 class="post-title">Hello World</h2>
+      <h2 class="post-title">一文讲透MySQL回表</h2>
       <article class="post-article">
-          Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
- Quick Start
- Create a new post
-1$ hexo new &amp;quot;My New Post&amp;quot;
-More info: Writing
- Run server
-1$ hex
+           一、先搞懂什么是回表
+回表（Back to Table）的概念
+在 InnoDB 存储引擎中，数据是以 聚簇索引（Clustered Index） 的形式组织的，表中的完整行数据只存储在主键索引的叶子节点中。
+而 二级索引（辅助索引） 的叶子节点中，并不保存整行数据，而是保存：
+
+索引列的值
+对应行的 主键值
+
+当 SQL 查询 通过二级索引定位到记录，但查询结果中需要的字段不完全包含在该索引中 时，MySQL 就必须根据二级索引中保存的主键值，再次访问聚簇索引获取完整行数据。
+这个过程就称为 回表（Back to Table） 。
+ 二、回表案例分析
+接下来先看一个案例，测试数据
+1234
       </article>
     </div>
   </div>
@@ -268,10 +274,10 @@ More info: Writing
       </div>
       <div>
         <span class="icon-brush"></span>
-        3.7k
+        5.4k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        00:14
+        00:20
       </div>
       <div>
         <span class="icon-eye"></span>
