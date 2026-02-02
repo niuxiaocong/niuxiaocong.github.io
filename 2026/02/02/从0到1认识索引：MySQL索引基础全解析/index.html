@@ -1,0 +1,593 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_4k4bc36ef96';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://niuxiaocong.github.io';</script>
+  <title>
+    从0到1认识索引：MySQL索引基础全解析 | 牛小聪
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_4k4bc36ef96.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/css/loader.css">
+
+    <meta name="description" content="今天咱们聊个MySQL入门必学、职场高频用到的知识点——索引。不管是日常开发查数据，还是面试被问“怎么优化慢查询”，索引都是绕不开的核心。这篇文章我会摒弃复杂高阶内容，用通俗语言+实战SQL，带你从0到1吃透MySQL索引基础，看完就能上手用，还能避开新手常见坑。  一、为什么要学MySQL索引？先搞懂它的核心价值 如果你的项目里有一张百万级数据的用户表，现在要查询“用户名为张三”的信息，没有索引">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从0到1认识索引：MySQL索引基础全解析">
+<meta property="og:url" content="https://niuxiaocong.github.io/2026/02/02/%E4%BB%8E0%E5%88%B01%E8%AE%A4%E8%AF%86%E7%B4%A2%E5%BC%95%EF%BC%9AMySQL%E7%B4%A2%E5%BC%95%E5%9F%BA%E7%A1%80%E5%85%A8%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="牛小聪">
+<meta property="og:description" content="今天咱们聊个MySQL入门必学、职场高频用到的知识点——索引。不管是日常开发查数据，还是面试被问“怎么优化慢查询”，索引都是绕不开的核心。这篇文章我会摒弃复杂高阶内容，用通俗语言+实战SQL，带你从0到1吃透MySQL索引基础，看完就能上手用，还能避开新手常见坑。  一、为什么要学MySQL索引？先搞懂它的核心价值 如果你的项目里有一张百万级数据的用户表，现在要查询“用户名为张三”的信息，没有索引">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-02-02T15:50:24.000Z">
+<meta property="article:modified_time" content="2026-02-02T15:54:53.155Z">
+<meta property="article:author" content="牛小聪">
+<meta property="article:tag" content="数据库，MySQL">
+<meta name="twitter:card" content="summary">
+    <link rel="alternate" href="/atom.xml" title="牛小聪" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </span>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/images/banner.webp" alt="从0到1认识索引：MySQL索引基础全解析">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">从0到1认识索引：MySQL索引基础全解析</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%AD%A6mysql%E7%B4%A2%E5%BC%95%E5%85%88%E6%90%9E%E6%87%82%E5%AE%83%E7%9A%84%E6%A0%B8%E5%BF%83%E4%BB%B7%E5%80%BC"><span class="toc-number">1.</span> <span class="toc-text"> 一、为什么要学MySQL索引？先搞懂它的核心价值</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C-mysql%E7%B4%A2%E5%BC%95%E5%88%B0%E5%BA%95%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">2.</span> <span class="toc-text"> 二、MySQL索引到底是什么</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89-mysql%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.</span> <span class="toc-text"> 三、MySQL中常见的索引类型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%89%E7%85%A7%E5%8A%9F%E8%83%BD%E5%88%86%E7%B1%BB"><span class="toc-number">3.1.</span> <span class="toc-text"> 按照功能分类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%89%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E7%B1%BB"><span class="toc-number">3.2.</span> <span class="toc-text"> 按数据结构分类</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B-mysql%E7%B4%A2%E5%BC%95%E7%9A%84%E6%93%8D%E4%BD%9C%E4%B8%8E%E4%BD%BF%E7%94%A8"><span class="toc-number">4.</span> <span class="toc-text"> 四、MySQL索引的操作与使用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E9%81%BF%E5%9D%91mysql%E7%B4%A2%E5%BC%95%E5%B8%B8%E8%A7%81%E8%AF%AF%E5%8C%BA"><span class="toc-number">4.1.</span> <span class="toc-text"> 五、避坑：MySQL索引常见误区</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94-%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text"> 五、总结</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="牛小聪" class="lazyload">
+  <div class="sidebar-author-name">牛小聪</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-从0到1认识索引：MySQL索引基础全解析" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-02-02T15:50:24.000Z" itemprop="datePublished">2026-02-02</time>
+    <time style="display: none;" id="post-update-time">2026-02-02</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>今天咱们聊个MySQL入门必学、职场高频用到的知识点——索引。不管是日常开发查数据，还是面试被问“怎么优化慢查询”，索引都是绕不开的核心。这篇文章我会摒弃复杂高阶内容，用通俗语言+实战SQL，带你从0到1吃透MySQL索引基础，看完就能上手用，还能避开新手常见坑。</p>
+<h1 id="一-为什么要学mysql索引先搞懂它的核心价值"><a class="markdownIt-Anchor" href="#一-为什么要学mysql索引先搞懂它的核心价值"></a> 一、为什么要学MySQL索引？先搞懂它的核心价值</h1>
+<p>如果你的项目里有一张百万级数据的用户表，现在要查询“用户名为张三”的信息，没有索引和有索引的区别到底有多大？</p>
+<p>实际测试中，无索引时MySQL会逐行扫描全表，可能要耗时几秒甚至十几秒；而加了索引后，耗时能直接降到毫秒级。这背后的关键，就是索引的作用——它就像书籍的目录，能帮MySQL跳过无效扫描，快速定位到目标数据。</p>
+<p>简单说，索引是MySQL性能优化的“基石”，不管你是后端开发、测试还是运维，只要和MySQL打交道，就必须懂索引。今天这篇文章，咱们就聚焦基础：搞懂索引是什么、有哪些类型、怎么创建使用，以及新手要避开哪些坑，帮你快速建立完整的索引基础认知。</p>
+<h1 id="二-mysql索引到底是什么"><a class="markdownIt-Anchor" href="#二-mysql索引到底是什么"></a> 二、MySQL索引到底是什么</h1>
+<p>很多人一听到<strong>索引</strong>就觉得抽象，其实结合咱们熟悉的图书馆场景，一下子就能懂。</p>
+<p>MySQL索引就像图书馆的“分类目录卡”：目录卡不存储书籍内容，只记录书籍的位置信息（比如在第几书架、第几层）和关键属性（作者、出版时间），帮你不用逐本翻书就能快速找到目标书籍；而MySQL索引也不存储表数据本身，只记录字段值（比如用户名、ID）和对应数据行的物理位置，帮MySQL跳过全表扫描，直接定位到要查询的数据。</p>
+<p>再细化类比：表中的所有数据，就相当于图书馆里的全部书籍；表的字段（如ID、用户名、创建时间），就是书籍的属性（作者、书名、出版时间）；索引则是按不同属性整理的目录——比如按“作者”整理的目录、按“作者+出版时间”整理的目录，对应到MySQL里，就是普通索引、复合索引。</p>
+<p>从技术层面来说，MySQL索引本质是建立在<strong>表字段上的特殊数据结构</strong>，核心<strong>目的是降低磁盘IO成本</strong>（减少数据读取次数）。这里补充两个必知的细节：一是索引会独立于表数据存储，需要占用额外存储空间，就像目录卡要单独放在目录柜里；二是MySQL默认用B+树结构实现索引，这种结构天生有序，支持范围查询（比如查询近7天的数据），特别适配MySQL的磁盘存储逻辑，也是它高效的关键。</p>
+<p>咱们再对比下无索引和有索引的查询逻辑，更直观感受差异：</p>
+<ul>
+<li><strong>无索引（全表扫描）</strong> ：就像图书馆没有目录，MySQL会从表的第一行数据开始，逐行查到最后一行，逐个核对是否符合查询条件，数据量越大，耗时越长。</li>
+<li><strong>有索引（快速定位）</strong> ：就像按目录找书，MySQL先查询索引结构，通过索引找到数据所在的物理位置，直接读取目标数据，不用多余扫描，效率大幅提升。</li>
+</ul>
+<p>这里还要提醒一句：索引不是<strong>万能加速器</strong>。它只能加速查询（SELECT操作），反而会减慢插入、更新、删除（INSERT/UPDATE/DELETE）操作——因为修改数据时，MySQL要同步更新对应的索引结构，就像图书馆新增书籍后，要同步更新目录卡一样，会增加额外耗时。而且索引依赖存储引擎，咱们日常开发用的默认引擎InnoDB，主键索引和数据是存在一起的，先聚焦InnoDB即可，先不用纠结其他引擎。</p>
+<h1 id="三-mysql中常见的索引类型"><a class="markdownIt-Anchor" href="#三-mysql中常见的索引类型"></a> 三、MySQL中常见的索引类型</h1>
+<h2 id="按照功能分类"><a class="markdownIt-Anchor" href="#按照功能分类"></a> 按照功能分类</h2>
+<p><strong>主键索引（PRIMARY KEY）</strong></p>
+<p>主键索引是最特殊的索引，<strong>默认自动创建</strong>，<strong>特点是唯一且非空</strong>，能唯一标识表中的每一行数据。在InnoDB引擎中，<strong>主键索引就是聚簇索引</strong>，数据会跟着主键索引存储，查询效率最高。</p>
+<p>示例SQL（建表后创建）：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> <span class="keyword">user</span> (</span><br><span class="line">  id <span class="type">INT</span> <span class="keyword">NOT NULL</span> AUTO_INCREMENT,</span><br><span class="line">  username <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">  create_time DATETIME <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span>,</span><br><span class="line">  <span class="keyword">PRIMARY KEY</span> (id) <span class="comment">-- 主键索引</span></span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8mb4;</span><br></pre></td></tr></table></figure>
+<p>适用场景：唯一标识数据行，比如用户ID、订单ID，几乎所有业务表都要设置主键索引。</p>
+<p><strong>唯一索引（UNIQUE）</strong>：唯一索引的作用是保证字段值唯一，允许存储NULL值（注意：多个NULL值不视为重复），和主键索引的区别是“可空”，适合用来避免非主键字段的数据重复。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 给手机号字段创建唯一索引，避免重复手机号</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">UNIQUE</span> INDEX idx_user_phone <span class="keyword">ON</span> <span class="keyword">user</span> (phone);</span><br></pre></td></tr></table></figure>
+<p>适用场景：需要保证唯一性但非主键的字段，比如手机号、邮箱、身份证号。</p>
+<p><strong>普通索引（INDEX）</strong></p>
+<p>普通索引是最基础的索引，<strong>没有唯一性约束，也允许NULL值，仅用于加速查询</strong>，是日常开发中使用频率最高的索引。</p>
+<p>示例SQL（建表后创建）：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 给用户名字段创建普通索引，加速按用户名查询</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_user_username <span class="keyword">ON</span> <span class="keyword">user</span> (username);</span><br></pre></td></tr></table></figure>
+<p>适用场景：高频查询但无需保证唯一性的字段，比如用户名、商品名称、分类ID。</p>
+<p><strong>复合索引（多字段组合）</strong></p>
+<p>复合索引是基于多个字段组合创建的索引，核心要遵循MySQL的“最左前缀原则”——查询时必须匹配组合中的第一个字段，才能触发索引，否则索引失效。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 给“用户名+创建时间”创建复合索引，适配多字段联合查询</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_user_username_createtime <span class="keyword">ON</span> <span class="keyword">user</span> (username, create_time);</span><br></pre></td></tr></table></figure>
+<p>适用场景：多字段联合查询的场景，比如“查询用户名为张三、近7天创建的记录”。这里要注意：查询时若只按“创建时间”条件查询，不会触发该复合索引，必须先匹配“用户名”。</p>
+<h2 id="按数据结构分类"><a class="markdownIt-Anchor" href="#按数据结构分类"></a> 按数据结构分类</h2>
+<p><strong>B+树索引</strong></p>
+<p>这是MySQL默认且最常用的索引结构，前面讲的主键索引、唯一索引、普通索引、复合索引，底层都是B+树实现。它的优势很明显：数据有序存储，支持范围查询（如&gt;、&lt;、BETWEEN）和排序，适配MySQL的磁盘存储逻辑，查询效率稳定。</p>
+<p><strong>哈希索引</strong></p>
+<p>哈希索引仅在MySQL的Memory引擎中支持，特点是等值查询速度极快，但不支持范围查询、排序和模糊查询，日常开发中几乎用不到，了解即可，不用深入研究。</p>
+<p><strong>前缀索引</strong></p>
+<p>针对长字符串字段（如地址、备注、文章内容），直接创建索引会占用大量存储空间，前缀索引可以只取字段的前N个字符创建索引，平衡索引长度和查询精度。</p>
+<p>示例SQL：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-- 给地址字段取前20个字符创建前缀索引</span><br><span class="line">CREATE INDEX idx_user_addr ON user (addr(20));</span><br></pre></td></tr></table></figure>
+<p>注意事项：前缀长度要合理，过长占用空间多，过短会降低查询精度，建议根据字段的区分度调整（比如地址字段前20个字符就能区分大部分数据）。</p>
+<p><strong>覆盖索引（也就是索引覆盖）</strong></p>
+<p>覆盖索引是一种查询优化场景：当查询的所有字段，都能通过索引直接获取，无需回表查询表数据，能大幅提升查询效率。比如创建了用户名+创建时间的复合索引，查询用户名=张三的创建时间时，直接从索引中就能拿到数据，不用再查数据表。</p>
+<h1 id="四-mysql索引的操作与使用"><a class="markdownIt-Anchor" href="#四-mysql索引的操作与使用"></a> 四、MySQL索引的操作与使用</h1>
+<p><strong>创建索引</strong></p>
+<p>有两种创建方式：建表时创建和建表后创建，根据场景选择即可。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 1. 建表时创建（主键/唯一/普通索引）</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> <span class="keyword">user</span> (</span><br><span class="line">  id <span class="type">INT</span> <span class="keyword">NOT NULL</span> AUTO_INCREMENT <span class="keyword">PRIMARY KEY</span>, <span class="comment">-- 主键索引</span></span><br><span class="line">  username <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">  phone <span class="type">VARCHAR</span>(<span class="number">11</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">  create_time DATETIME <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span>,</span><br><span class="line">  <span class="keyword">UNIQUE</span> INDEX idx_user_phone (phone), <span class="comment">-- 唯一索引</span></span><br><span class="line">  INDEX idx_user_username (username) <span class="comment">-- 普通索引</span></span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8mb4;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 2. 建表后创建（普通/复合/前缀索引）</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_user_createtime <span class="keyword">ON</span> <span class="keyword">user</span> (create_time); <span class="comment">-- 普通索引</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_user_username_createtime <span class="keyword">ON</span> <span class="keyword">user</span> (username, create_time); <span class="comment">-- 复合索引</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_user_addr <span class="keyword">ON</span> <span class="keyword">user</span> (addr(<span class="number">20</span>)); <span class="comment">-- 前缀索引</span></span><br></pre></td></tr></table></figure>
+<p>命名规范：建议用idx_表名_字段名，复合索引可拼接字段名，方便后续识别和维护。</p>
+<p><strong>查看索引</strong></p>
+<p>创建后可以通过命令查看索引是否生效，以及索引的详细信息：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> INDEX <span class="keyword">FROM</span> <span class="keyword">user</span>;</span><br></pre></td></tr></table></figure>
+<p>重点关注3个字段：</p>
+<ul>
+<li>Key_name：索引名称，确认创建的索引是否存在；</li>
+<li>Column_name：索引对应的字段，确认字段是否正确；</li>
+<li>Cardinality：索引基数，数值越大，说明字段区分度越高，索引效率越好。</li>
+</ul>
+<p><strong>删除索引</strong></p>
+<p>当索引不再使用，或需要优化索引时，可删除冗余索引，删除前务必确认不会影响业务查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 删除指定索引</span></span><br><span class="line"><span class="keyword">DROP</span> INDEX idx_user_addr <span class="keyword">ON</span> <span class="keyword">user</span>;</span><br><span class="line"><span class="comment">-- 主键索引不能用DROP删除，需通过ALTER TABLE修改</span></span><br><span class="line"><span class="keyword">ALTER TABLE</span> <span class="keyword">user</span> <span class="keyword">DROP</span> <span class="keyword">PRIMARY KEY</span>; <span class="comment">-- 谨慎操作！</span></span><br></pre></td></tr></table></figure>
+<p><strong>如何触发索引</strong></p>
+<p>查询时要满足两个条件，才能触发索引：一是WHERE条件匹配索引字段，二是复合索引要遵循最左前缀原则。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 示例：复合索引 idx_user_username_createtime (username, create_time)</span></span><br><span class="line"><span class="comment">-- 正例1：匹配第一个字段，触发索引</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> username <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br><span class="line"><span class="comment">-- 正例2：匹配两个字段，触发索引</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> username <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span> <span class="keyword">AND</span> create_time <span class="operator">&gt;</span> <span class="string">&#x27;2025-01-01&#x27;</span>;</span><br><span class="line"><span class="comment">-- 反例：不匹配第一个字段，索引失效</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> create_time <span class="operator">&gt;</span> <span class="string">&#x27;2025-01-01&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p><strong>用EXPLAIN判断索引是否生效</strong></p>
+<p>可以用EXPLAIN命令，快速判断查询是否触发索引，核心看key字段：若key字段不为NULL，说明索引生效；若为NULL，说明索引未生效，可能是查询条件不合理或索引设计问题。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 在查询语句前加EXPLAIN即可</span></span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> username <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>执行后，若key字段显示idx_user_username，说明该索引已生效；若key字段为NULL，需检查查询条件是否符合索引使用规则。</p>
+<h2 id="五-避坑mysql索引常见误区"><a class="markdownIt-Anchor" href="#五-避坑mysql索引常见误区"></a> 五、避坑：MySQL索引常见误区</h2>
+<p>很多人学完索引后，还是会踩坑，要么加了索引没效果，要么反而拖慢性能。咱们结合图书馆场景，再梳理几个高频误区，帮大家少走弯路。</p>
+<p>先回到之前的图书馆场景：假设你要找一批书——作者是张三、出版时间近7年，按出版时间倒序取前20本。如果图书馆没有分类，你只能逐本翻书，核对作者和出版时间，把符合条件的书堆在一旁，翻完后再手动排序，最后选前20本，耗时耗力，这就是MySQL的全表扫描；但如果图书馆按作者+出版时间分类，你直接定位到张三的区域，按时间从新到旧选20本就行，效率极高，这就是复合索引的作用。而很多人的误区，本质就是没做好这种<strong>分类规划</strong>。</p>
+<p><strong>误区1：索引越多越好</strong></p>
+<p>索引越多越快吗，其实不然。索引会占用额外存储空间，而且每次插入、更新、删除数据时，都要同步维护所有索引，索引越多，写入操作越慢。</p>
+<p>正确做法：按需创建索引，只给高频查询字段建索引，避免冗余索引（比如建了(a,b)的复合索引，就不用再建a的普通索引）。</p>
+<p><strong>误区2：所有字段都适合建索引</strong></p>
+<p>不是所有字段都适合建索引，以下3类字段不建议建索引：</p>
+<ul>
+<li><strong>区分度低的字段</strong>：比如性别（只有男、女、未知）、状态（只有启用、禁用），这类字段查询时匹配的数据量太大，索引效果和全表扫描差不多，反而浪费空间。</li>
+<li><strong>频繁更新的字段</strong>：比如订单状态，每次更新都要同步维护索引，会增加写入成本，拖慢性能。</li>
+<li><strong>小表字段</strong>：如果表数据量小于1万行，全表扫描的速度很快，建索引反而没必要，还会占用空间。</li>
+</ul>
+<p><strong>误区3：加了索引就一定生效</strong></p>
+<p>这是最常踩的坑，以下3个场景会导致索引失效，一定要避开：</p>
+<ul>
+<li>索引字段用函数操作：比如<code>SELECT * FROM user WHERE LEFT(username,3) = '张';</code>，对索引字段做函数处理，会导致索引失效，建议优化为<code>SELECT * FROM user WHERE username LIKE '张%';</code>（前缀模糊查询可触发索引）。</li>
+<li>隐式类型转换：比如手机号字段是VARCHAR类型，查询时用数字匹配<code>SELECT * FROM user WHERE phone = 13800138000;</code>，会触发隐式转换，导致索引失效，正确做法是给数字加引号<code>phone = '13800138000'</code>。</li>
+<li>复合索引不满足最左前缀原则：比如复合索引(a,b)，查询时只匹配b字段，索引会失效，必须先匹配a字段才能触发索引。</li>
+</ul>
+<h1 id="五-总结"><a class="markdownIt-Anchor" href="#五-总结"></a> 五、总结</h1>
+<p>今天咱们从0到1梳理了MySQL索引基础，核心要点可以总结为3句话：</p>
+<ul>
+<li>索引是MySQL的查询加速器，本质是基于字段的特殊数据结构，像图书馆目录一样帮MySQL快速定位数据；</li>
+<li>常用索引有主键、唯一、普通、复合索引，按业务场景选择，复合索引要遵循最左前缀原则；</li>
+<li>索引不是越多越好，按需创建、规避失效场景，才能发挥它的最大价值。</li>
+</ul>
+<p>对于新同学来说，建议先上手实操文中的SQL示例，在测试环境中创建、使用索引，感受索引对查询速度的影响，再逐步理解底层逻辑。后续我们还会聊索引优化、InnoDB索引机制等进阶内容，感兴趣的可以关注我。</p>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%8CMySQL/" title="数据库，MySQL" data-aos="zoom-in">数据库，MySQL</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%8CMySQL/" rel="tag" title="数据库，MySQL">数据库，MySQL</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="Hello World" class="lazyload">
+      <a href="/2026/02/02/hello-world/" aria-label="后一篇: Hello World"  title="后一篇: Hello World"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          Hello World
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      牛小聪
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        3.7k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        00:14
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%AD%A6mysql%E7%B4%A2%E5%BC%95%E5%85%88%E6%90%9E%E6%87%82%E5%AE%83%E7%9A%84%E6%A0%B8%E5%BF%83%E4%BB%B7%E5%80%BC"><span class="toc-number">1.</span> <span class="toc-text"> 一、为什么要学MySQL索引？先搞懂它的核心价值</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C-mysql%E7%B4%A2%E5%BC%95%E5%88%B0%E5%BA%95%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">2.</span> <span class="toc-text"> 二、MySQL索引到底是什么</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89-mysql%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.</span> <span class="toc-text"> 三、MySQL中常见的索引类型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%89%E7%85%A7%E5%8A%9F%E8%83%BD%E5%88%86%E7%B1%BB"><span class="toc-number">3.1.</span> <span class="toc-text"> 按照功能分类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%89%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E7%B1%BB"><span class="toc-number">3.2.</span> <span class="toc-text"> 按数据结构分类</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B-mysql%E7%B4%A2%E5%BC%95%E7%9A%84%E6%93%8D%E4%BD%9C%E4%B8%8E%E4%BD%BF%E7%94%A8"><span class="toc-number">4.</span> <span class="toc-text"> 四、MySQL索引的操作与使用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E9%81%BF%E5%9D%91mysql%E7%B4%A2%E5%BC%95%E5%B8%B8%E8%A7%81%E8%AF%AF%E5%8C%BA"><span class="toc-number">4.1.</span> <span class="toc-text"> 五、避坑：MySQL索引常见误区</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94-%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text"> 五、总结</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="牛小聪" class="lazyload">
+  <div class="sidebar-author-name">牛小聪</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  
+<script src="/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "牛小聪",
+          title: "从0到1认识索引：MySQL索引基础全解析",
+          url: "https://niuxiaocong.github.io/2026/02/02/%E4%BB%8E0%E5%88%B01%E8%AE%A4%E8%AF%86%E7%B4%A2%E5%BC%95%EF%BC%9AMySQL%E7%B4%A2%E5%BC%95%E5%9F%BA%E7%A1%80%E5%85%A8%E8%A7%A3%E6%9E%90/",
+          excerpt: "",
+          description: "",
+          stripContent: "今天咱们聊个MySQL入门必学、职场高频用到的知识点——索引。不管是日常开发查数据，还是面试被问“怎么优化慢查询”，索引都是绕不开的核心。这篇文章我会摒弃复杂高阶内容，用通俗语言+实战SQL，带你从0到1吃透MySQL索引基础，看完就能上手用，还能避开新手常见坑。  一、为什么要学MySQL索引？先搞懂它的核心价值 如果你的项目里有一张百万级数据的用户表，现在要查询“用户名为张三”的信息，没有索引和有索引的区别到底有多大？ 实际测试中，无索引时MySQL会逐行扫描全表，可能要耗时几秒甚至十几秒；",
+          date: "Mon Feb 02 2026 23:50:24 GMT+0800",
+          updated: "Mon Feb 02 2026 23:54:53 GMT+0800",
+          cover: "/images/banner.webp",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.0' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>
