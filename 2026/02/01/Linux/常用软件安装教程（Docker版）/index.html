@@ -9,7 +9,7 @@
   
   <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_4k4bc36ef96';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://niuxiaocong.github.io';</script>
   <title>
-    快速熟悉Webchat项目 | 牛小聪
+    常用软件安装教程（Docker版） | 牛小聪
   </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
@@ -17,20 +17,20 @@
     
 <link rel="stylesheet" href="/css/loader.css">
 
-    <meta name="description" content="一、项目介绍这个项目分成了三期；第一期主要是网页版的一个微信（IM系统）、二期是在一期项目里面嵌入了一个企业级的AI助手；三期是电商业务方向； 二、微服务架构图  前端服务webchat-front-client: IM 前端服务 webchat-front-oauth: 统一认证服务 webchat-front-admin: 管理后台的前端服务 webchat-front-mall：电商系统前端">
+    <meta name="description" content="操作系统信息 centos7.6 1、安装向量数据库 Milvus1、执行下面这条命令下载docker-compose文件或者是手动下载docker-compose文件：https:&#x2F;&#x2F;github.com&#x2F;milvus-io&#x2F;milvus&#x2F;releases&#x2F;tag&#x2F;v2.5.12 wget https:&#x2F;&#x2F;github.com&#x2F;milvus-io&#x2F;milvus&#x2F;releases&#x2F;download">
 <meta property="og:type" content="article">
-<meta property="og:title" content="快速熟悉Webchat项目">
-<meta property="og:url" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%B8%80%E3%80%81%E5%BF%AB%E9%80%9F%E7%86%9F%E6%82%89WebChat%E9%A1%B9%E7%9B%AE/index.html">
+<meta property="og:title" content="常用软件安装教程（Docker版）">
+<meta property="og:url" content="https://niuxiaocong.github.io/2026/02/01/Linux/%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B%EF%BC%88Docker%E7%89%88%EF%BC%89/index.html">
 <meta property="og:site_name" content="牛小聪">
-<meta property="og:description" content="一、项目介绍这个项目分成了三期；第一期主要是网页版的一个微信（IM系统）、二期是在一期项目里面嵌入了一个企业级的AI助手；三期是电商业务方向； 二、微服务架构图  前端服务webchat-front-client: IM 前端服务 webchat-front-oauth: 统一认证服务 webchat-front-admin: 管理后台的前端服务 webchat-front-mall：电商系统前端">
+<meta property="og:description" content="操作系统信息 centos7.6 1、安装向量数据库 Milvus1、执行下面这条命令下载docker-compose文件或者是手动下载docker-compose文件：https:&#x2F;&#x2F;github.com&#x2F;milvus-io&#x2F;milvus&#x2F;releases&#x2F;tag&#x2F;v2.5.12 wget https:&#x2F;&#x2F;github.com&#x2F;milvus-io&#x2F;milvus&#x2F;releases&#x2F;download">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%B8%80%E3%80%81%E5%BF%AB%E9%80%9F%E7%86%9F%E6%82%89WebChat%E9%A1%B9%E7%9B%AE/image-20260203103145757.png">
-<meta property="article:published_time" content="2026-02-03T02:28:48.000Z">
-<meta property="article:modified_time" content="2026-02-03T02:31:55.849Z">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/01/Linux/%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B%EF%BC%88Docker%E7%89%88%EF%BC%89/image-20260203110907563.png">
+<meta property="article:published_time" content="2026-02-01T03:06:08.000Z">
+<meta property="article:modified_time" content="2026-02-03T03:09:12.332Z">
 <meta property="article:author" content="牛小聪">
-<meta property="article:tag" content="Webchat">
+<meta property="article:tag" content="Linux，Docker">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%B8%80%E3%80%81%E5%BF%AB%E9%80%9F%E7%86%9F%E6%82%89WebChat%E9%A1%B9%E7%9B%AE/image-20260203103145757.png">
+<meta name="twitter:image" content="https://niuxiaocong.github.io/2026/02/01/Linux/%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B%EF%BC%88Docker%E7%89%88%EF%BC%89/image-20260203110907563.png">
     <link rel="alternate" href="/atom.xml" title="牛小聪" type="application/atom+xml">
     <link rel="shortcut icon" href="/images/favicon.ico">
   
@@ -130,11 +130,11 @@
 <header id="header" aria-label="Site header">
         <picture>
         </picture>
-          <img  fetchpriority="high" src="/images/banner.webp" alt="快速熟悉Webchat项目">
+          <img  fetchpriority="high" src="/images/banner.webp" alt="常用软件安装教程（Docker版）">
   <div id="header-outer">
     <div id="header-title">
           <span id="logo">
-            <h1 data-aos="slide-up">快速熟悉Webchat项目</h1>
+            <h1 data-aos="slide-up">常用软件安装教程（Docker版）</h1>
           </span>
         <h2 id="subtitle-wrap" data-aos="slide-down">
         </h2>
@@ -149,7 +149,7 @@
     <div class="sidebar-wrap" data-aos="fade-up">
           <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
 <div class="sidebar-toc-wrapper toc-div-class" >
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D"><span class="toc-text">一、项目介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E5%9B%BE"><span class="toc-text">二、微服务架构图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%E6%9C%8D%E5%8A%A1"><span class="toc-text">前端服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8E%E7%AB%AF%E6%9C%8D%E5%8A%A1"><span class="toc-text">后端服务</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%A6%82%E5%BF%B5%E4%BB%8B%E7%BB%8D"><span class="toc-text">三、概念介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#BFF%EF%BC%88Backend-From-Front%EF%BC%89"><span class="toc-text">BFF（Backend From Front）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UGC%E3%80%81PGC%E3%80%81AIGC"><span class="toc-text">UGC、PGC、AIGC</span></a></li></ol></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%E3%80%81%E5%AE%89%E8%A3%85%E5%90%91%E9%87%8F%E6%95%B0%E6%8D%AE%E5%BA%93-Milvus"><span class="toc-text">1、安装向量数据库 Milvus</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81%E5%AE%89%E8%A3%85Tomcat"><span class="toc-text">2、安装Tomcat</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%E3%80%81%E5%AE%89%E8%A3%85minio"><span class="toc-text">3、安装minio</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4%E3%80%81%E5%AE%89%E8%A3%85RocketMQ"><span class="toc-text">4、安装RocketMQ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5%E3%80%81%E5%AE%89%E8%A3%85Redis"><span class="toc-text">5、安装Redis</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6%E3%80%81%E5%AE%89%E8%A3%85nginx"><span class="toc-text">6、安装nginx</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7%E3%80%81%E5%AE%89%E8%A3%85mysql5-7"><span class="toc-text">7、安装mysql5.7</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8%E3%80%81%E5%AE%89%E8%A3%85Nacos"><span class="toc-text">8、安装Nacos</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9%E3%80%81%E5%AE%89%E8%A3%85%E5%AE%B9%E5%99%A8%E7%9B%91%E6%8E%A7%E5%B7%A5%E5%85%B7Portainer"><span class="toc-text">9、安装容器监控工具Portainer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10%E3%80%81%E5%AE%89%E8%A3%85MongoDB"><span class="toc-text">10、安装MongoDB</span></a></li></ol>
 </div>
 </div>
           <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
@@ -224,12 +224,12 @@
   </div>
 </aside>
 
-          <section id="main" aria-label="Main content"><article id="post-WebChat/一、快速熟悉WebChat项目" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+          <section id="main" aria-label="Main content"><article id="post-Linux/常用软件安装教程（Docker版）" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-inner" data-aos="fade-up">
     <div class="article-meta">
       <div class="article-date">
   <span class="article-date-link icon-calendar" data-aos="zoom-in">
-    <time datetime="2026-02-03T02:28:48.000Z" itemprop="datePublished">2026-02-03</time>
+    <time datetime="2026-02-01T03:06:08.000Z" itemprop="datePublished">2026-02-01</time>
     <time style="display: none;" id="post-update-time">2026-02-03</time>
   </span>
 </div>
@@ -239,93 +239,296 @@
     <div class="hr-line"></div>
     
     <div class="e-content article-entry" itemprop="articleBody">
-        <h2 id="一、项目介绍"><a href="#一、项目介绍" class="headerlink" title="一、项目介绍"></a>一、项目介绍</h2><p>这个项目分成了三期；第一期主要是网页版的一个微信（IM系统）、二期是在一期项目里面嵌入了一个企业级的AI助手；三期是电商业务方向；</p>
-<h2 id="二、微服务架构图"><a href="#二、微服务架构图" class="headerlink" title="二、微服务架构图"></a>二、微服务架构图</h2><img src="/2026/02/03/WebChat/%E4%B8%80%E3%80%81%E5%BF%AB%E9%80%9F%E7%86%9F%E6%82%89WebChat%E9%A1%B9%E7%9B%AE/image-20260203103145757.png" class="" title="image-20260203103145757">
+        <p>操作系统信息 centos7.6</p>
+<h2 id="1、安装向量数据库-Milvus"><a href="#1、安装向量数据库-Milvus" class="headerlink" title="1、安装向量数据库 Milvus"></a>1、安装向量数据库 Milvus</h2><p>1、执行下面这条命令下载docker-compose文件<br>或者是手动下载docker-compose文件：<a target="_blank" rel="noopener" href="https://github.com/milvus-io/milvus/releases/tag/v2.5.12">https://github.com/milvus-io/milvus/releases/tag/v2.5.12</a></p>
+<pre><code>wget https://github.com/milvus-io/milvus/releases/download/v2.5.12/milvus-standalone-docker-compose.yml
+</code></pre>
+<p>2、再文件所在目录执行命令即可</p>
+<pre><code>docker-compose -f milvus-standalone-docker-compose.yml up -d
+</code></pre>
+<p>3、看到如下页面就算是部署成功</p>
+<p><a target="_blank" rel="noopener" href="http://127.0.0.1:9091/webui/">http://127.0.0.1:9091/webui/</a></p>
+<img src="/2026/02/01/Linux/%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B%EF%BC%88Docker%E7%89%88%EF%BC%89/image-20260203110907563.png" class="" title="image-20260203110907563">
 
-<h3 id="前端服务"><a href="#前端服务" class="headerlink" title="前端服务"></a>前端服务</h3><p>webchat-front-client: IM 前端服务</p>
-<p>webchat-front-oauth: 统一认证服务</p>
-<p>webchat-front-admin: 管理后台的前端服务</p>
-<p>webchat-front-mall：电商系统前端服务</p>
-<p>webchat-front-payment：支付的前端服务</p>
-<h3 id="后端服务"><a href="#后端服务" class="headerlink" title="后端服务"></a>后端服务</h3><p>webchat-gateway：业务网关服务，前端的请求会经过业务网关路由到不同的服务上</p>
-<p>webchat-api：外部API声明</p>
-<p>webchat-sso：统一登录认证</p>
-<p>webchat-client-chat：为webchat-front-client前端提供接口声明</p>
-<p>webchat-client-mall：为webchat-front-mall前端提供接口声明</p>
-<p>webchat-admin：为webchat-front-admin提供声明</p>
-<p>webchat-pgc：专业内容生产消息</p>
-<p>webchat-ugc：用户内容生产消息</p>
-<p>webchat-aigc：大模型ai生成消息</p>
-<p>webchat-pay：支付底座</p>
-<p>webchat-user：基础账号服务</p>
-<p>webchat-act：内容点赞评论基础服务</p>
-<p>webchat-search：内容搜索引擎</p>
-<p>webchat-domain：公共对象公里模块</p>
-<p>webchat-common：公共服务模块</p>
-<p>webchat-remote：rpc远程接口声明模块</p>
-<p>webchat-connect：管理ws，sse等长连接服务</p>
-<h2 id="三、概念介绍"><a href="#三、概念介绍" class="headerlink" title="三、概念介绍"></a>三、概念介绍</h2><p>通过上面的架构图可以看到上面的一些词汇比如BFF、UGC、PGC、AIGC分别是什么</p>
-<h3 id="BFF（Backend-From-Front）"><a href="#BFF（Backend-From-Front）" class="headerlink" title="BFF（Backend From Front）"></a>BFF（Backend From Front）</h3><p>BFF 全称（Backend From Front）：是一个后端对应前端的一个服务，比如webchat-client-mall后端服务对应的接收的就是webchat-front-mall前端服务发过来的请求；在后端webchat-client-mall后端服务里面需要做的就是参数信息校验，具体的业务逻辑交给核心层来做</p>
-<h3 id="UGC、PGC、AIGC"><a href="#UGC、PGC、AIGC" class="headerlink" title="UGC、PGC、AIGC"></a>UGC、PGC、AIGC</h3><p><strong>UGC（User Generated Content）用户生产内容</strong></p>
-<ul>
-<li><strong>来源主体</strong>：普通用户</li>
-<li><strong>特点</strong>：门槛低、数量大、内容多样、质量参差不齐</li>
-<li><strong>代表平台</strong>：抖音、小红书、微博、B 站评论区</li>
-<li><strong>示例</strong>：用户自己发布的视频、图片、评论、攻略等</li>
-<li><strong>核心价值</strong>：活跃社区、扩大内容规模</li>
-</ul>
-<p><strong>PGC（Professional Generated Content）专业生产内容</strong></p>
-<ul>
-<li><strong>来源主体</strong>：专业机构或具备专业能力的创作者</li>
-<li><strong>特点</strong>：专业度高、制作精良、有一定审核与规划</li>
-<li><strong>代表平台</strong>：爱奇艺、腾讯视频、电视台内容、头部短视频团队</li>
-<li><strong>示例</strong>：电影、电视剧、专业教程、高质量栏目等</li>
-<li><strong>核心价值</strong>：树立品牌、提升平台内容品质</li>
-</ul>
-<p><strong>OGC（Occupationally Generated Content）职业生产内容</strong></p>
-<ul>
-<li><strong>来源主体</strong>：以内容为职业的创作者（职业 KOL&#x2F;达人&#x2F;Mcn）</li>
-<li><strong>介于 UGC 与 PGC 之间</strong></li>
-<li><strong>特点</strong>：内容更专业且持续稳定更新，但相比机构制作更灵活、更具个人风格</li>
-<li><strong>代表平台</strong>：B 站 UP 主、YouTube 网红、抖音达人</li>
-<li><strong>示例</strong>：专业测评、知识科普、直播带货、个人品牌类内容</li>
-<li><strong>核心价值</strong>：专业化与个人魅力结合，有商业化能力</li>
-</ul>
-<p><strong>AIGC (AI Generated Content) AI 生产内容</strong></p>
-<ul>
-<li><strong>来源主体</strong>：人工智能模型（大语言模型 &#x2F; 多模态模型等）</li>
-<li><strong>介于 PGC 与自动化内容之间</strong></li>
-<li><strong>特点</strong>：生成效率高、可规模化生产，内容质量依赖模型能力与提示词设计，需人工校验与约束</li>
-<li><strong>代表平台</strong>：ChatGPT、文心一言、通义千问、Midjourney、Stable Diffusion</li>
-<li><strong>示例</strong>：AI 文案生成、AI 图片&#x2F;视频生成、智能客服回复、脚本与代码生成</li>
-<li><strong>核心价值</strong>：极大降低内容生产成本，提升生产效率，支持个性化与批量化内容供给</li>
-</ul>
+<h2 id="2、安装Tomcat"><a href="#2、安装Tomcat" class="headerlink" title="2、安装Tomcat"></a>2、安装Tomcat</h2><p>1、镜像拉取</p>
+<pre><code>docker pull tomcat:8.5.46
+</code></pre>
+<p>2、容器启动</p>
+<pre><code>docker run -d --name tomcat \
+  -p 8080:8080 \
+  -v /opt/tomcat/webapps:/opt/mountdata/tomcat/webapps \
+  -v /opt/tomcat/logs:/opt/mountdata/tomcat/logs \
+  -v /opt/tomcat/conf:/opt/mountdata/tomcat/conf \
+  tomcat:8.5.46
+</code></pre>
+<h2 id="3、安装minio"><a href="#3、安装minio" class="headerlink" title="3、安装minio"></a>3、安装minio</h2><p>1、镜像拉取</p>
+<pre><code>docker pull minio:latest
+</code></pre>
+<p>2、容器启动和挂载</p>
+<pre><code>docker run -d --name minio \
+  -p 9000:9000 \
+  -p 9001:9001 \
+  -restart=always \
+  -v /opt/mountdata/minio/data:/data \
+  -v /opt/mountdata/minio/config:/root/.minio \
+  -e MINIO_ROOT_USER=admin \
+  -e MINIO_ROOT_PASSWORD=admin123 \
+  minio/minio server /data --console-address &quot;:9001&quot;
+</code></pre>
+<p>docker componse 文件配置</p>
+<pre><code>version: &#39;3.9&#39;
+
+services:
+  minio:
+    image: minio/minio
+    container_name: minio
+    restart: always
+    ports:
+      - &quot;9000:9000&quot;   # API端口
+      - &quot;9001:9001&quot;   # 控制台端口
+    volumes:
+      - /opt/mountdata/minio/data:/data        # 数据持久化
+      - /opt/mountdata/minio/config:/root/.minio  # 配置持久化
+    environment:
+      MINIO_ROOT_USER: &quot;admin&quot;
+      MINIO_ROOT_PASSWORD: &quot;admin123&quot;
+    command: server /data --console-address &quot;:9001&quot;
+</code></pre>
+<h2 id="4、安装RocketMQ"><a href="#4、安装RocketMQ" class="headerlink" title="4、安装RocketMQ"></a>4、安装RocketMQ</h2><p>1、镜像拉取</p>
+<pre><code>docker pull apache/rocketmq:4.9.6
+</code></pre>
+<p>2、容器启动</p>
+<p>启动mqnamesrv</p>
+<pre><code>docker run -d \
+  --name rmqnamesrv \
+  -p 9876:9876 \
+  -v /opt/mountdata/rocketmq/rmqnamesrv/logs:/root/logs \
+  -v /opt/mountdata/rocketmq/rmqnamesrv/store:/root/store \
+  apache/rocketmq:4.9.6 \
+  sh mqnamesrv
+</code></pre>
+<p>启动broker</p>
+<pre><code>docker run -d \
+  --name rmqbroker \
+  -p 10911:10911 \
+  -p 10909:10909 \
+  -v /opt/mountdata/rocketmq/rmqbroker/logs:/root/logs \
+  -v /opt/mountdata/rocketmq/rmqbroker/store:/root/store \
+  --env NAMESRV_ADDR=&quot;rmqnamesrv:9876&quot; \
+  --link rmqnamesrv \
+  apache/rocketmq:4.9.6 \
+  sh mqbroker -c /home/rocketmq/rocketmq-4.9.6/conf/broker.conf
+</code></pre>
+<p>docker componse 文件配置</p>
+<pre><code>version: &#39;3.5&#39;
+
+services:
+  namesrv:
+    image: apache/rocketmq:4.9.6
+    container_name: rmqnamesrv
+    ports:
+      - &quot;9876:9876&quot;
+    volumes:
+      - /opt/rocketmq/namesrv/logs:/root/logs
+      - /opt/rocketmq/namesrv/store:/root/store
+    command: sh mqnamesrv
+    restart: always
+
+  broker:
+    image: apache/rocketmq:4.9.6
+    container_name: rmqbroker
+    ports:
+      - &quot;10911:10911&quot;
+      - &quot;10909:10909&quot;
+    depends_on:
+      - namesrv
+    environment:
+      NAMESRV_ADDR: &quot;namesrv:9876&quot;
+    volumes:
+      - /opt/rocketmq/broker/logs:/root/logs
+      - /opt/rocketmq/broker/store:/root/store
+      - /opt/rocketmq/broker/conf/broker.conf:/home/rocketmq/rocketmq-5.1.4/conf/broker.conf
+    command: sh mqbroker -c /home/rocketmq/rocketmq-5.1.4/conf/broker.conf
+    restart: always
+</code></pre>
+<p>监控RocketMq-console</p>
+<pre><code>docker run -d \
+  --name rocketmq-console \
+  -p 8080:8080 \
+  -e &quot;JAVA_OPTS=-Drocketmq.namesrv.addr=rmqnamesrv:9876&quot; \
+  --link rmqnamesrv \
+  styletang/rocketmq-console-ng
+</code></pre>
+<h2 id="5、安装Redis"><a href="#5、安装Redis" class="headerlink" title="5、安装Redis"></a>5、安装Redis</h2><p>1、镜像拉取</p>
+<pre><code>docker pull redis7.0.1
+</code></pre>
+<p>2、容器运行</p>
+<pre><code>docker run -d \
+  --name redis-prod \
+  --memory 1g --memory-swap 1g \
+  -p 6379:6379 \
+  -v /opt/mountdata/redis/data:/data \
+  -v /opt/mountdata/redis/conf/redis.conf:/usr/local/etc/redis/redis.conf \
+  redis:7.0.1 \
+  redis-server /usr/local/etc/redis/redis.conf
+</code></pre>
+<p>docker componse 文件配置</p>
+<pre><code>version: &#39;3.9&#39;
+
+services:
+  redis:
+    image: redis:7.0.1
+    container_name: redis
+    restart: always
+    ports:
+      - &quot;6379:6379&quot;
+    volumes:
+      # 持久化数据目录
+      - /opt/mountdata/redis:/data
+      # 配置文件挂载
+      - /opt/mountdata/redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+</code></pre>
+<h2 id="6、安装nginx"><a href="#6、安装nginx" class="headerlink" title="6、安装nginx"></a>6、安装nginx</h2><p>1、镜像拉取</p>
+<pre><code>docker pull nginx:1.22.0
+</code></pre>
+<p>2、容器启动</p>
+<p>宿主机目录创建</p>
+<pre><code>sudo mkdir -p /opt/mountdata/nginx/&#123;conf.d,certs,html,logs&#125;
+</code></pre>
+<p>容器启动前先把镜像的目录先拷贝到宿主机</p>
+<pre><code># 提取主配置文件
+docker run --rm nginx:1.22.0 cat /etc/nginx/nginx.conf &gt; /opt/mountdata/nginx/nginx.conf
+# 提取默认server配置
+docker run --rm nginx:1.22.0 cat /etc/nginx/conf.d/default.conf &gt; /opt/mountdata/nginx/conf.d/default.conf
+# 提取mime.types文件（可选）
+docker run --rm nginx:1.22.0 cat /etc/nginx/mime.types &gt; /opt/mountdata/nginx/mime.types
+</code></pre>
+<p>文件权限校验</p>
+<pre><code>sudo chown -R 101:101 /opt/mountdata/nginx/logs  # Nginx用户UID
+sudo chmod -R 755 /opt/mountdata/nginx
+sudo chmod 644 /opt/mountdata/nginx/nginx.conf
+sudo chmod 644 /opt/mountdata/nginx/conf.d/default.conf
+</code></pre>
+<p>启动这个容器</p>
+<pre><code>docker run -d --name nginx-prod \
+  -p 80:80 \
+  -p 5000:5000 \
+  -p 5004:5004 \
+  -p 5002:5002 \
+  -p 5003:5003 \
+  -p 5001:5001 \
+  -p 5100:5100 \
+  -p 7100:7100 \
+  -p 443:443 \
+  -v /opt/mountdata/nginx/nginx.conf:/etc/nginx/nginx.conf:ro \
+  -v /opt/mountdata/nginx/mime.types:/etc/nginx/mime.types:ro \
+  -v /opt/mountdata/nginx/conf.d:/etc/nginx/conf.d:ro \
+  -v /opt/mountdata/nginx/certs:/etc/nginx/certs:ro \
+  -v /opt/mountdata/nginx/html:/usr/share/nginx/html:ro \
+  -v /opt/mountdata/nginx/logs:/var/log/nginx \
+  nginx:1.22.0
+</code></pre>
+<p>3、如果修改了配置文件，环境怎么刷新</p>
+<p>检测配置文件是否有误</p>
+<pre><code>docker exec nginx-prod nginx -t
+</code></pre>
+<p>重新加载nginx</p>
+<pre><code>docker exec nginx-prod nginx -s reload
+</code></pre>
+<h2 id="7、安装mysql5-7"><a href="#7、安装mysql5-7" class="headerlink" title="7、安装mysql5.7"></a>7、安装mysql5.7</h2><p>1、镜像拉取</p>
+<pre><code>docker pull mysql:5.7
+</code></pre>
+<p>2、容器启动</p>
+<pre><code>docker run -d \
+  --name mysql-prod \
+  --restart=always \
+  -p 3306:3306 \
+  -e MYSQL_ROOT_PASSWORD=LLyyqq04080811... \
+  -e TZ=Asia/Shanghai \
+  -v /opt/mysql/data:/var/lib/mysql \
+  -v /opt/mysql/logs:/var/log/mysql \
+  -v /opt/mysql/conf/my.cnf:/etc/mysql/my.cnf \
+  mysql:5.7 \
+  --character-set-server=utf8mb4 \
+  --collation-server=utf8mb4_unicode_ci \
+  --explicit_defaults_for_timestamp=1
+</code></pre>
+<h2 id="8、安装Nacos"><a href="#8、安装Nacos" class="headerlink" title="8、安装Nacos"></a>8、安装Nacos</h2><p>1、镜像拉取</p>
+<pre><code>docker pull nacos/nacos-server:v2.2.3
+</code></pre>
+<p>2、提前拷贝镜像里面的配置文件</p>
+<pre><code>宿主机目录创建
+mkdir -p /opt/mountdata/nacos/&#123;conf,logs,data&#125;
+
+临时容器启动
+docker run -d --name nacos-tmp nacos/nacos-server:v2.2.3
+拷贝文件到宿主机
+docker cp nacos-tmp:/home/nacos/conf /opt/mountdata/nacos/
+docker cp nacos-tmp:/home/nacos/logs /opt/mountdata/nacos/
+docker cp nacos-tmp:/home/nacos/data /opt/mountdata/nacos/
+最后删除临时容器
+docker rm -f nacos-tmp
+</code></pre>
+<p>3、启动Nacos容器</p>
+<pre><code>docker run -d \
+--name nacos-prod \
+-p 8848:8848 \
+-p 9848:9848 \
+-p 9849:9849 \
+-e MODE=standalone \
+-v /opt/mountdata/nacos/conf:/home/nacos/conf \
+-v /opt/mountdata/nacos/logs:/home/nacos/logs \
+-v /opt/mountdata/nacos/data:/home/nacos/data \
+nacos/nacos-server:v2.2.3
+</code></pre>
+<h2 id="9、安装容器监控工具Portainer"><a href="#9、安装容器监控工具Portainer" class="headerlink" title="9、安装容器监控工具Portainer"></a>9、安装容器监控工具Portainer</h2><p>1、镜像拉取</p>
+<pre><code>docker pull portainer/portainer-ce
+</code></pre>
+<p>2、提前把docker里面的data目录内容copy到&#x2F;opt&#x2F;mountdata&#x2F;portainer&#x2F;portainer_data</p>
+<pre><code>docker cp portainer:/data/. /opt/mountdata/portainer/portainer_data/
+</code></pre>
+<p>3、启动docker容器</p>
+<pre><code>docker run -d \
+  --name portainer-prod \
+  -p 9000:9000 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /opt/mountdata/portainer/portainer_data:/data \
+  --restart=always \
+  portainer/portainer-ce
+</code></pre>
+<h2 id="10、安装MongoDB"><a href="#10、安装MongoDB" class="headerlink" title="10、安装MongoDB"></a>10、安装MongoDB</h2><p>1、创建MongoDB数据挂载目录</p>
+<pre><code>mkdir -p /opt/mountdata/mongodb/data
+</code></pre>
+<p>2、镜像拉取</p>
+<pre><code>docker pull mkdir -p /opt/mountdata/mongodb/data
+</code></pre>
+<p>3、容器启动</p>
+<pre><code>docker run -d \
+  --name mongodb-prod \
+  -p 27017:27017 \
+  -v /opt/mountdata/mongodb/data:/data/db \
+  --restart=always \
+  mongo:6.0
+</code></pre>
 
     </div>
     <footer class="article-footer">
-        <a class="article-category-link" href="/categories/Webchat/" title="Webchat" data-aos="zoom-in">Webchat</a>
+        <a class="article-category-link" href="/categories/Linux/" title="Linux" data-aos="zoom-in">Linux</a>
 
-        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/Webchat/" rel="tag" title="Webchat">Webchat</a></li></ul>
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/Linux%EF%BC%8CDocker/" rel="tag" title="Linux，Docker">Linux，Docker</a></li></ul>
 
     </footer>
   </div>
     <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
       <div class="article-nav-link-wrap left">
-            <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="二、Webchat项目微服务拆分思想" class="lazyload">
-        <a href="/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/" aria-label="前一篇: 二、Webchat项目微服务拆分思想" title="前一篇: 二、Webchat项目微服务拆分思想"></a>
+            <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="从0到1认识索引：MySQL索引基础全解析" class="lazyload">
+        <a href="/2026/02/02/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%BB%8E0%E5%88%B01%E8%AE%A4%E8%AF%86%E7%B4%A2%E5%BC%95%EF%BC%9AMySQL%E7%B4%A2%E5%BC%95%E5%9F%BA%E7%A1%80%E5%85%A8%E8%A7%A3%E6%9E%90/" aria-label="前一篇: 从0到1认识索引：MySQL索引基础全解析" title="前一篇: 从0到1认识索引：MySQL索引基础全解析"></a>
         <div class="article-nav-caption">前一篇</div>
         <h3 class="article-nav-title">
-            二、Webchat项目微服务拆分思想
+            从0到1认识索引：MySQL索引基础全解析
         </h3>
       </div>
-    <div class="article-nav-link-wrap right">
-          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="MySQL事务基础知识点" class="lazyload">
-      <a href="/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E4%BA%8B%E5%8A%A1%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E7%82%B9/" aria-label="后一篇: MySQL事务基础知识点"  title="后一篇: MySQL事务基础知识点"></a>
-      <div class="article-nav-caption">后一篇</div>
-      <h3 class="article-nav-title">
-          MySQL事务基础知识点
-      </h3>
-    </div>
   </nav>
 
 </article>
@@ -375,7 +578,7 @@
   <div class="sidebar-wrap">
         <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
 <div class="sidebar-toc-wrapper toc-div-class" >
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D"><span class="toc-text">一、项目介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E5%9B%BE"><span class="toc-text">二、微服务架构图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%E6%9C%8D%E5%8A%A1"><span class="toc-text">前端服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8E%E7%AB%AF%E6%9C%8D%E5%8A%A1"><span class="toc-text">后端服务</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%A6%82%E5%BF%B5%E4%BB%8B%E7%BB%8D"><span class="toc-text">三、概念介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#BFF%EF%BC%88Backend-From-Front%EF%BC%89"><span class="toc-text">BFF（Backend From Front）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UGC%E3%80%81PGC%E3%80%81AIGC"><span class="toc-text">UGC、PGC、AIGC</span></a></li></ol></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%E3%80%81%E5%AE%89%E8%A3%85%E5%90%91%E9%87%8F%E6%95%B0%E6%8D%AE%E5%BA%93-Milvus"><span class="toc-text">1、安装向量数据库 Milvus</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81%E5%AE%89%E8%A3%85Tomcat"><span class="toc-text">2、安装Tomcat</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%E3%80%81%E5%AE%89%E8%A3%85minio"><span class="toc-text">3、安装minio</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4%E3%80%81%E5%AE%89%E8%A3%85RocketMQ"><span class="toc-text">4、安装RocketMQ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5%E3%80%81%E5%AE%89%E8%A3%85Redis"><span class="toc-text">5、安装Redis</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6%E3%80%81%E5%AE%89%E8%A3%85nginx"><span class="toc-text">6、安装nginx</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7%E3%80%81%E5%AE%89%E8%A3%85mysql5-7"><span class="toc-text">7、安装mysql5.7</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8%E3%80%81%E5%AE%89%E8%A3%85Nacos"><span class="toc-text">8、安装Nacos</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9%E3%80%81%E5%AE%89%E8%A3%85%E5%AE%B9%E5%99%A8%E7%9B%91%E6%8E%A7%E5%B7%A5%E5%85%B7Portainer"><span class="toc-text">9、安装容器监控工具Portainer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10%E3%80%81%E5%AE%89%E8%A3%85MongoDB"><span class="toc-text">10、安装MongoDB</span></a></li></ol>
 </div>
 </div>
         <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
@@ -506,13 +709,13 @@
       <script data-pjax>
         window.REIMU_POST = {
           author: "牛小聪",
-          title: "快速熟悉Webchat项目",
-          url: "https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%B8%80%E3%80%81%E5%BF%AB%E9%80%9F%E7%86%9F%E6%82%89WebChat%E9%A1%B9%E7%9B%AE/",
+          title: "常用软件安装教程（Docker版）",
+          url: "https://niuxiaocong.github.io/2026/02/01/Linux/%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B%EF%BC%88Docker%E7%89%88%EF%BC%89/",
           excerpt: "",
           description: "",
-          stripContent: "一、项目介绍这个项目分成了三期；第一期主要是网页版的一个微信（IM系统）、二期是在一期项目里面嵌入了一个企业级的AI助手；三期是电商业务方向； 二、微服务架构图  前端服务webchat-front-client: IM 前端服务 webchat-front-oauth: 统一认证服务 webchat-front-admin: 管理后台的前端服务 webchat-front-mall：电商系统前端服务 webchat-front-payment：支付的前端服务 后端服务webchat-gatew",
-          date: "Tue Feb 03 2026 10:28:48 GMT+0800",
-          updated: "Tue Feb 03 2026 10:31:55 GMT+0800",
+          stripContent: "操作系统信息 centos7.6 1、安装向量数据库 Milvus1、执行下面这条命令下载docker-compose文件或者是手动下载docker-compose文件：https://github.com/milvus-io/milvus/releases/tag/v2.5.12 wget https://github.com/milvus-io/milvus/releases/download/v2.5.12/milvus-standalone-docker-compose.yml  2、再",
+          date: "Sun Feb 01 2026 11:06:08 GMT+0800",
+          updated: "Tue Feb 03 2026 11:09:12 GMT+0800",
           cover: "/images/banner.webp",
         };
       </script>
