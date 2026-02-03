@@ -1,0 +1,664 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_4k4bc36ef96';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://niuxiaocong.github.io';</script>
+  <title>
+    三、WebChat项目注册+SSO单点 | 牛小聪
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_4k4bc36ef96.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/css/loader.css">
+
+    <meta name="description" content="一、注册功能业务流程    业务实现验证码生成分布式部署的情况下每一个Jvm的Session是不会共享的，那为什么再这里还会用Session？ 是因为验证码有以下几个天然属性：验证码只属于当前用户、生命周期段、无需跨用户共享；   验证码生成工具类1234567891011121314151617181920212223242526272829303132333435363738394041424">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三、WebChat项目注册+SSO单点">
+<meta property="og:url" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/index.html">
+<meta property="og:site_name" content="牛小聪">
+<meta property="og:description" content="一、注册功能业务流程    业务实现验证码生成分布式部署的情况下每一个Jvm的Session是不会共享的，那为什么再这里还会用Session？ 是因为验证码有以下几个天然属性：验证码只属于当前用户、生命周期段、无需跨用户共享；   验证码生成工具类1234567891011121314151617181920212223242526272829303132333435363738394041424">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/image-20260203104319043.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/image-20260203104341833.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/image-20260203104403976.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/image-20260203104429981.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/image-20260203104449695.png">
+<meta property="article:published_time" content="2026-02-03T02:41:05.000Z">
+<meta property="article:modified_time" content="2026-02-03T02:44:56.069Z">
+<meta property="article:author" content="牛小聪">
+<meta property="article:tag" content="Webchat">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/image-20260203104319043.png">
+    <link rel="alternate" href="/atom.xml" title="牛小聪" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </span>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/images/banner.webp" alt="三、WebChat项目注册+SSO单点">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">三、WebChat项目注册+SSO单点</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E6%B3%A8%E5%86%8C%E5%8A%9F%E8%83%BD"><span class="toc-text">一、注册功能</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%9A%E5%8A%A1%E6%B5%81%E7%A8%8B"><span class="toc-text">业务流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%9A%E5%8A%A1%E5%AE%9E%E7%8E%B0"><span class="toc-text">业务实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90"><span class="toc-text">验证码生成</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90%E5%B7%A5%E5%85%B7%E7%B1%BB"><span class="toc-text">验证码生成工具类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%80%9A%E7%94%A8Session%E7%AE%A1%E7%90%86%E7%B1%BB"><span class="toc-text">通用Session管理类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C%E6%9C%8D%E5%8A%A1%E7%B1%BB"><span class="toc-text">验证码校验服务类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E9%AA%8C%E8%AF%81%E7%A0%81%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-text">获取验证码代码实现</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E5%86%8C%E5%8A%9F%E8%83%BD"><span class="toc-text">注册功能</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B3%A8%E5%86%8C%E6%B5%81%E7%A8%8B"><span class="toc-text">注册流程</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B3%A8%E5%86%8C%E4%B8%9A%E5%8A%A1%E6%96%B9%E6%B3%95"><span class="toc-text">注册业务方法</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95"><span class="toc-text">二、单点登录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E7%82%B9%E6%B5%81%E7%A8%8B"><span class="toc-text">单点流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%99%BB%E5%BD%95%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95"><span class="toc-text">登录实现方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81IM-%E6%8E%88%E6%9D%83%E8%AE%A4%E8%AF%81"><span class="toc-text">三、IM 授权认证</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#IM-%E6%8E%88%E6%9D%83%E8%AE%A4%E8%AF%81%E6%B5%81%E7%A8%8B"><span class="toc-text">IM 授权认证流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%88%E6%9D%83%E8%AE%A4%E8%AF%81%E8%BF%87%E6%BB%A4%E5%99%A8%E7%B1%BB"><span class="toc-text">授权认证过滤器类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#createUserLoginSession%E6%96%B9%E6%B3%95"><span class="toc-text">createUserLoginSession方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%80%BB%E7%BB%93"><span class="toc-text">四、总结</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="牛小聪" class="lazyload">
+  <div class="sidebar-author-name">牛小聪</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">8</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/niuxiaocong itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-bilibili sidebar-social-icon">
+      <a href=https://space.bilibili.com/352487678 itemprop="url" target="_blank" aria-label="bilibili" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-juejin sidebar-social-icon">
+      <a href=https://juejin.cn/user/1324234125087575 itemprop="url" target="_blank" aria-label="juejin" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-WebChat/三、WebChat项目注册+SSO单点" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-02-03T02:41:05.000Z" itemprop="datePublished">2026-02-03</time>
+    <time style="display: none;" id="post-update-time">2026-02-03</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h2 id="一、注册功能"><a href="#一、注册功能" class="headerlink" title="一、注册功能"></a>一、注册功能</h2><h3 id="业务流程"><a href="#业务流程" class="headerlink" title="业务流程"></a>业务流程</h3><img src="/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/image-20260203104319043.png" class="" title="image-20260203104319043">
+
+
+
+<h3 id="业务实现"><a href="#业务实现" class="headerlink" title="业务实现"></a>业务实现</h3><h4 id="验证码生成"><a href="#验证码生成" class="headerlink" title="验证码生成"></a>验证码生成</h4><p>分布式部署的情况下每一个Jvm的Session是不会共享的，那为什么再这里还会用Session？</p>
+<p>是因为验证码有以下几个天然属性：验证码只属于当前用户、生命周期段、<strong>无需跨用户共享</strong>；</p>
+<img src="/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/image-20260203104341833.png" class="" title="image-20260203104341833">
+
+<h5 id="验证码生成工具类"><a href="#验证码生成工具类" class="headerlink" title="验证码生成工具类"></a>验证码生成工具类</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PicValidCodeUtil</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/***</span></span><br><span class="line"><span class="comment">     * 定义图片的width</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">int</span> <span class="variable">width</span> <span class="operator">=</span> <span class="number">90</span>;</span><br><span class="line">    <span class="comment">/***</span></span><br><span class="line"><span class="comment">     * 定义图片的height</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">int</span> <span class="variable">height</span> <span class="operator">=</span> <span class="number">20</span>;</span><br><span class="line">    <span class="comment">/***</span></span><br><span class="line"><span class="comment">     * 定义图片上显示验证码的个数</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">int</span> <span class="variable">codeCount</span> <span class="operator">=</span> <span class="number">4</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">int</span> <span class="variable">xx</span> <span class="operator">=</span> <span class="number">15</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">int</span> <span class="variable">fontHeight</span> <span class="operator">=</span> <span class="number">18</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span>  <span class="type">int</span> <span class="variable">codeY</span> <span class="operator">=</span> <span class="number">16</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">char</span>[] codeSequence = &#123; <span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;D&#x27;</span>, <span class="string">&#x27;E&#x27;</span>, <span class="string">&#x27;F&#x27;</span>, <span class="string">&#x27;G&#x27;</span>, <span class="string">&#x27;H&#x27;</span>, <span class="string">&#x27;I&#x27;</span>, <span class="string">&#x27;J&#x27;</span>, <span class="string">&#x27;K&#x27;</span>, <span class="string">&#x27;L&#x27;</span>, <span class="string">&#x27;M&#x27;</span>, <span class="string">&#x27;N&#x27;</span>, <span class="string">&#x27;O&#x27;</span>, <span class="string">&#x27;P&#x27;</span>, <span class="string">&#x27;Q&#x27;</span>, <span class="string">&#x27;R&#x27;</span>, <span class="string">&#x27;S&#x27;</span>, <span class="string">&#x27;T&#x27;</span>, <span class="string">&#x27;U&#x27;</span>, <span class="string">&#x27;V&#x27;</span>, <span class="string">&#x27;W&#x27;</span>, <span class="string">&#x27;X&#x27;</span>, <span class="string">&#x27;Y&#x27;</span>, <span class="string">&#x27;Z&#x27;</span>, <span class="string">&#x27;0&#x27;</span>, <span class="string">&#x27;1&#x27;</span>, <span class="string">&#x27;2&#x27;</span>, <span class="string">&#x27;3&#x27;</span>, <span class="string">&#x27;4&#x27;</span>, <span class="string">&#x27;5&#x27;</span>, <span class="string">&#x27;6&#x27;</span>, <span class="string">&#x27;7&#x27;</span>, <span class="string">&#x27;8&#x27;</span>, <span class="string">&#x27;9&#x27;</span> &#125;;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">char</span>[] numberCodeSequence = &#123;<span class="string">&#x27;0&#x27;</span>, <span class="string">&#x27;1&#x27;</span>, <span class="string">&#x27;2&#x27;</span>, <span class="string">&#x27;3&#x27;</span>, <span class="string">&#x27;4&#x27;</span>, <span class="string">&#x27;5&#x27;</span>, <span class="string">&#x27;6&#x27;</span>, <span class="string">&#x27;7&#x27;</span>, <span class="string">&#x27;8&#x27;</span>, <span class="string">&#x27;9&#x27;</span> &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 生成一个map集合</span></span><br><span class="line"><span class="comment">     * code为生成的验证码</span></span><br><span class="line"><span class="comment">     * codePic为生成的验证码BufferedImage对象</span></span><br><span class="line"><span class="comment">     * onlyNumber true 生成纯数字的验证吗，false 生成字母 + 数字</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> PicValidCodeResult <span class="title function_">generateCodeAndPic</span><span class="params">(<span class="type">boolean</span> onlyNumber)</span> &#123;</span><br><span class="line">        <span class="comment">// 定义图像buffer</span></span><br><span class="line">        <span class="type">BufferedImage</span> <span class="variable">buffImg</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BufferedImage</span>(width, height, BufferedImage.TYPE_INT_RGB);</span><br><span class="line">        <span class="type">Graphics</span> <span class="variable">gd</span> <span class="operator">=</span> buffImg.getGraphics();</span><br><span class="line">        <span class="comment">// 创建一个随机数生成器类</span></span><br><span class="line">        <span class="type">Random</span> <span class="variable">random</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Random</span>();</span><br><span class="line">        <span class="comment">// 将图像填充为白色</span></span><br><span class="line">        gd.setColor(Color.WHITE);</span><br><span class="line">        gd.fillRect(<span class="number">0</span>, <span class="number">0</span>, width, height);</span><br><span class="line">        <span class="comment">// 创建字体，字体的大小应该根据图片的高度来定。</span></span><br><span class="line">        <span class="type">Font</span> <span class="variable">font</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Font</span>(<span class="string">&quot;Fixedsys&quot;</span>, Font.BOLD, fontHeight);</span><br><span class="line">        <span class="comment">// 设置字体。</span></span><br><span class="line">        gd.setFont(font);</span><br><span class="line">        <span class="comment">// 画边框。</span></span><br><span class="line"><span class="comment">//        gd.setColor(Color.BLACK);</span></span><br><span class="line">        gd.drawRect(<span class="number">0</span>, <span class="number">0</span>, width - <span class="number">1</span>, height - <span class="number">1</span>);</span><br><span class="line">        <span class="comment">// 随机产生40条干扰线，使图象中的认证码不易被其它程序探测到。</span></span><br><span class="line">        gd.setColor(Color.BLACK);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">30</span>; i++) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">x</span> <span class="operator">=</span> random.nextInt(width);</span><br><span class="line">            <span class="type">int</span> <span class="variable">y</span> <span class="operator">=</span> random.nextInt(height);</span><br><span class="line">            <span class="type">int</span> <span class="variable">xl</span> <span class="operator">=</span> random.nextInt(<span class="number">12</span>);</span><br><span class="line">            <span class="type">int</span> <span class="variable">yl</span> <span class="operator">=</span> random.nextInt(<span class="number">12</span>);</span><br><span class="line">            gd.drawLine(x, y, x + xl, y + yl);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// randomCode用于保存随机产生的验证码，以便用户登录后进行验证。</span></span><br><span class="line">        <span class="type">StringBuffer</span> <span class="variable">randomCode</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuffer</span>();</span><br><span class="line">        <span class="type">int</span> <span class="variable">red</span> <span class="operator">=</span> <span class="number">0</span>, green = <span class="number">0</span>, blue = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 随机产生codeCount数字的验证码。</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; codeCount; i++) &#123;</span><br><span class="line">            <span class="comment">// 得到随机产生的验证码数字。</span></span><br><span class="line">            <span class="type">String</span> <span class="variable">code</span> <span class="operator">=</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">            <span class="keyword">if</span> (onlyNumber) &#123;</span><br><span class="line">                code = String.valueOf(numberCodeSequence[random.nextInt(<span class="number">10</span>)]);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                code = String.valueOf(codeSequence[random.nextInt(<span class="number">26</span>)]);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 产生随机的颜色分量来构造颜色值，这样输出的每位数字的颜色值都将不同。</span></span><br><span class="line">            red = random.nextInt(<span class="number">255</span>);</span><br><span class="line">            green = random.nextInt(<span class="number">255</span>);</span><br><span class="line">            blue = random.nextInt(<span class="number">255</span>);</span><br><span class="line">            <span class="comment">// 用随机产生的颜色将验证码绘制到图像中。</span></span><br><span class="line">            gd.setColor(<span class="keyword">new</span> <span class="title class_">Color</span>(red, green, blue));</span><br><span class="line">            gd.drawString(code, (i + <span class="number">1</span>) * xx, codeY);</span><br><span class="line">            <span class="comment">// 将产生的四个随机数组合在一起。</span></span><br><span class="line">            randomCode.append(code);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">PicValidCodeResult</span>(randomCode.toString(), buffImg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="通用Session管理类"><a href="#通用Session管理类" class="headerlink" title="通用Session管理类"></a>通用Session管理类</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SessionService</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> HttpServletRequest request;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/***</span></span><br><span class="line"><span class="comment">     * 创建SESSIOn</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> key</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> val</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">set</span><span class="params">(String key, String val)</span> &#123;</span><br><span class="line">        request.getSession().setAttribute(key, val);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/***</span></span><br><span class="line"><span class="comment">     * 查询SESSION</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> key</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">get</span><span class="params">(String key)</span> &#123;</span><br><span class="line">        <span class="type">Object</span> <span class="variable">valObj</span> <span class="operator">=</span> request.getSession().getAttribute(key);</span><br><span class="line">        <span class="keyword">return</span> valObj == <span class="literal">null</span> ? <span class="literal">null</span> : valObj.toString();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">remove</span><span class="params">(String key)</span> &#123;</span><br><span class="line">        request.getSession().removeAttribute(key);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="验证码校验服务类"><a href="#验证码校验服务类" class="headerlink" title="验证码校验服务类"></a>验证码校验服务类</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sessionService.set(WebConstant.PIC_VALID_CODE_SESSION_KEY, code);</span><br></pre></td></tr></table></figure>
+
+<p>这样写为什么没有问题？，我第一眼看到这个，key是固定值，如果两个用户都请求 &#x2F;code 第一个反应是这个key的value会不会被覆盖；答案是<strong>不会</strong>，因为这是session级别的；</p>
+<p>可以理解成它是由sessionId + key 对应 value</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SessionId + PIC_VALID_CODE_SESSION_KEY → code</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ValidCodeService</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> SessionService sessionService;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/***</span></span><br><span class="line"><span class="comment">     * 刷新验证码</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">refreshCode</span><span class="params">(String code)</span> &#123;</span><br><span class="line">        <span class="comment">// Session 保存下来</span></span><br><span class="line">        sessionService.set(WebConstant.PIC_VALID_CODE_SESSION_KEY, code);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 数字验证码核验</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> code</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">validCode</span><span class="params">(String code)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(StringUtils.isBlank(code)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">AuthException</span>(<span class="string">&quot;图形验证码校验失败&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Session 保存下来</span></span><br><span class="line">        <span class="keyword">if</span> (code.equals(sessionService.get(WebConstant.PIC_VALID_CODE_SESSION_KEY))) &#123;</span><br><span class="line">            sessionService.remove(WebConstant.PIC_VALID_CODE_SESSION_KEY);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">AuthException</span>(<span class="string">&quot;图形验证码校验失败&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="获取验证码代码实现"><a href="#获取验证码代码实现" class="headerlink" title="获取验证码代码实现"></a>获取验证码代码实现</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/code&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">getValidCode</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="comment">// 生成图形验证码</span></span><br><span class="line">    <span class="type">PicValidCodeResult</span> <span class="variable">picValidCodeResult</span> <span class="operator">=</span> PicValidCodeUtil.generateCodeAndPic(<span class="literal">true</span>);</span><br><span class="line">    <span class="comment">// 刷新验证码</span></span><br><span class="line">    validCodeService.refreshCode(picValidCodeResult.getCode());</span><br><span class="line">    <span class="comment">// 返回客户端</span></span><br><span class="line">    printValidCodeImage(picValidCodeResult.getImage());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">printValidCodeImage</span><span class="params">(BufferedImage img)</span> &#123;</span><br><span class="line">    response.setContentType(<span class="string">&quot;image/png&quot;</span>);</span><br><span class="line">    response.setDateHeader(<span class="string">&quot;expries&quot;</span>, -<span class="number">1</span>);</span><br><span class="line">    response.setHeader(<span class="string">&quot;Cache-Control&quot;</span>, <span class="string">&quot;no-cache&quot;</span>);</span><br><span class="line">    response.setHeader(<span class="string">&quot;Pragma&quot;</span>, <span class="string">&quot;no-cache&quot;</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        ImageIO.write(img, <span class="string">&quot;png&quot;</span>, response.getOutputStream());</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        log.error(<span class="string">&quot;POSTER IMAGE CREATE ERROR.&quot;</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="注册功能"><a href="#注册功能" class="headerlink" title="注册功能"></a>注册功能</h4><h5 id="注册流程"><a href="#注册流程" class="headerlink" title="注册流程"></a>注册流程</h5><img src="/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/image-20260203104403976.png" class="" title="image-20260203104403976">
+
+<p>BFF层服务webchat-sso</p>
+<p>为什么要在这个服务里面校验验证码，而不是再下游统一校验；这主要还是因为session再每一个服务不会共享；验证码的生成是保存再webchat-sso服务里面的，如果去取下游的服务去校验验证码，下游的session里面是肯定没有存储的，所以必然会校验失败。</p>
+<p>正确的做法是验证码校验必须在 webchat-sso 服务内完成，而不下沉到业务服务中。<br>原因在于验证码属于认证前置状态，其生命周期仅存在于身份建立之前，应由统一的认证入口负责校验。<br>在微服务架构下，各服务的 Session 天然隔离，验证码生成状态仅存在于 webchat-sso 的会话上下文中，下游服务既无法也不应直接访问该状态。<br>若将验证码校验下沉到业务服务，将导致跨服务状态依赖和认证逻辑扩散，破坏服务边界并引入安全风险。因此，验证码校验统一在webchat-sso内完成，校验通过后再进入后续注册&#x2F;登录流程。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PostMapping(&quot;/oauth/register&quot;)</span></span><br><span class="line"><span class="keyword">public</span> APIResponseBean <span class="title function_">register</span><span class="params">(<span class="meta">@RequestBody</span> UserRegistryInfoRequestVO request)</span> &#123;</span><br><span class="line">    <span class="comment">// 数字验证码核验</span></span><br><span class="line">    validCodeService.validCode(request.getPicCheckCode());</span><br><span class="line">    <span class="type">boolean</span> <span class="variable">result</span> <span class="operator">=</span> ssoCoreService.registry(request);</span><br><span class="line">    <span class="keyword">return</span> APIResponseBeanUtil.success(result ? <span class="string">&quot;注册成功&quot;</span> : <span class="string">&quot;测试失败&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="注册业务方法"><a href="#注册业务方法" class="headerlink" title="注册业务方法"></a>注册业务方法</h5><p>步骤上大致分成以下几步，入参校验、用户信息保存、添加助手、事物结束刷新缓存</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">registry</span><span class="params">(String photo, String userName, String mobile, String password)</span> &#123;</span><br><span class="line">    <span class="comment">// 参数校验</span></span><br><span class="line">    <span class="built_in">this</span>.validateRegistryParam(userName, mobile);</span><br><span class="line">    <span class="comment">// 注册信息入库</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">uid</span> <span class="operator">=</span> <span class="built_in">this</span>.registryUser2DB(userName, photo, mobile, password);</span><br><span class="line">    <span class="comment">// 默认添加我的AI助手</span></span><br><span class="line">    SpringContextUtil.getBean(User2AIAgentSenderAccountRelationService.class).subscribe(uid, WebConstant.AI_AGENT_ID);</span><br><span class="line">    SpringContextUtil.getBean(User2ServerAccountRelationService.class).subscribe(uid, WebConstant.WEBCHAT_PAY_ID);</span><br><span class="line">    <span class="comment">// 注册成功，事务结束后刷新用户缓存信息</span></span><br><span class="line">    TransactionSyncManagerUtil.registerSynchronization(() -&gt; &#123;</span><br><span class="line">        <span class="comment">// 刷新用户缓存</span></span><br><span class="line">        <span class="built_in">this</span>.refreshAndGetUserEntityFromCache(uid);</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果你在事务里直接刷缓存，会发生什么？</p>
+<p>问题一、首先考虑隔离级别RR重复读隔离级别下面没有问题，但是再RC读已提交隔离级别下面会产生数据读取问题</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">事务 T1（当前线程）：RC隔离级别下这个事物没有提交</span><br><span class="line">  insert <span class="title function_">user</span><span class="params">(uid)</span></span><br><span class="line"></span><br><span class="line">事务 T2（缓存刷新里的查询）：RC 级别下，T1事物没有提交，然后去查这条新插入的数据是获取不到的</span><br><span class="line">  select * from user <span class="type">where</span> <span class="variable">uid</span> <span class="operator">=</span> ?</span><br><span class="line">  </span><br><span class="line">诱发问题：</span><br><span class="line">缓存写入 <span class="literal">null</span>，会有脏数据的问题</span><br></pre></td></tr></table></figure>
+
+<p>问题二、RR隔离级别，事务回滚了，但缓存已经写了，这样会导致缓存里面又用户数据但是数据库里面没有。造成数据不一致问题。</p>
+<pre><code>registryUser2DB 成功
+刷缓存
+后续 subscribe 抛异常
+事务回滚
+</code></pre>
+<p>记住一句话：<strong>事务内数据不可信</strong>，只有事务提交成功后的数据才有资格进入缓存</p>
+<h2 id="二、单点登录"><a href="#二、单点登录" class="headerlink" title="二、单点登录"></a>二、单点登录</h2><h3 id="单点流程"><a href="#单点流程" class="headerlink" title="单点流程"></a>单点流程</h3><img src="/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/image-20260203104429981.png" class="" title="image-20260203104429981">
+
+<h3 id="登录实现方法"><a href="#登录实现方法" class="headerlink" title="登录实现方法"></a>登录实现方法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> String <span class="title function_">login</span><span class="params">(UserLoginInfoRequestVO loginInfoRequest, HttpServletResponse httpServletResponse)</span> &#123;</span><br><span class="line">    <span class="comment">// 1. 查询账号是否存在</span></span><br><span class="line">    <span class="type">UserBaseResponseVO</span> <span class="variable">user</span> <span class="operator">=</span> <span class="built_in">this</span>.getUserBaseInfo(loginInfoRequest.getMobile());</span><br><span class="line">    Assert.notNull(user, <span class="string">&quot;账号不存在！&quot;</span>);</span><br><span class="line">    <span class="comment">// 2. 校验账号密码</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">inputPassword</span> <span class="operator">=</span> MD5Utils.md5(loginInfoRequest.getPassword().concat(WebConstant.MD5_SALT));</span><br><span class="line">    <span class="keyword">if</span> (!ObjectUtils.equals(inputPassword, user.getPassword())) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">AuthException</span>(<span class="string">&quot;密码错误！&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 生成token value</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">token</span> <span class="operator">=</span> snowflakeIdGeneratorService.generateId();</span><br><span class="line">    <span class="comment">// 3. 缓存token对应用户信息</span></span><br><span class="line">    doCacheUserToken(user.getUserId(), token);</span><br><span class="line">    <span class="comment">// 4. 种泛域名/大域名登录用户cookie</span></span><br><span class="line">    createLoginCookie(httpServletResponse, token);</span><br><span class="line">    <span class="comment">// 4. 生成登录授权码</span></span><br><span class="line">    <span class="keyword">return</span> genLoginOauthCode(user.getUserId());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>有了Token为什么还需要授权码？Token和授权码是什么？</p>
+<p>简单来说Token是登录凭证，授权码是用来换取登录的临时凭证；</p>
+<p>Token的本质上来说是已经登录用户的会话凭证，特点是和userId强绑定、生命周期较长、每次请求都会携带、可以根据Token直接点各位用户；通常用来做API鉴权、用户态维持、SSO统一登录</p>
+<p>授权码的本质，我已经通过认证的一次性证明；特点是只能用一次（按照项目的需求来，一般就能用一次）、快速过期、不能直接访问业务接口、只能用来换取Token；用途，SSO跨系统登录，避免token暴露给前端&#x2F;URL。</p>
+<p>如果只用Token会有什么问题？</p>
+<p>问题1、token容易泄露，会暴露再URL参数，Header头、Referer中</p>
+<p>问题2、没有办法支持SSO跳转，A系统跳转到B系统Token怎么进行安全传递</p>
+<p>问题3、Token被重放的风险比较高，一旦Token被劫持就可以长期使用</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>token</th>
+<th>授权码</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>是否一次性</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>是否短期</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>是否可直接访问接口</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>是否可暴露在 URL</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>是否可重放</td>
+<td>高风险</td>
+<td>极低</td>
+</tr>
+</tbody></table>
+<p>总结：Token 是用户的登录态凭证，用于后续所有请求鉴权；登录授权码是一次性的中转凭证，只用于安全地换取 token，本身不具备访问能力。</p>
+<p>一个典型SSO&#x2F;OAuth时序</p>
+<ul>
+<li>① 用户在 SSO 登录</li>
+<li>② SSO 校验账号密码</li>
+<li>③ SSO 生成 token（服务器内部）</li>
+<li>④ SSO 返回 loginOauthCode 给前端</li>
+<li>⑤ 前端跳转 &#x2F; 回调到业务系统，带 code</li>
+<li>⑥ 业务系统用 code 去 SSO 换 token</li>
+<li>⑦ 业务系统拿 token → 建立登录态</li>
+</ul>
+<h2 id="三、IM-授权认证"><a href="#三、IM-授权认证" class="headerlink" title="三、IM 授权认证"></a>三、IM 授权认证</h2><h3 id="IM-授权认证流程"><a href="#IM-授权认证流程" class="headerlink" title="IM 授权认证流程"></a>IM 授权认证流程</h3><img src="/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/image-20260203104449695.png" class="" title="image-20260203104449695">
+
+<h3 id="授权认证过滤器类"><a href="#授权认证过滤器类" class="headerlink" title="授权认证过滤器类"></a>授权认证过滤器类</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="meta">@Order(-6)</span></span><br><span class="line"><span class="meta">@WebFilter(filterName = &quot;oauthFilter&quot;, urlPatterns = &#123;&quot;/*&quot;&#125;)</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span></span><br><span class="line"><span class="title class_">OauthFilter</span> <span class="keyword">implements</span> <span class="title class_">Filter</span> &#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> OauthProperties oauthProperties;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> OauthServiceClient oauthServiceClient;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> UserSessionService userSessionService;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">init</span><span class="params">(FilterConfig filterConfig)</span> <span class="keyword">throws</span> ServletException &#123;&#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * SSO_TOKEN</span></span><br><span class="line"><span class="comment">     * BIZ_TOKEN</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 1. 【基于业务自己的cookie+token】获取业务系统自己Cookie，解析sessionId，根据sessionId访问业务系统自己redis来获取登录人</span></span><br><span class="line"><span class="comment">     * 2. 【基于cookie/token单点认证】获取SSO TOKEN（泛域名下Cookie可以共享），RPC请求SSO Server来兑换登录id</span></span><br><span class="line"><span class="comment">     * 3. 【oauth认证】获取当前OauthCode，如果有则RPC请求SSO Server来兑换登录id</span></span><br><span class="line"><span class="comment">     * 4.  302 到统一登录服务完成登录认证</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> servletRequest</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> servletResponse</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> filterChain</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> ServletException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doFilter</span><span class="params">(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)</span> <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line">        <span class="type">HttpServletRequest</span> <span class="variable">request</span> <span class="operator">=</span> (HttpServletRequest) servletRequest;</span><br><span class="line">        <span class="type">HttpServletResponse</span> <span class="variable">response</span> <span class="operator">=</span> (HttpServletResponse) servletResponse;</span><br><span class="line">        <span class="type">String</span> <span class="variable">userId</span> <span class="operator">=</span> userSessionService.getUserIdByBizToken(request);</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isNotBlank(userId)) &#123;</span><br><span class="line">            <span class="comment">// 已经登录</span></span><br><span class="line">            SessionHelper.setUserId(userId);</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                filterChain.doFilter(request, response);</span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                SessionHelper.clear();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 2.尝试获取泛域名cookie</span></span><br><span class="line">        userId = userSessionService.getUserIdBySSOToken(request);</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isNotBlank(userId)) &#123;</span><br><span class="line">            userSessionService.createUserLoginSession(response, userId);</span><br><span class="line">            SessionHelper.setUserId(userId);</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                filterChain.doFilter(request, response);</span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                SessionHelper.clear();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 3.取集中session服务判断是否已经登录，如果已经登录则直接进入后续方法。</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">oauthCode</span> <span class="operator">=</span> request.getHeader(<span class="string">&quot;oauth-code&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isNotBlank(oauthCode)) &#123;</span><br><span class="line">            userId = oauthServiceClient.getUserIdByOauthCode(oauthCode).getData();</span><br><span class="line">            <span class="keyword">if</span> (StringUtils.isNotBlank(userId)) &#123;</span><br><span class="line">                userSessionService.createUserLoginSession(response, userId);</span><br><span class="line">                SessionHelper.setUserId(userId);</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    filterChain.doFilter(request, response);</span><br><span class="line">                &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                    SessionHelper.clear();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 302 重定向到统一登录页面</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="built_in">this</span>.unLogin(request, response);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">unLogin</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> &#123;</span><br><span class="line">        Map&lt;String, Object&gt; responseMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        response.setCharacterEncoding(<span class="string">&quot;UTF-8&quot;</span>); <span class="comment">// 设置字符编码为 UTF-8</span></span><br><span class="line">        response.setContentType(<span class="string">&quot;application/json;charset=UTF-8&quot;</span>); <span class="comment">// 设置内容类型和字符编码</span></span><br><span class="line">        responseMap.put(<span class="string">&quot;code&quot;</span>, BaseErrCodeEnum.UN_LOGIN.getCode());</span><br><span class="line">        responseMap.put(<span class="string">&quot;message&quot;</span>, BaseErrCodeEnum.UN_LOGIN.getMessage());</span><br><span class="line">        responseMap.put(<span class="string">&quot;redirect_url&quot;</span>, getRedirectUrl(request));</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            response.getWriter().println(JsonUtil.toJsonString(responseMap));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> String <span class="title function_">getRedirectUrl</span><span class="params">(HttpServletRequest request)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">serverUrl</span> <span class="operator">=</span> oauthProperties.getServerUrl();</span><br><span class="line">        <span class="type">String</span> <span class="variable">originUrl</span> <span class="operator">=</span> request.getHeader(<span class="string">&quot;origin-url&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> String.format(serverUrl, URLEncoder.encode(originUrl));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">destroy</span><span class="params">()</span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="createUserLoginSession方法"><a href="#createUserLoginSession方法" class="headerlink" title="createUserLoginSession方法"></a>createUserLoginSession方法</h3><p>再这个方法主要是做，缓存用户登录SESSIONID，然后把Session种到指定的域名下面</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">createUserLoginSession</span><span class="params">(HttpServletResponse response, String userId)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">sessionId</span> <span class="operator">=</span> MD5Utils.md5(userId + DateUtils.getCurrentFormatDate());</span><br><span class="line">    <span class="built_in">this</span>.setUserIdBySessionId(sessionId, userId);</span><br><span class="line">    <span class="comment">// 种浏览器Cookie</span></span><br><span class="line">    <span class="type">Cookie</span> <span class="variable">cookie</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Cookie</span>(CookieConstants.WEB_CHAT_CLIENT_USER_COOKIE_KEY, sessionId);</span><br><span class="line">    cookie.setDomain(<span class="string">&quot;localhost&quot;</span>);</span><br><span class="line">    cookie.setPath(<span class="string">&quot;/&quot;</span>);</span><br><span class="line">    cookie.setMaxAge(CookieConstants.COOKIE_OUT_TIME);</span><br><span class="line">    response.addCookie(cookie);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、总结"><a href="#四、总结" class="headerlink" title="四、总结"></a>四、总结</h2><p><strong>验证码设计</strong></p>
+<pre><code>    验证码属于认证前置状态，仅与当前用户会话相关
+       不需要跨用户、跨服务共享，使用 Session 存储是合理的
+       校验必须在统一认证入口（BFF / SSO）完成，不能下沉到业务服务
+</code></pre>
+<p><strong>Session 与分布式</strong></p>
+<pre><code>分布式环境下 Session 天然隔离，不可依赖下游服务的 Session 状态
+sessionId + key 共同构成隔离空间，不存在多用户覆盖问题
+</code></pre>
+<p><strong>事务与缓存一致性</strong></p>
+<pre><code>事务未提交前的数据不具备对外可见性
+事务内直接刷新缓存可能导致：
+      RC 隔离级别下缓存写入空值
+      事务回滚但缓存已写，产生脏数据
+缓存写入应延迟到事务成功提交之后
+</code></pre>
+<p><strong>Token 与授权码</strong></p>
+<pre><code>Token 是登录态凭证，用于请求鉴权和用户身份识别
+授权码是一次性、短生命周期的中转凭证
+授权码用于安全地换取 Token，避免 Token 暴露和重放风险
+</code></pre>
+<p><strong>SSO 认证流程</strong></p>
+<pre><code>登录态优先级：业务系统本地登录态 → SSO Token → 授权码
+授权成功后在业务系统建立本地 Session，避免每次请求依赖 SSO
+认证失败统一重定向到 SSO 登录入口
+</code></pre>
+<p><strong>架构边界原则</strong></p>
+<pre><code>认证状态集中管理，避免跨服务状态依赖
+状态只在必要范围内存在，生命周期尽量短
+核心目标是减少状态扩散，降低系统耦合和安全风险
+</code></pre>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/Webchat/" title="Webchat" data-aos="zoom-in">Webchat</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/Webchat/" rel="tag" title="Webchat">Webchat</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="部署篇-Webchat项目Docker部署" class="lazyload">
+        <a href="/2026/02/03/WebChat/%E9%83%A8%E7%BD%B2%E7%AF%87-Webchat%E9%A1%B9%E7%9B%AEDocker%E9%83%A8%E7%BD%B2/" aria-label="前一篇: 部署篇-Webchat项目Docker部署" title="前一篇: 部署篇-Webchat项目Docker部署"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            部署篇-Webchat项目Docker部署
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="二、Webchat项目微服务拆分思想" class="lazyload">
+      <a href="/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/" aria-label="后一篇: 二、Webchat项目微服务拆分思想"  title="后一篇: 二、Webchat项目微服务拆分思想"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          二、Webchat项目微服务拆分思想
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      牛小聪
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        22.2k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        01:33
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E6%B3%A8%E5%86%8C%E5%8A%9F%E8%83%BD"><span class="toc-text">一、注册功能</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%9A%E5%8A%A1%E6%B5%81%E7%A8%8B"><span class="toc-text">业务流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%9A%E5%8A%A1%E5%AE%9E%E7%8E%B0"><span class="toc-text">业务实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90"><span class="toc-text">验证码生成</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90%E5%B7%A5%E5%85%B7%E7%B1%BB"><span class="toc-text">验证码生成工具类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%80%9A%E7%94%A8Session%E7%AE%A1%E7%90%86%E7%B1%BB"><span class="toc-text">通用Session管理类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C%E6%9C%8D%E5%8A%A1%E7%B1%BB"><span class="toc-text">验证码校验服务类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E9%AA%8C%E8%AF%81%E7%A0%81%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-text">获取验证码代码实现</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E5%86%8C%E5%8A%9F%E8%83%BD"><span class="toc-text">注册功能</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B3%A8%E5%86%8C%E6%B5%81%E7%A8%8B"><span class="toc-text">注册流程</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B3%A8%E5%86%8C%E4%B8%9A%E5%8A%A1%E6%96%B9%E6%B3%95"><span class="toc-text">注册业务方法</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95"><span class="toc-text">二、单点登录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E7%82%B9%E6%B5%81%E7%A8%8B"><span class="toc-text">单点流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%99%BB%E5%BD%95%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95"><span class="toc-text">登录实现方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81IM-%E6%8E%88%E6%9D%83%E8%AE%A4%E8%AF%81"><span class="toc-text">三、IM 授权认证</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#IM-%E6%8E%88%E6%9D%83%E8%AE%A4%E8%AF%81%E6%B5%81%E7%A8%8B"><span class="toc-text">IM 授权认证流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%88%E6%9D%83%E8%AE%A4%E8%AF%81%E8%BF%87%E6%BB%A4%E5%99%A8%E7%B1%BB"><span class="toc-text">授权认证过滤器类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#createUserLoginSession%E6%96%B9%E6%B3%95"><span class="toc-text">createUserLoginSession方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%80%BB%E7%BB%93"><span class="toc-text">四、总结</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="牛小聪" class="lazyload">
+  <div class="sidebar-author-name">牛小聪</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">8</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/niuxiaocong itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-bilibili sidebar-social-icon">
+      <a href=https://space.bilibili.com/352487678 itemprop="url" target="_blank" aria-label="bilibili" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-juejin sidebar-social-icon">
+      <a href=https://juejin.cn/user/1324234125087575 itemprop="url" target="_blank" aria-label="juejin" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  
+<script src="/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "牛小聪",
+          title: "三、WebChat项目注册+SSO单点",
+          url: "https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/",
+          excerpt: "",
+          description: "",
+          stripContent: "一、注册功能业务流程    业务实现验证码生成分布式部署的情况下每一个Jvm的Session是不会共享的，那为什么再这里还会用Session？ 是因为验证码有以下几个天然属性：验证码只属于当前用户、生命周期段、无需跨用户共享；   验证码生成工具类123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676",
+          date: "Tue Feb 03 2026 10:41:05 GMT+0800",
+          updated: "Tue Feb 03 2026 10:44:56 GMT+0800",
+          cover: "/images/banner.webp",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.11.2' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

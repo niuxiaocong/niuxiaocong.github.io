@@ -1,0 +1,620 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_4k4bc36ef96';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://niuxiaocong.github.io';</script>
+  <title>
+    部署篇-Webchat项目Docker部署 | 牛小聪
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_4k4bc36ef96.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/css/loader.css">
+
+    <meta name="description" content="DockerFile编写webchat-act 服务1234567891011121314# jdkFROM eclipse-temurin:17-jre-jammy#作者信息（可选）LABEL maintainer&#x3D;&quot;nyc&quot;# 设置工作目录WORKDIR &#x2F;app# 复制已打包好的 Spring Boot jarCOPY webchat-act.jar &#x2F;app&#x2F;webch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="部署篇-Webchat项目Docker部署">
+<meta property="og:url" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E9%83%A8%E7%BD%B2%E7%AF%87-Webchat%E9%A1%B9%E7%9B%AEDocker%E9%83%A8%E7%BD%B2/index.html">
+<meta property="og:site_name" content="牛小聪">
+<meta property="og:description" content="DockerFile编写webchat-act 服务1234567891011121314# jdkFROM eclipse-temurin:17-jre-jammy#作者信息（可选）LABEL maintainer&#x3D;&quot;nyc&quot;# 设置工作目录WORKDIR &#x2F;app# 复制已打包好的 Spring Boot jarCOPY webchat-act.jar &#x2F;app&#x2F;webch">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-02-03T02:46:14.000Z">
+<meta property="article:modified_time" content="2026-02-03T02:56:20.813Z">
+<meta property="article:author" content="牛小聪">
+<meta property="article:tag" content="Webchat">
+<meta name="twitter:card" content="summary">
+    <link rel="alternate" href="/atom.xml" title="牛小聪" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </span>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/images/banner.webp" alt="部署篇-Webchat项目Docker部署">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">部署篇-Webchat项目Docker部署</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#DockerFile%E7%BC%96%E5%86%99"><span class="toc-text">DockerFile编写</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-act-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-act 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-admin-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-admin 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-aigc-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-aigc 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-api-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-api 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-client-chat-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-client-chat 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-client-mall-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-client-mall 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-client-payment-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-client-payment 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-connect-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-connect 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-gateway-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-gateway 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-netty-gateway-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-netty-gateway 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-netty-server-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-netty-server 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-pay-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-pay 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-pgc-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-pgc 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-search-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-search 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-sso-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-sso 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-ugc-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-ugc 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-user-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-user 服务</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%B9%E5%99%A8%E4%B8%80%E9%94%AE%E5%90%AF%E5%81%9C%E8%84%9A%E6%9C%AC"><span class="toc-text">容器一键启停脚本</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#nginx%E9%85%8D%E7%BD%AE"><span class="toc-text">nginx配置</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#gateway-conf"><span class="toc-text">gateway.conf</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-front-admin-conf"><span class="toc-text">webchat-front-admin.conf</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-front-client-conf"><span class="toc-text">webchat-front-client.conf</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-front-mall-conf"><span class="toc-text">webchat-front-mall.conf</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-front-oauth-conf"><span class="toc-text">webchat-front-oauth.conf</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-front-payment-conf"><span class="toc-text">webchat-front-payment.conf</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="牛小聪" class="lazyload">
+  <div class="sidebar-author-name">牛小聪</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">8</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/niuxiaocong itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-bilibili sidebar-social-icon">
+      <a href=https://space.bilibili.com/352487678 itemprop="url" target="_blank" aria-label="bilibili" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-juejin sidebar-social-icon">
+      <a href=https://juejin.cn/user/1324234125087575 itemprop="url" target="_blank" aria-label="juejin" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-WebChat/部署篇-Webchat项目Docker部署" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-02-03T02:46:14.000Z" itemprop="datePublished">2026-02-03</time>
+    <time style="display: none;" id="post-update-time">2026-02-03</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="DockerFile编写"><a href="#DockerFile编写" class="headerlink" title="DockerFile编写"></a>DockerFile编写</h1><h2 id="webchat-act-服务"><a href="#webchat-act-服务" class="headerlink" title="webchat-act 服务"></a>webchat-act 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jre-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY webchat-act.jar /app/webchat-act.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -Xss1m -XX:MaxMetaspaceSize=96m  -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8025</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-act.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">  -p 8025:8025 \</span><br><span class="line">  --memory=612m \</span><br><span class="line">  --memory-swap=612m \</span><br><span class="line">  -v /opt/project/webchat/webchat-act/config:/app/config \</span><br><span class="line">  --name webchat-act \</span><br><span class="line">  webchat-act服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<p>Jar包减压命令jar -xf …</p>
+<p>jar -xf &#x2F;path&#x2F;to&#x2F;webchat-act.jar BOOT-INF&#x2F;classes&#x2F;bootstrap.yml</p>
+<h2 id="webchat-admin-服务"><a href="#webchat-admin-服务" class="headerlink" title="webchat-admin 服务"></a>webchat-admin 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jdk-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY webchat-admin.jar /app/webchat-admin.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -Xss1m -XX:MaxMetaspaceSize=96m  -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8010</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-admin.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">  -p 8010:8010 \</span><br><span class="line">  --memory=512m \</span><br><span class="line">  --memory-swap=512m \</span><br><span class="line">  -v /opt/project/webchat/webchat-admin/config:/app/config \</span><br><span class="line">  --name webchat-admin \</span><br><span class="line">  webchat-admin服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-aigc-服务"><a href="#webchat-aigc-服务" class="headerlink" title="webchat-aigc 服务"></a>webchat-aigc 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jre-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY webchat-aigc.jar /app/webchat-aigc.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -Xss1m -XX:MaxMetaspaceSize=96m  -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8019</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-aigc.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">  -p 8019:8019 \</span><br><span class="line">  --memory=612m \</span><br><span class="line">  --memory-swap=612m \</span><br><span class="line">  -v /opt/project/webchat/webchat-aigc/config:/app/config \</span><br><span class="line">  --name webchat-aigc \</span><br><span class="line">  webchat-aigc服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-api-服务"><a href="#webchat-api-服务" class="headerlink" title="webchat-api 服务"></a>webchat-api 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jre-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY webchat-api.jar /app/webchat-api.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -Xss1m -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8026</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-api.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">  -p 8026:8026 \</span><br><span class="line">  --memory=512m \</span><br><span class="line">  --memory-swap=512m \</span><br><span class="line">  -v /opt/project/webchat/webchat-api/config:/app/config \</span><br><span class="line">  --name webchat-api \</span><br><span class="line">  webchat-api服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-client-chat-服务"><a href="#webchat-client-chat-服务" class="headerlink" title="webchat-client-chat 服务"></a>webchat-client-chat 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jdk-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY webchat-client-chat.jar /app/webchat-client-chat.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -Xss1m -XX:MaxMetaspaceSize=96m  -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8082</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-client-chat.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">  -p 8082:8082 \</span><br><span class="line">  --memory=512m \</span><br><span class="line">  --memory-swap=512m \</span><br><span class="line">  -v /opt/project/webchat/webchat-client-chat/config:/app/config \</span><br><span class="line">  --name webchat-client-chat \</span><br><span class="line">  webchat-client-chat服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-client-mall-服务"><a href="#webchat-client-mall-服务" class="headerlink" title="webchat-client-mall 服务"></a>webchat-client-mall 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jdk-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY webchat-client-mall.jar /app/webchat-client-mall.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -Xss1m -XX:MaxMetaspaceSize=96m  -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8083</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-client-mall.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">  --memory=512m \</span><br><span class="line">  --memory-swap=512m \</span><br><span class="line">  -p 8083:8083 \</span><br><span class="line">  -v /opt/project/webchat/webchat-client-mall/config:/app/config \</span><br><span class="line">  --name webchat-client-mall \</span><br><span class="line">  webchat-client-mall服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-client-payment-服务"><a href="#webchat-client-payment-服务" class="headerlink" title="webchat-client-payment 服务"></a>webchat-client-payment 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jdk-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY webchat-client-payment.jar /app/webchat-client-payment.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -Xss1m  -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8888</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-client-payment.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">  -p 8888:8888 \</span><br><span class="line">  --memory=512m \</span><br><span class="line">  --memory-swap=512m \</span><br><span class="line">  -v /opt/project/webchat/webchat-client-payment/config:/app/config \</span><br><span class="line">  --name webchat-client-payment \</span><br><span class="line">  webchat-client-payment服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-connect-服务"><a href="#webchat-connect-服务" class="headerlink" title="webchat-connect 服务"></a>webchat-connect 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jre-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY webchat-connect.jar /app/webchat-connect.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -Xss1m  -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8088</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-connect.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">    -p 8088:8088 \</span><br><span class="line">    --memory=512m \</span><br><span class="line">    --memory-swap=512m \</span><br><span class="line">    -v /opt/project/webchat/webchat-connect/config:/app/config \</span><br><span class="line">    --name webchat-connect \</span><br><span class="line">webchat-connect服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-gateway-服务"><a href="#webchat-gateway-服务" class="headerlink" title="webchat-gateway 服务"></a>webchat-gateway 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jdk-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY webchat-gateway.jar /app/webchat-gateway.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms256m -Xmx256m -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8001</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-gateway.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">-p 8001:8001 \</span><br><span class="line">--memory=512m \</span><br><span class="line">--memory-swap=512m \</span><br><span class="line">-v /opt/project/webchat/webchat-gateway/config:/app/config \</span><br><span class="line">--name webchat-gateway \</span><br><span class="line">webchat-gateway服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-netty-gateway-服务"><a href="#webchat-netty-gateway-服务" class="headerlink" title="webchat-netty-gateway 服务"></a>webchat-netty-gateway 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jre-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY webchat-netty-gateway.jar /app/webchat-netty-gateway.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 88</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-netty-gateway.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">-p 88:88 \</span><br><span class="line">--memory=512m \</span><br><span class="line">--memory-swap=512m \</span><br><span class="line">-v /opt/project/webchat/webchat-netty-gateway/config:/app/config \</span><br><span class="line">--name webchat-netty-gateway \</span><br><span class="line">webchat-netty-gateway服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-netty-server-服务"><a href="#webchat-netty-server-服务" class="headerlink" title="webchat-netty-server 服务"></a>webchat-netty-server 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jre-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY webchat-netty-server.jar /app/webchat-netty-server.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 9999</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-netty-server.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">-p 9999:9999 \</span><br><span class="line">--memory=612m \</span><br><span class="line">--memory-swap=612m \</span><br><span class="line">-v /opt/project/webchat/webchat-netty-server/config:/app/config \</span><br><span class="line">--name webchat-netty-server \</span><br><span class="line">webchat-netty-server服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-pay-服务"><a href="#webchat-pay-服务" class="headerlink" title="webchat-pay 服务"></a>webchat-pay 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jre-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY webchat-pay.jar /app/webchat-pay.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8014</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-pay.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">-p 8014:8014 \</span><br><span class="line">--memory=612m \</span><br><span class="line">--memory-swap=612m \</span><br><span class="line">-v /opt/project/webchat/webchat-pay/config:/app/config \</span><br><span class="line">--name webchat-pay \</span><br><span class="line">webchat-pay服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-pgc-服务"><a href="#webchat-pgc-服务" class="headerlink" title="webchat-pgc 服务"></a>webchat-pgc 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jre-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY webchat-pgc.jar /app/webchat-pgc.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8018</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-pgc.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">--memory=612m \</span><br><span class="line">--memory-swap=612m \</span><br><span class="line">-p 8018:8018 \</span><br><span class="line">-v /opt/project/webchat/webchat-pgc/config:/app/config \</span><br><span class="line">--name webchat-pgc \</span><br><span class="line">webchat-pgc服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-search-服务"><a href="#webchat-search-服务" class="headerlink" title="webchat-search 服务"></a>webchat-search 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jre-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY  webchat-search.jar /app/webchat-search.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8089</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-search.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">--memory=512m \</span><br><span class="line">--memory-swap=512m \</span><br><span class="line">-p 8089:8089 \</span><br><span class="line">-v /opt/project/webchat-search/config:/app/config \</span><br><span class="line">--name webchat-search \</span><br><span class="line">webchat-search服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-sso-服务"><a href="#webchat-sso-服务" class="headerlink" title="webchat-sso 服务"></a>webchat-sso 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jre-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY  webchat-sso.jar /app/webchat-sso.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8079</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-sso.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">-p 8079:8079 \</span><br><span class="line">--memory=512m \</span><br><span class="line">--memory-swap=512m \</span><br><span class="line">-v /opt/project/webchat/webchat-sso/config:/app/config \</span><br><span class="line">--name webchat-sso \</span><br><span class="line">webchat-sso服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-ugc-服务"><a href="#webchat-ugc-服务" class="headerlink" title="webchat-ugc 服务"></a>webchat-ugc 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jre-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY  webchat-ugc.jar /app/webchat-ugc.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8017</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-ugc.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">-p 8017:8017 \</span><br><span class="line">--memory=712m \</span><br><span class="line">--memory-swap=712m \</span><br><span class="line">-v /opt/project/webchat/webchat-ugc/config:/app/config \</span><br><span class="line">--name webchat-ugc \</span><br><span class="line">webchat-ugc服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-user-服务"><a href="#webchat-user-服务" class="headerlink" title="webchat-user 服务"></a>webchat-user 服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># jdk</span><br><span class="line">FROM eclipse-temurin:17-jre-jammy</span><br><span class="line">#作者信息（可选）</span><br><span class="line">LABEL maintainer=&quot;nyc&quot;</span><br><span class="line"># 设置工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"># 复制已打包好的 Spring Boot jar</span><br><span class="line">COPY webchat-user.jar /app/webchat-user.jar</span><br><span class="line"># JVM 参数优化（可根据实际服务器内存调整）</span><br><span class="line">ENV JAVA_OPTS=&quot;-Xms192m -Xmx192m -Xss1m -XX:MaxMetaspaceSize=96m  -XX:+UseG1GC&quot;</span><br><span class="line"># 容器暴露端口</span><br><span class="line">EXPOSE 8025</span><br><span class="line"># 启动命令</span><br><span class="line">ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;java $JAVA_OPTS -Dspring.config.location=classpath:/,file:/app/config/ -jar /app/webchat-user.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>容器启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">    -p 8020:8020 \</span><br><span class="line">    --memory=612m \</span><br><span class="line">    --memory-swap=612m \</span><br><span class="line">    --restart=always \</span><br><span class="line">    -v /opt/project/webchat/webchat-user/config:/app/config \</span><br><span class="line">    --name webchat-user \</span><br><span class="line">webchat-user服务镜像名称/镜像id</span><br></pre></td></tr></table></figure>
+
+<h1 id="容器一键启停脚本"><a href="#容器一键启停脚本" class="headerlink" title="容器一键启停脚本"></a>容器一键启停脚本</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line"></span><br><span class="line"># ================== 基础配置 ==================</span><br><span class="line"></span><br><span class="line"># 优先启动的核心容器</span><br><span class="line">CORE_CONTAINERS=(</span><br><span class="line">  webchat-gateway</span><br><span class="line">  webchat-netty-gateway</span><br><span class="line">  webchat-netty-server</span><br><span class="line">  webchat-connect</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"># 其他容器（顺序无要求）</span><br><span class="line">OTHER_CONTAINERS=(</span><br><span class="line">  webchat-act</span><br><span class="line">  webchat-admin</span><br><span class="line">  webchat-aigc</span><br><span class="line">  webchat-api</span><br><span class="line">  webchat-client-chat</span><br><span class="line">  webchat-client-mall</span><br><span class="line">  webchat-client-payment</span><br><span class="line">  webchat-pay</span><br><span class="line">  webchat-pgc</span><br><span class="line">  webchat-search</span><br><span class="line">  webchat-sso</span><br><span class="line">  webchat-ugc</span><br><span class="line">  webchat-user</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"># ================== 通用方法 ==================</span><br><span class="line"></span><br><span class="line">container_exists() &#123;</span><br><span class="line">  docker ps -a --format &#x27;&#123;&#123;.Names&#125;&#125;&#x27; | grep -w &quot;$1&quot; &gt; /dev/null</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">container_running() &#123;</span><br><span class="line">  docker ps --format &#x27;&#123;&#123;.Names&#125;&#125;&#x27; | grep -w &quot;$1&quot; &gt; /dev/null</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">start_container() &#123;</span><br><span class="line">  local name=$1</span><br><span class="line">  if ! container_exists &quot;$name&quot;; then</span><br><span class="line">    echo &quot;⚠️  容器不存在，跳过：$name&quot;</span><br><span class="line">    return</span><br><span class="line">  fi</span><br><span class="line"></span><br><span class="line">  if container_running &quot;$name&quot;; then</span><br><span class="line">    echo &quot;✅ 已在运行：$name&quot;</span><br><span class="line">  else</span><br><span class="line">    echo &quot;▶️  启动容器：$name&quot;</span><br><span class="line">    docker start &quot;$name&quot;</span><br><span class="line">  fi</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">stop_container() &#123;</span><br><span class="line">  local name=$1</span><br><span class="line">  if container_running &quot;$name&quot;; then</span><br><span class="line">    echo &quot;⏹️  停止容器：$name&quot;</span><br><span class="line">    docker stop &quot;$name&quot;</span><br><span class="line">  else</span><br><span class="line">    echo &quot;ℹ️  未运行：$name&quot;</span><br><span class="line">  fi</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># ================== 操作逻辑 ==================</span><br><span class="line"></span><br><span class="line">start_all() &#123;</span><br><span class="line">  echo &quot;===== 启动核心容器 =====&quot;</span><br><span class="line">  for c in &quot;$&#123;CORE_CONTAINERS[@]&#125;&quot;; do</span><br><span class="line">    start_container &quot;$c&quot;</span><br><span class="line">  done</span><br><span class="line"></span><br><span class="line">  echo</span><br><span class="line">  echo &quot;===== 启动其他容器 =====&quot;</span><br><span class="line">  for c in &quot;$&#123;OTHER_CONTAINERS[@]&#125;&quot;; do</span><br><span class="line">    start_container &quot;$c&quot;</span><br><span class="line">  done</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">stop_all() &#123;</span><br><span class="line">  echo &quot;===== 停止所有容器 =====&quot;</span><br><span class="line">  for c in &quot;$&#123;OTHER_CONTAINERS[@]&#125;&quot;; do</span><br><span class="line">    stop_container &quot;$c&quot;</span><br><span class="line">  done</span><br><span class="line"></span><br><span class="line">  for c in &quot;$&#123;CORE_CONTAINERS[@]&#125;&quot;; do</span><br><span class="line">    stop_container &quot;$c&quot;</span><br><span class="line">  done</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">status_all() &#123;</span><br><span class="line">  echo &quot;===== 容器状态 =====&quot;</span><br><span class="line">  docker ps -a --format &quot;table &#123;&#123;.Names&#125;&#125;\t&#123;&#123;.Status&#125;&#125;&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># ================== 入口 ==================</span><br><span class="line"></span><br><span class="line">case &quot;$1&quot; in</span><br><span class="line">  start)</span><br><span class="line">    start_all</span><br><span class="line">    ;;</span><br><span class="line">  stop)</span><br><span class="line">    stop_all</span><br><span class="line">    ;;</span><br><span class="line">  restart)</span><br><span class="line">    stop_all</span><br><span class="line">    echo</span><br><span class="line">    start_all</span><br><span class="line">    ;;</span><br><span class="line">  status)</span><br><span class="line">    status_all</span><br><span class="line">    ;;</span><br><span class="line">  *)</span><br><span class="line">    echo &quot;用法：$0 &#123;start|stop|restart|status&#125;&quot;</span><br><span class="line">    exit 1</span><br><span class="line">    ;;</span><br><span class="line">esac</span><br></pre></td></tr></table></figure>
+
+<p>给这个文件赋予执行权限</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod +x webchat-docker.sh</span><br></pre></td></tr></table></figure>
+
+<p>使用方式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 一键启动</span><br><span class="line">./webchat-docker.sh start</span><br><span class="line"># 一键停止</span><br><span class="line">./webchat-docker.sh stop</span><br><span class="line"># 一键重启</span><br><span class="line">./webchat-docker.sh restart</span><br><span class="line"># 查看状态</span><br><span class="line">./webchat-docker.sh status</span><br></pre></td></tr></table></figure>
+
+<h1 id="nginx配置"><a href="#nginx配置" class="headerlink" title="nginx配置"></a>nginx配置</h1><h2 id="gateway-conf"><a href="#gateway-conf" class="headerlink" title="gateway.conf"></a>gateway.conf</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    server_name webchat.com;</span><br><span class="line"></span><br><span class="line">    # OAuth 前端</span><br><span class="line">    location /webchat-oauth/ &#123;</span><br><span class="line">        proxy_pass http://192.168.216.20:5000/;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    # Client 前端（WebSocket）</span><br><span class="line">    location /webchat-client/ &#123;</span><br><span class="line">        proxy_pass http://192.168.216.20:5001/;</span><br><span class="line">        proxy_http_version 1.1;</span><br><span class="line">        proxy_set_header Upgrade $http_upgrade;</span><br><span class="line">        proxy_set_header Connection &quot;upgrade&quot;;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    # Admin 前端</span><br><span class="line">    location /webchat-admin/ &#123;</span><br><span class="line">        proxy_pass http://192.168.216.20:5002/;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    # Mall 前端（WebSocket）</span><br><span class="line">    location /webchat-mall/ &#123;</span><br><span class="line">        proxy_pass http://192.168.216.20:5003/;</span><br><span class="line">        proxy_http_version 1.1;</span><br><span class="line">        proxy_set_header Upgrade $http_upgrade;</span><br><span class="line">        proxy_set_header Connection &quot;upgrade&quot;;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">    &#125; </span><br><span class="line">          </span><br><span class="line">    # Payment 前端</span><br><span class="line">    location /webchat-payment/ &#123;</span><br><span class="line">        proxy_pass http://192.168.216.20:5004/;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    # sso-service</span><br><span class="line">    location /sso-service/ &#123;</span><br><span class="line">        proxy_pass http://192.168.216.20:8001/sso-service/;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">        proxy_set_header X-Forwarded-Proto $scheme;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    # admin-service</span><br><span class="line">    location /admin-service/ &#123;</span><br><span class="line">        proxy_pass http://192.168.216.20:8001/admin-service/;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">        proxy_set_header X-Forwarded-Proto $scheme;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    # 转发 /connect-service/ws/ 下的请求</span><br><span class="line">    location /connect-service/ws/ &#123;</span><br><span class="line">        proxy_pass http://192.168.216.20:8001/connect-service/ws/;</span><br><span class="line">    </span><br><span class="line">        # 必须的 WebSocket 头设置</span><br><span class="line">        proxy_http_version 1.1;</span><br><span class="line">        proxy_set_header Upgrade $http_upgrade;</span><br><span class="line">        proxy_set_header Connection &quot;upgrade&quot;;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">        proxy_set_header X-Forwarded-Proto $scheme;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    # 转发 /client-service 下的请求</span><br><span class="line">    location /client-service/ &#123;</span><br><span class="line">        proxy_pass http://192.168.216.20:8001/client-service/;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">        proxy_set_header X-Forwarded-Proto $scheme;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    # 转发 /client-service/ 下的请求</span><br><span class="line">    location /aigc-service/event/ &#123;</span><br><span class="line">        proxy_pass http://192.168.216.20:8001/aigc-service/event/;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">        proxy_set_header X-Forwarded-Proto $scheme;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    # 转发 /mall-service 下的请求</span><br><span class="line">    location /mall-service/ &#123;</span><br><span class="line">        proxy_pass http://192.168.216.20:8001/mall-service/;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">        proxy_set_header X-Forwarded-Proto $scheme;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    location /netty-service/ws/ &#123;</span><br><span class="line">        proxy_pass http://192.168.216.20:8001/netty-service/ws/;</span><br><span class="line">    </span><br><span class="line">        # 必须的 WebSocket 头设置</span><br><span class="line">        proxy_http_version 1.1;</span><br><span class="line">        proxy_set_header Upgrade $http_upgrade;</span><br><span class="line">        proxy_set_header Connection &quot;upgrade&quot;;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">        proxy_set_header X-Forwarded-Proto $scheme;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    # 转发 /payment-service 下的请求</span><br><span class="line">    location /payment-service/ &#123;</span><br><span class="line">        proxy_pass http://192.168.216.20:8001/payment-service/;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">        proxy_set_header X-Forwarded-Proto $scheme;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-front-admin-conf"><a href="#webchat-front-admin-conf" class="headerlink" title="webchat-front-admin.conf"></a>webchat-front-admin.conf</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 5002;</span><br><span class="line">    server_name _;</span><br><span class="line">    root /usr/share/nginx/html/webchat-front-admin;</span><br><span class="line">    index index.html;</span><br><span class="line">    location / &#123;</span><br><span class="line">        try_files $uri $uri/ /index.html;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-front-client-conf"><a href="#webchat-front-client-conf" class="headerlink" title="webchat-front-client.conf"></a>webchat-front-client.conf</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 5001;</span><br><span class="line">    server_name _;</span><br><span class="line">    root /usr/share/nginx/html/webchat-front-client;</span><br><span class="line">    index index.html;</span><br><span class="line">    location / &#123;</span><br><span class="line">        try_files $uri $uri/ /index.html;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-front-mall-conf"><a href="#webchat-front-mall-conf" class="headerlink" title="webchat-front-mall.conf"></a>webchat-front-mall.conf</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 5003;</span><br><span class="line">    server_name _;</span><br><span class="line">    root /usr/share/nginx/html/webchat-front-mall;</span><br><span class="line">    index index.html;</span><br><span class="line">    location / &#123;</span><br><span class="line">        try_files $uri $uri/ /index.html;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-front-oauth-conf"><a href="#webchat-front-oauth-conf" class="headerlink" title="webchat-front-oauth.conf"></a>webchat-front-oauth.conf</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 5000;</span><br><span class="line">    server_name _;</span><br><span class="line">    root /usr/share/nginx/html/webchat-front-oauth;</span><br><span class="line">    index index.html;</span><br><span class="line">    location / &#123;</span><br><span class="line">        try_files $uri $uri/ /index.html;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="webchat-front-payment-conf"><a href="#webchat-front-payment-conf" class="headerlink" title="webchat-front-payment.conf"></a>webchat-front-payment.conf</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 5004;</span><br><span class="line">    server_name _;</span><br><span class="line">    root /usr/share/nginx/html/webchat-front-payment;</span><br><span class="line">    index index.html;</span><br><span class="line">    location / &#123;</span><br><span class="line">        try_files $uri $uri/ /index.html;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>nginx容器启动启动命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name nginx-prod \</span><br><span class="line">  -p 80:80 \</span><br><span class="line">  -p 5000:5000 \</span><br><span class="line">  -p 5004:5004 \</span><br><span class="line">  -p 5002:5002 \</span><br><span class="line">  -p 5003:5003 \</span><br><span class="line">  -p 5001:5001 \</span><br><span class="line">  -p 5100:5100 \</span><br><span class="line">  -p 7100:7100 \</span><br><span class="line">  -p 443:443 \</span><br><span class="line">  -v /opt/mountdata/nginx/nginx.conf:/etc/nginx/nginx.conf:ro \</span><br><span class="line">  -v /opt/mountdata/nginx/mime.types:/etc/nginx/mime.types:ro \</span><br><span class="line">  -v /opt/mountdata/nginx/conf.d:/etc/nginx/conf.d:ro \</span><br><span class="line">  -v /opt/mountdata/nginx/certs:/etc/nginx/certs:ro \</span><br><span class="line">  -v /opt/mountdata/nginx/html:/usr/share/nginx/html:ro \</span><br><span class="line">  -v /opt/mountdata/nginx/logs:/var/log/nginx \</span><br><span class="line">  nginx:1.22.0</span><br></pre></td></tr></table></figure>
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/Webchat/" title="Webchat" data-aos="zoom-in">Webchat</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/Webchat/" rel="tag" title="Webchat">Webchat</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="三、WebChat项目注册+SSO单点" class="lazyload">
+      <a href="/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/" aria-label="后一篇: 三、WebChat项目注册+SSO单点"  title="后一篇: 三、WebChat项目注册+SSO单点"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          三、WebChat项目注册+SSO单点
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      牛小聪
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        22.2k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        01:33
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#DockerFile%E7%BC%96%E5%86%99"><span class="toc-text">DockerFile编写</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-act-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-act 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-admin-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-admin 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-aigc-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-aigc 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-api-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-api 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-client-chat-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-client-chat 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-client-mall-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-client-mall 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-client-payment-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-client-payment 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-connect-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-connect 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-gateway-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-gateway 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-netty-gateway-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-netty-gateway 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-netty-server-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-netty-server 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-pay-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-pay 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-pgc-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-pgc 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-search-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-search 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-sso-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-sso 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-ugc-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-ugc 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-user-%E6%9C%8D%E5%8A%A1"><span class="toc-text">webchat-user 服务</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%B9%E5%99%A8%E4%B8%80%E9%94%AE%E5%90%AF%E5%81%9C%E8%84%9A%E6%9C%AC"><span class="toc-text">容器一键启停脚本</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#nginx%E9%85%8D%E7%BD%AE"><span class="toc-text">nginx配置</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#gateway-conf"><span class="toc-text">gateway.conf</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-front-admin-conf"><span class="toc-text">webchat-front-admin.conf</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-front-client-conf"><span class="toc-text">webchat-front-client.conf</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-front-mall-conf"><span class="toc-text">webchat-front-mall.conf</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-front-oauth-conf"><span class="toc-text">webchat-front-oauth.conf</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webchat-front-payment-conf"><span class="toc-text">webchat-front-payment.conf</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="牛小聪" class="lazyload">
+  <div class="sidebar-author-name">牛小聪</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">8</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/niuxiaocong itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-bilibili sidebar-social-icon">
+      <a href=https://space.bilibili.com/352487678 itemprop="url" target="_blank" aria-label="bilibili" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-juejin sidebar-social-icon">
+      <a href=https://juejin.cn/user/1324234125087575 itemprop="url" target="_blank" aria-label="juejin" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  
+<script src="/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "牛小聪",
+          title: "部署篇-Webchat项目Docker部署",
+          url: "https://niuxiaocong.github.io/2026/02/03/WebChat/%E9%83%A8%E7%BD%B2%E7%AF%87-Webchat%E9%A1%B9%E7%9B%AEDocker%E9%83%A8%E7%BD%B2/",
+          excerpt: "",
+          description: "",
+          stripContent: "DockerFile编写webchat-act 服务1234567891011121314# jdkFROM eclipse-temurin:17-jre-jammy#作者信息（可选）LABEL maintainer=&amp;quot;nyc&amp;quot;# 设置工作目录WORKDIR /app# 复制已打包好的 Spring Boot jarCOPY webchat-act.jar /app/webchat-act.jar# JVM 参数优化（可根据实际服务器内存调整）ENV JAVA_OPTS=&amp;q",
+          date: "Tue Feb 03 2026 10:46:14 GMT+0800",
+          updated: "Tue Feb 03 2026 10:56:20 GMT+0800",
+          cover: "/images/banner.webp",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.11.2' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

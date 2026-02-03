@@ -1,0 +1,584 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_4k4bc36ef96';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://niuxiaocong.github.io';</script>
+  <title>
+    二、Webchat项目微服务拆分思想 | 牛小聪
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_4k4bc36ef96.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/css/loader.css">
+
+    <meta name="description" content="一、引言Webchat 项目的架构拆分并非一蹴而就，而是伴随着业务规模和复杂度的不断提升，经历了单体架构 → 前后端分离架构 → 微服务架构的逐步演进。在不同阶段，系统在可维护性、扩展性、性能与协作效率等方面逐渐暴露出一系列问题，正是这些问题持续累积并被放大，最终推动了项目向微服务架构拆分，形成了目前的系统形态。 二、单体架构单体工程在项目初期没有任何问题，因为早期业务体量小，功能也不多，开发迭代">
+<meta property="og:type" content="article">
+<meta property="og:title" content="二、Webchat项目微服务拆分思想">
+<meta property="og:url" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/index.html">
+<meta property="og:site_name" content="牛小聪">
+<meta property="og:description" content="一、引言Webchat 项目的架构拆分并非一蹴而就，而是伴随着业务规模和复杂度的不断提升，经历了单体架构 → 前后端分离架构 → 微服务架构的逐步演进。在不同阶段，系统在可维护性、扩展性、性能与协作效率等方面逐渐暴露出一系列问题，正是这些问题持续累积并被放大，最终推动了项目向微服务架构拆分，形成了目前的系统形态。 二、单体架构单体工程在项目初期没有任何问题，因为早期业务体量小，功能也不多，开发迭代">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/image-20260203103703501.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/image-20260203103725238.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/image-20260203103744918.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/image-20260203103828052.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/image-20260203103844109.png">
+<meta property="article:published_time" content="2026-02-03T02:34:44.000Z">
+<meta property="article:modified_time" content="2026-02-03T02:38:52.601Z">
+<meta property="article:author" content="牛小聪">
+<meta property="article:tag" content="Webchat">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/image-20260203103703501.png">
+    <link rel="alternate" href="/atom.xml" title="牛小聪" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </span>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/images/banner.webp" alt="二、Webchat项目微服务拆分思想">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">二、Webchat项目微服务拆分思想</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%BC%95%E8%A8%80"><span class="toc-text">一、引言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%8D%95%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="toc-text">二、单体架构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E5%90%8E%E7%AB%AF%E5%85%A8%E9%83%A8%E6%A2%AD%E5%93%88%E5%9C%A8%E4%B8%80%E5%9D%97"><span class="toc-text">前后端全部梭哈在一块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E5%90%8E%E7%AB%AF%E5%88%86%E5%BC%80%E9%83%A8%E7%BD%B2"><span class="toc-text">前后端分开部署</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%EF%BC%88%E5%88%86%E6%B2%BB%E6%80%9D%E6%83%B3%EF%BC%89"><span class="toc-text">三、服务拆分（分治思想）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SSO-Single-Sign-On-SSO"><span class="toc-text">SSO(Single Sign-On SSO)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%9F%BA%E4%BA%8ESOA%E7%9A%84%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E9%80%9A%E7%94%A8%E6%9E%B6%E6%9E%84%E6%A8%A1%E7%89%88"><span class="toc-text">四、服务端基于SOA的微服务拆分通用架构模版</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#OpenAPI"><span class="toc-text">OpenAPI</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BFF"><span class="toc-text">BFF</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Core-Server"><span class="toc-text">Core Server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Base-Server"><span class="toc-text">Base Server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SDK"><span class="toc-text">SDK</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E6%80%BB%E7%BB%93"><span class="toc-text">五、总结</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="牛小聪" class="lazyload">
+  <div class="sidebar-author-name">牛小聪</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">8</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/niuxiaocong itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-bilibili sidebar-social-icon">
+      <a href=https://space.bilibili.com/352487678 itemprop="url" target="_blank" aria-label="bilibili" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-juejin sidebar-social-icon">
+      <a href=https://juejin.cn/user/1324234125087575 itemprop="url" target="_blank" aria-label="juejin" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-WebChat/二、Webchat项目微服务拆分思想" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-02-03T02:34:44.000Z" itemprop="datePublished">2026-02-03</time>
+    <time style="display: none;" id="post-update-time">2026-02-03</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h2 id="一、引言"><a href="#一、引言" class="headerlink" title="一、引言"></a>一、引言</h2><p>Webchat 项目的架构拆分并非一蹴而就，而是伴随着业务规模和复杂度的不断提升，经历了<strong>单体架构 → 前后端分离架构 → 微服务架构</strong>的逐步演进。在不同阶段，系统在<strong>可维护性、扩展性、性能与协作效率</strong>等方面逐渐暴露出一系列问题，正是这些问题持续累积并被放大，最终推动了项目向微服务架构拆分，形成了目前的系统形态。</p>
+<h2 id="二、单体架构"><a href="#二、单体架构" class="headerlink" title="二、单体架构"></a>二、单体架构</h2><p>单体工程在项目初期没有任何问题，因为早期业务体量小，功能也不多，开发迭代也没有很高频，开发快、维护成本低、部署资源要求低，这反而是项目早期最佳选择。<br>但是随着业务的增长、团队的扩大，单体架构在扩展性、高可用、研发效率、项目管理等众多方面开始变得很糟糕，例如模块之间高度耦合，修改一个功能可能影响到多个模块； 所有功能打成一个包，任何一个小变动都需要全量构建和发布； 发布一次影响整个系统，稍有问题就可能导致系统整体不可用； 单体通常固定技术栈，所有模块必须统一，所以想要为某个模块使用新的技术点几乎是不可能的；等等问题。</p>
+<h3 id="前后端全部梭哈在一块"><a href="#前后端全部梭哈在一块" class="headerlink" title="前后端全部梭哈在一块"></a>前后端全部梭哈在一块</h3><p>单体架构的部署情况</p>
+<img src="/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/image-20260203103703501.png" class="" title="image-20260203103703501">
+
+<h3 id="前后端分开部署"><a href="#前后端分开部署" class="headerlink" title="前后端分开部署"></a>前后端分开部署</h3><p>随着团队扩张和开发职责的清晰划分，传统单体工程中的前后端混写模式导致维护成本高、开发效率低、发布风险大。通过前后端分离，可以实现职责解耦、提高并行开发能力、采用现代化前端技术栈，并显著提升系统的可扩展性与开发体验，从而更好支撑业务持续增长和团队协作。</p>
+<img src="/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/image-20260203103725238.png" class="" title="image-20260203103725238">
+
+<p>随着时间的推移和功能的增加，前后端的工程也会变得越来越庞大，虽然做到了前后端的职责上的划分，前端虽然独立了，但是后端服务发布的风险依然存在，例如 一个小功能修改，必须重新发布整个单体服务； 发一次后端可能影响所有业务； 回滚成本高，一旦失败波及整个系统影响的范围还是很大。产生这种问题的原因根本是后端服务依然还是一个<strong>巨石</strong></p>
+<h2 id="三、服务拆分（分治思想）"><a href="#三、服务拆分（分治思想）" class="headerlink" title="三、服务拆分（分治思想）"></a>三、服务拆分（分治思想）</h2><p>聪明的你想到了服务拆分，类似分家（各过各的日子）</p>
+<img src="/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/image-20260203103744918.png" class="" title="image-20260203103744918">
+
+<p>这样一来我们的服务扩展性确实变高了，但是我们又发现每个服务内部都有很多重复性建设的任务，也就是很多重复的功能。例如IM客户端和管理后台，他们两个的访问都需要进行登录；但是这两个端的账号数据是各自管理的没有互通，也就是说这两个端都要实现登录功能。这个问题有没有办法解决，答案是有；我们只需要做统一登录SSO即可。</p>
+<h3 id="SSO-Single-Sign-On-SSO"><a href="#SSO-Single-Sign-On-SSO" class="headerlink" title="SSO(Single Sign-On SSO)"></a>SSO(Single Sign-On SSO)</h3><p>单点登录(Single Sign-On, SSO)是一种认证机制,它允许用户使用一组凭据登录到多个相关但独立的软件系统。也就是说，我拿到这个登录的凭据，我就能访问IM系统和管理后台，不用再两个服务里面分别实现登录。</p>
+<img src="/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/image-20260203103828052.png" class="" title="image-20260203103828052">
+
+<p>随着统一登录服务（SSO）的落地，各团队体验到了“基础能力服务化”的好处：登录逻辑不再重复建设，功能增强也能一次升级、全系统受益；进一步还可以把系统都在重复开发用户查询等基础能力，是否也可以像 SSO 一样，将这些通用功能抽离成独立基础服务供各业务系统调用。</p>
+<h2 id="四、服务端基于SOA的微服务拆分通用架构模版"><a href="#四、服务端基于SOA的微服务拆分通用架构模版" class="headerlink" title="四、服务端基于SOA的微服务拆分通用架构模版"></a>四、服务端基于SOA的微服务拆分通用架构模版</h2><p>现在是完成了服务的拆分、但是也只是从业务功能纬度做了个大的拆分，而不是从技术纬度做的拆分，所以大家会有很多基础服务在不断重复建设的感觉，接下来就一步一步的针对Webchat项目做拆解。</p>
+<img src="/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/image-20260203103844109.png" class="" title="image-20260203103844109">
+
+<p>服务端基于SOA微服务架构拆分通用架构模版，我们只需要结合我们的业务套模版进一步拆分就可以了。</p>
+<ul>
+<li><p>OpenAPI：对外暴露的API</p>
+</li>
+<li><p>SDK：一般情况来看，一个项目会吧common、domain、remote作为公共基础sdk。</p>
+</li>
+<li><p>BFF层：后端对前端，为什么需要这一层，原因是我们希望核心服务只关系核心的业务实现，不关心前端的请求是否登录、是否需要鉴权。一旦耦合了这些逻辑，那我们的核心服务将不再纯粹。</p>
+</li>
+<li><p>核心业务层（Core Server）：这一层只负责核心业务逻辑的处理。</p>
+</li>
+<li><p>基础通用服务层（Base Server）：可以理解成和业务上没有相关性，但是核心服务层需要这里的数据做支撑，其他项目也可以直接使用的。</p>
+</li>
+</ul>
+<h3 id="OpenAPI"><a href="#OpenAPI" class="headerlink" title="OpenAPI"></a>OpenAPI</h3><p>webchat-api服务提供对外的接口暴露</p>
+<h3 id="BFF"><a href="#BFF" class="headerlink" title="BFF"></a>BFF</h3><p>我们已经具备了 PGC、UGC、AIGC 等核心业务服务，理论上前端可以直接调用这些服务接口。但这种方式<strong>并非最优解</strong>。 在架构设计上，我们希望<strong>核心服务只专注于核心业务能力的实现</strong>，而不关心前端侧的请求来源、用户是否登录、鉴权校验、参数适配等与业务无关的通用逻辑。如果让核心服务直接承接前端请求，这些通用能力势必会被引入并与核心业务代码耦合，导致服务职责边界模糊、复杂度上升，进而削弱服务的<strong>纯粹性与通用性</strong>。随着调用方增多（Web、App、小程序等），这种耦合还会进一步放大维护成本和演进风险。因此，在核心服务之上引入一层<strong>面向前端的后端服务（BFF）</strong> ，用于统一处理登录态、鉴权、参数组装、协议适配和聚合编排等逻辑，可以有效隔离前端变化对核心服务的影响，使核心服务保持稳定、可复用、可持续演进。</p>
+<p>进而拆分了webchat-client-admin、webchat-client-mall、webchat-client-chat、webchat-sso、webchat-clientpayment</p>
+<h3 id="Core-Server"><a href="#Core-Server" class="headerlink" title="Core Server"></a>Core Server</h3><p>webchat-pgc（专业内容生产服务）、webchat-ugc（用户内容生产服务）、webchat-aigc（AI内容生产服务）</p>
+<p>基于SOA+ 领域模型的思想，当下内容型产品主要有三大领域 <strong>PGC、UGC、AIGC</strong>。</p>
+<ul>
+<li><p>比如公众号文章的内容由专业的架构、组织和专业的个人生产，所以公众号的文章服务应该由PGC来实现；</p>
+</li>
+<li><p>朋友圈、IM对话消息由个人用户生产，对应的服务应该在UGC内完成；</p>
+</li>
+<li><p>chat4j企业级ai助手、机器人、embedding等需要大模型生产的内容服务在AIGC内完成。</p>
+</li>
+</ul>
+<h3 id="Base-Server"><a href="#Base-Server" class="headerlink" title="Base Server"></a>Base Server</h3><p>webchat-pay（支付服务）、webchat-user（账号服务）、webchat-act（互动服务）、webchat-search（搜索服务）、webchat-connect（长连接管理）</p>
+<p>1.每个服务都需要用户数据，而im作为核心业务，出来用户账号之外，还有公众号、服务号、群组、机器人、ai助手等其他类型的账号，以及账号之间的订阅&#x2F;关注关系数据。后期还会扩展电商等其他业务，所以账号社交关系内聚到user服务里，需要任何账号和社交关系的数据都从这里来统一获取，包括统一登录注册登录所需要的账号数据。</p>
+<p>2.我们在朋友圈需要对帖子（内容）进行点赞平台，在公众号服务下需要对文章点赞、分享转发评论，在电商业务中可以对商品点赞、分享、收藏、转发、评论。这些我们都可以抽象为 用户+ 资源+互动行为 服务，统一由act来实现。</p>
+<p>3.IM的搜索、电商的搜索、ai助手的RAG搜索、电商商品的feed统一由搜索服务来完成，同时es、向量库的读写也只有search服务来管理，其他服务需要搜索能力统一来search获取，这样搜索我们又统一内聚到了search服务。</p>
+<p>4.因为IM实时对话是核心，实时的技术核心是长链接，所以我们把长链接服务作为基础服务。除了IM场景下，后续在电商等其他业务场景下需要服务端主动推送的都可以由这个服务提供长链接能力。</p>
+<h3 id="SDK"><a href="#SDK" class="headerlink" title="SDK"></a>SDK</h3><p>这里没有特殊的方法和要求，一般情况来看，一个项目会吧common、domain、remote作为公共基础sdk。<br>1.common模块主要是工具类、枚举、注解、通用的service等</p>
+<p>2.domain主要是维护VO、DTO、BO等业务参数对象</p>
+<p>3.remote主要是RPC远程接口相关内容</p>
+<h2 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h2><p>Webchat 项目的整体架构演进，是一个<strong>典型由业务驱动、问题倒逼的系统演化过程</strong>。从最初的单体架构，到前后端分离，再到基于 SOA 思想的微服务体系，每一次调整都并非“为了拆而拆”，而是源于业务规模扩大、系统复杂度提升以及团队协作模式变化所带来的现实问题。</p>
+<p>在单体阶段，系统以快速交付为目标，获得了开发和部署上的高效率；但随着业务增长，其在扩展性、发布风险和技术演进上的缺陷逐渐显现。前后端分离解决了职责混乱和协作效率问题，却并未从根本上消除后端“巨石服务”带来的发布和稳定性风险。最终，通过服务拆分与能力下沉，系统逐步演进为以<strong>领域划分 + 技术分层</strong>为核心的微服务架构。</p>
+<p>在微服务阶段，Webchat 以 <strong>PGC &#x2F; UGC &#x2F; AIGC</strong> 作为核心业务领域，明确了内容生产的边界；同时将用户、支付、互动、搜索、长连接等能力抽象为基础通用服务，避免重复建设，实现能力复用。通过引入 <strong>BFF 层</strong>，有效隔离前端变化与核心业务逻辑，保障了核心服务的纯粹性、通用性与长期可演进能力。</p>
+<p>最终形成的架构，不仅提升了系统的可维护性、可扩展性与稳定性，也为后续多端接入、多业务形态（内容、电商、AI 能力扩展）提供了清晰、可持续演进的基础。这一过程的核心经验在于：<strong>合理的架构不是一次性设计出来的，而是在持续的业务实践中，通过不断拆解问题、沉淀能力逐步演化而成的。</strong></p>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/Webchat/" title="Webchat" data-aos="zoom-in">Webchat</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/Webchat/" rel="tag" title="Webchat">Webchat</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="三、WebChat项目注册+SSO单点" class="lazyload">
+        <a href="/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/" aria-label="前一篇: 三、WebChat项目注册+SSO单点" title="前一篇: 三、WebChat项目注册+SSO单点"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            三、WebChat项目注册+SSO单点
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="快速熟悉Webchat项目" class="lazyload">
+      <a href="/2026/02/03/WebChat/%E4%B8%80%E3%80%81%E5%BF%AB%E9%80%9F%E7%86%9F%E6%82%89WebChat%E9%A1%B9%E7%9B%AE/" aria-label="后一篇: 快速熟悉Webchat项目"  title="后一篇: 快速熟悉Webchat项目"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          快速熟悉Webchat项目
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      牛小聪
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        22.2k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        01:33
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%BC%95%E8%A8%80"><span class="toc-text">一、引言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%8D%95%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="toc-text">二、单体架构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E5%90%8E%E7%AB%AF%E5%85%A8%E9%83%A8%E6%A2%AD%E5%93%88%E5%9C%A8%E4%B8%80%E5%9D%97"><span class="toc-text">前后端全部梭哈在一块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E5%90%8E%E7%AB%AF%E5%88%86%E5%BC%80%E9%83%A8%E7%BD%B2"><span class="toc-text">前后端分开部署</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%EF%BC%88%E5%88%86%E6%B2%BB%E6%80%9D%E6%83%B3%EF%BC%89"><span class="toc-text">三、服务拆分（分治思想）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SSO-Single-Sign-On-SSO"><span class="toc-text">SSO(Single Sign-On SSO)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%9F%BA%E4%BA%8ESOA%E7%9A%84%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E9%80%9A%E7%94%A8%E6%9E%B6%E6%9E%84%E6%A8%A1%E7%89%88"><span class="toc-text">四、服务端基于SOA的微服务拆分通用架构模版</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#OpenAPI"><span class="toc-text">OpenAPI</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BFF"><span class="toc-text">BFF</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Core-Server"><span class="toc-text">Core Server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Base-Server"><span class="toc-text">Base Server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SDK"><span class="toc-text">SDK</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E6%80%BB%E7%BB%93"><span class="toc-text">五、总结</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="牛小聪" class="lazyload">
+  <div class="sidebar-author-name">牛小聪</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">8</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/niuxiaocong itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-bilibili sidebar-social-icon">
+      <a href=https://space.bilibili.com/352487678 itemprop="url" target="_blank" aria-label="bilibili" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-juejin sidebar-social-icon">
+      <a href=https://juejin.cn/user/1324234125087575 itemprop="url" target="_blank" aria-label="juejin" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  
+<script src="/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "牛小聪",
+          title: "二、Webchat项目微服务拆分思想",
+          url: "https://niuxiaocong.github.io/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/",
+          excerpt: "",
+          description: "",
+          stripContent: "一、引言Webchat 项目的架构拆分并非一蹴而就，而是伴随着业务规模和复杂度的不断提升，经历了单体架构 → 前后端分离架构 → 微服务架构的逐步演进。在不同阶段，系统在可维护性、扩展性、性能与协作效率等方面逐渐暴露出一系列问题，正是这些问题持续累积并被放大，最终推动了项目向微服务架构拆分，形成了目前的系统形态。 二、单体架构单体工程在项目初期没有任何问题，因为早期业务体量小，功能也不多，开发迭代也没有很高频，开发快、维护成本低、部署资源要求低，这反而是项目早期最佳选择。但是随着业务的增长、团队",
+          date: "Tue Feb 03 2026 10:34:44 GMT+0800",
+          updated: "Tue Feb 03 2026 10:38:52 GMT+0800",
+          cover: "/images/banner.webp",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.11.2' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>
