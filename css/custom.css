@@ -1,0 +1,46 @@
+/* 修复文章目录左侧对齐问题 */
+
+/* 目录容器 */
+.toc-wrapper {
+  padding-left: 0 !important;
+}
+
+/* 一级目录 */
+.toc-wrapper > ol {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* 二级及以下目录 - 增加缩进 */
+.toc-wrapper ol ol {
+  margin-left: 20px !important;
+  padding-left: 0 !important;
+}
+
+/* 三级目录 - 更多缩进 */
+.toc-wrapper ol ol ol {
+  margin-left: 20px !important;
+}
+
+/* 四级目录 */
+.toc-wrapper ol ol ol ol {
+  margin-left: 20px !important;
+}
+
+/* 目录项 */
+.toc-item {
+  list-style: none !important;
+  margin: 8px 0 !important;
+}
+
+/* 目录链接 */
+.toc-link {
+  display: block;
+  padding: 4px 0;
+  text-decoration: none;
+}
+
+/* 移除默认的 before 伪元素（如果有的话） */
+.toc-item:before {
+  margin-right: 8px !important;
+}

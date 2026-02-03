@@ -137,7 +137,7 @@
   </div>
 </header>
 
-        <div id="content" aria-label="Page content"  class="sidebar-right" >
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
           <aside id="sidebar" aria-label="Sidebar">
   <div class="sidebar-wrapper-container ">
   <div class="sidebar-wrapper">
@@ -150,7 +150,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">2</div>
+    <div class="sidebar-state-number">4</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
@@ -203,6 +203,50 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E4%BA%8B%E5%8A%A1%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E7%82%B9/" aria-label="MySQL事务基础知识点" title="MySQL事务基础知识点"></a>
+    <div class="post-cover left">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="MySQL事务基础知识点" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-02-03</span>
+        <span><span class="icon-pencil"></span>2.6k 字</span>
+        <span><span class="icon-clock"></span>10 分钟</span>
+      </div>
+      <h2 class="post-title">MySQL事务基础知识点</h2>
+      <article class="post-article">
+          一、什么是 MySQL 事务？逻辑操作单元中的事务是一组不可分割的工作逻辑单元，其作用是实现数据状态之间的转换。以转账为例，用户A向用户B转账50元时，需同时从用户A账户扣除50元并向用户B账户增加50元。事务将多个操作命令作为一个完整集合提交至系统，确保这些命令要么全部成功执行，要么在失败时全部撤销，从而保持数据的一致性与操作的原子性。
+二、MySQL 事务的四大核心特性（ACID）原子性（Atomicity）原子性要求事务是不可分割的最小工作单元，事务内的所有操作要么全部执行成功并提交，要么全部执行失败并回滚，不存在部分执行的中间状态。
+一致性（Consistency）一致性指事务执行前后
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/" aria-label="MySQL索引结构的演进与设计逻辑" title="MySQL索引结构的演进与设计逻辑"></a>
+    <div class="post-cover right">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="MySQL索引结构的演进与设计逻辑" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-02-03</span>
+        <span><span class="icon-pencil"></span>3.3k 字</span>
+        <span><span class="icon-clock"></span>12 分钟</span>
+      </div>
+      <h2 class="post-title">MySQL索引结构的演进与设计逻辑</h2>
+      <article class="post-article">
+          一、引言索引并非与生俱来就是B+树结构，但大多数人与MySQL打交道时，都默认了索引&amp;#x3D;B+树的认知。我们往往记住了最终的结论，却忽略了背后的迭代历程——它为何会从早期的查找树，一步步演化成如今的B+树？每一次迭代都在解决什么核心痛点，今天我们就来拆解MySQL索引结构的演变。
+二、索引结构的设计核心诉求在追溯演进前，我们先明确一个核心前提：所有索引结构的设计，都围绕三大核心诉求平衡展开，这也是判断结构优劣的关键标尺。
+
+高效查询：核心是减少磁盘IO次数，既要支持等值查询，也要适配范围查询、排序等高频业务场景，避免极端慢查询。
+低存储成本：索引本身不存储业务数据，仅作为导航工具，需控制
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/2026/02/02/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8FMySQL%E5%9B%9E%E8%A1%A8/" aria-label="一文讲透MySQL回表" title="一文讲透MySQL回表"></a>
     <div class="post-cover left">
           <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="一文讲透MySQL回表" class="lazyload">
@@ -211,23 +255,19 @@
       <div class="post-meta">
         <span><span class="icon-calendar"></span>2026-02-02</span>
         <span><span class="icon-pencil"></span>1.8k 字</span>
-        <span><span class="icon-clock"></span>7 分钟</span>
+        <span><span class="icon-clock"></span>8 分钟</span>
       </div>
       <h2 class="post-title">一文讲透MySQL回表</h2>
       <article class="post-article">
-           一、先搞懂什么是回表
-回表（Back to Table）的概念
-在 InnoDB 存储引擎中，数据是以 聚簇索引（Clustered Index） 的形式组织的，表中的完整行数据只存储在主键索引的叶子节点中。
-而 二级索引（辅助索引） 的叶子节点中，并不保存整行数据，而是保存：
+          一、先搞懂什么是回表回表（Back to Table）的概念
+在 InnoDB 存储引擎中，数据是以 聚簇索引（Clustered Index） 的形式组织的，表中的完整行数据只存储在主键索引的叶子节点中。而 二级索引（辅助索引） 的叶子节点中，并不保存整行数据，而是保存：
 
 索引列的值
 对应行的 主键值
 
-当 SQL 查询 通过二级索引定位到记录，但查询结果中需要的字段不完全包含在该索引中 时，MySQL 就必须根据二级索引中保存的主键值，再次访问聚簇索引获取完整行数据。
-这个过程就称为 回表（Back to Table） 。
- 二、回表案例分析
-接下来先看一个案例，测试数据
-1234
+当 SQL 查询 通过二级索引定位到记录，但查询结果中需要的字段不完全包含在该索引中 时，MySQL 就必须根据二级索引中保存的主键值，再次访问聚簇索引获取完整行数据。这个过程就称为 回表（Back to Table） 。
+回表案例分析接下来先看一个案例，测试数据
+123456789101
       </article>
     </div>
   </div>
@@ -242,14 +282,13 @@
       <div class="post-meta">
         <span><span class="icon-calendar"></span>2026-02-02</span>
         <span><span class="icon-pencil"></span>3.6k 字</span>
-        <span><span class="icon-clock"></span>13 分钟</span>
+        <span><span class="icon-clock"></span>14 分钟</span>
       </div>
       <h2 class="post-title">从0到1认识索引：MySQL索引基础全解析</h2>
       <article class="post-article">
           今天咱们聊个MySQL入门必学、职场高频用到的知识点——索引。不管是日常开发查数据，还是面试被问“怎么优化慢查询”，索引都是绕不开的核心。这篇文章我会摒弃复杂高阶内容，用通俗语言+实战SQL，带你从0到1吃透MySQL索引基础，看完就能上手用，还能避开新手常见坑。
- 一、为什么要学MySQL索引？先搞懂它的核心价值
-如果你的项目里有一张百万级数据的用户表，现在要查询“用户名为张三”的信息，没有索引和有索引的区别到底有多大？
-实际测试中，无索引时MySQL会逐行扫描全表，可能要耗时几秒甚至十几秒；而加了索引后，耗时能直接降到毫秒级。这背后的关键，就是索引的作用——它就像书籍的目录，能帮MySQL
+一、为什么要学MySQL索引？先搞懂它的核心价值如果你的项目里有一张百万级数据的用户表，现在要查询“用户名为张三”的信息，没有索引和有索引的区别到底有多大？
+实际测试中，无索引时MySQL会逐行扫描全表，可能要耗时几秒甚至十几秒；而加了索引后，耗时能直接降到毫秒级。这背后的关键，就是索引的作用——它就像书籍的目录，能帮MySQL跳过
       </article>
     </div>
   </div>
@@ -274,10 +313,10 @@
       </div>
       <div>
         <span class="icon-brush"></span>
-        5.4k
+        11.3k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        00:20
+        00:44
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -305,7 +344,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">2</div>
+    <div class="sidebar-state-number">4</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
@@ -420,7 +459,7 @@
   \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
                                                   
 `,'color: #ff5252;')
-    console.log('%c Theme.Reimu v' + '1.12.0' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.11.2' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
   </script>
   
 

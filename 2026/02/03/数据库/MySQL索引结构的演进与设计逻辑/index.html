@@ -1,0 +1,653 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_4k4bc36ef96';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://niuxiaocong.github.io';</script>
+  <title>
+    MySQL索引结构的演进与设计逻辑 | 牛小聪
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_4k4bc36ef96.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/css/loader.css">
+
+    <meta name="description" content="一、引言索引并非与生俱来就是B+树结构，但大多数人与MySQL打交道时，都默认了索引&#x3D;B+树的认知。我们往往记住了最终的结论，却忽略了背后的迭代历程——它为何会从早期的查找树，一步步演化成如今的B+树？每一次迭代都在解决什么核心痛点，今天我们就来拆解MySQL索引结构的演变。 二、索引结构的设计核心诉求在追溯演进前，我们先明确一个核心前提：所有索引结构的设计，都围绕三大核心诉求平衡展开，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL索引结构的演进与设计逻辑">
+<meta property="og:url" content="https://niuxiaocong.github.io/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/index.html">
+<meta property="og:site_name" content="牛小聪">
+<meta property="og:description" content="一、引言索引并非与生俱来就是B+树结构，但大多数人与MySQL打交道时，都默认了索引&#x3D;B+树的认知。我们往往记住了最终的结论，却忽略了背后的迭代历程——它为何会从早期的查找树，一步步演化成如今的B+树？每一次迭代都在解决什么核心痛点，今天我们就来拆解MySQL索引结构的演变。 二、索引结构的设计核心诉求在追溯演进前，我们先明确一个核心前提：所有索引结构的设计，都围绕三大核心诉求平衡展开，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093511817.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093535176.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093558873.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093653416.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093725079.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093754657.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093816918.png">
+<meta property="article:published_time" content="2026-02-03T01:29:16.000Z">
+<meta property="article:modified_time" content="2026-02-03T01:42:52.947Z">
+<meta property="article:author" content="牛小聪">
+<meta property="article:tag" content="数据库，MySQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://niuxiaocong.github.io/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093511817.png">
+    <link rel="alternate" href="/atom.xml" title="牛小聪" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </span>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/images/banner.webp" alt="MySQL索引结构的演进与设计逻辑">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">MySQL索引结构的演进与设计逻辑</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%BC%95%E8%A8%80"><span class="toc-text">一、引言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%A0%B8%E5%BF%83%E8%AF%89%E6%B1%82"><span class="toc-text">二、索引结构的设计核心诉求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%BC%94%E8%BF%9B%E8%84%89%E7%BB%9C"><span class="toc-text">三、演进脉络</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E4%BB%A3%E7%BB%93%E6%9E%84%EF%BC%88%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91%EF%BC%89"><span class="toc-text">第一代结构（二叉查找树）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%94%B9%E8%BF%9B%EF%BC%9A%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%88%E7%BA%A2%E9%BB%91%E6%A0%91%E4%B9%9F%E6%98%AF%E5%B1%9E%E4%BA%8E%E5%B9%B3%E8%A1%A1%E6%A0%91%E7%9A%84%E4%B8%80%E7%A7%8D%EF%BC%89"><span class="toc-text">优化改进：平衡二叉树（红黑树也是属于平衡树的一种）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%A7%E7%BB%AD%E4%BC%98%E5%8C%96%EF%BC%9AB-tree%EF%BC%88B%E6%A0%91%EF%BC%89"><span class="toc-text">继续优化：B-tree（B树）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%95%E6%9D%A1%E6%95%B0%E6%8D%AE%E6%9F%A5%E6%89%BE%E6%B5%81%E7%A8%8B%EF%BC%88%E4%BB%A5%E6%9F%A5%E6%89%BE-key-45-%E4%B8%BA%E4%BE%8B%EF%BC%89"><span class="toc-text">单条数据查找流程（以查找 key &#x3D; 45 为例）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8C%83%E5%9B%B4%E6%95%B0%E6%8D%AE%E6%9F%A5%E6%89%BE%E6%B5%81%E7%A8%8B%EF%BC%88%E4%BB%A5%E6%9F%A5%E6%89%BE-45-100-%E4%B8%BA%E4%BE%8B%EF%BC%89"><span class="toc-text">范围数据查找流程（以查找 45 ~ 100 为例）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#B-%E6%A0%91%E5%9C%A8%E8%8C%83%E5%9B%B4%E6%9F%A5%E8%AF%A2%E4%B8%AD%E7%9A%84%E6%80%A7%E8%83%BD%E9%97%AE%E9%A2%98"><span class="toc-text">B 树在范围查询中的性能问题</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E7%BB%88%E7%89%88-B-Tree"><span class="toc-text">最终版 B+Tree</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%95%E6%9D%A1%E6%95%B0%E6%8D%AE%E6%9F%A5%E6%89%BE%E6%B5%81%E7%A8%8B%EF%BC%88%E4%BB%A5%E6%9F%A5%E6%89%BE-key-45-%E4%B8%BA%E4%BE%8B%EF%BC%89-1"><span class="toc-text">单条数据查找流程（以查找 key &#x3D; 45 为例）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8C%83%E5%9B%B4%E6%95%B0%E6%8D%AE%E6%9F%A5%E6%89%BE%E6%B5%81%E7%A8%8B%EF%BC%88%E4%BB%A5%E6%9F%A5%E6%89%BE-45-100-%E4%B8%BA%E4%BE%8B%EF%BC%89-1"><span class="toc-text">范围数据查找流程（以查找 45 ~ 100 为例）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#B-%E6%A0%91%E8%8C%83%E5%9B%B4%E6%9F%A5%E8%AF%A2%E9%AB%98%E6%95%88%E7%9A%84%E6%A0%B9%E6%9C%AC%E5%8E%9F%E5%9B%A0"><span class="toc-text">B+树范围查询高效的根本原因</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%89%A9%E5%B1%95%E8%A1%A5%E5%85%85-Hash%E7%B4%A2%E5%BC%95"><span class="toc-text">四、扩展补充 Hash索引</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E6%80%BB%E7%BB%93"><span class="toc-text">五、总结</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="牛小聪" class="lazyload">
+  <div class="sidebar-author-name">牛小聪</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-数据库/MySQL索引结构的演进与设计逻辑" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-02-03T01:29:16.000Z" itemprop="datePublished">2026-02-03</time>
+    <time style="display: none;" id="post-update-time">2026-02-03</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h2 id="一、引言"><a href="#一、引言" class="headerlink" title="一、引言"></a>一、引言</h2><p>索引并非与生俱来就是B+树结构，但大多数人与MySQL打交道时，都默认了索引&#x3D;B+树的认知。我们往往记住了最终的结论，却忽略了背后的迭代历程——它为何会从早期的查找树，一步步演化成如今的B+树？每一次迭代都在解决什么核心痛点，今天我们就来拆解MySQL索引结构的演变。</p>
+<h2 id="二、索引结构的设计核心诉求"><a href="#二、索引结构的设计核心诉求" class="headerlink" title="二、索引结构的设计核心诉求"></a>二、索引结构的设计核心诉求</h2><p>在追溯演进前，我们先明确一个核心前提：所有索引结构的设计，都围绕三大核心诉求平衡展开，这也是判断结构优劣的关键标尺。</p>
+<ol>
+<li><strong>高效查询</strong>：核心是减少磁盘IO次数，既要支持等值查询，也要适配范围查询、排序等高频业务场景，避免极端慢查询。</li>
+<li><strong>低存储成本</strong>：索引本身不存储业务数据，仅作为导航工具，需控制自身存储空间，避免占用过多磁盘资源。</li>
+<li><strong>稳定性与适配性</strong>：适配磁盘存储的预读特性，能应对大数据量增长，维持索引结构平衡，确保查询效率稳定。</li>
+</ol>
+<h2 id="三、演进脉络"><a href="#三、演进脉络" class="headerlink" title="三、演进脉络"></a>三、演进脉络</h2><h3 id="第一代结构（二叉查找树）"><a href="#第一代结构（二叉查找树）" class="headerlink" title="第一代结构（二叉查找树）"></a>第一代结构（二叉查找树）</h3><p>二叉查找树的特点如下</p>
+<ul>
+<li>若左子树不空，则左子树上所有结点的值均小于根节点的值；</li>
+<li>若右字树不空，则右子树上所有结点的值均大于跟节点的值；</li>
+<li>左、右子树也分别为二叉排序树</li>
+</ul>
+<p>如图</p>
+<img src="/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093511817.png" class="" title="image-20260203093511817">
+
+
+
+<ol>
+<li><p><strong>核心结构</strong>：每个节点最多包含两个子节点，左子树的所有节点值小于父节点，右子树的所有节点值大于父节点，通过这种有序性实现快速查找。</p>
+</li>
+<li><p><strong>查找逻辑</strong>：以查询值与父节点比较，小于则进入左子树，大于则进入右子树，依次递归，直到找到目标节点或遍历至空节点。</p>
+</li>
+<li><p><strong>致命局限</strong>：完全无法适配MySQL的大数据量、磁盘存储场景</p>
+</li>
+</ol>
+<p>这种结构有一个致命的缺陷就是会退化成单链表，查找时间复杂度从O(logn)骤变为O(n)，与全表扫描无异；比如这种数据情况【50，40，30，20，10，5】</p>
+<img src="/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093535176.png" class="" title="image-20260203093535176">
+
+
+
+<p>树高过高百万级数据下，树高可达数十层甚至上百层，而磁盘IO是毫秒级操作，过多IO次数会导致查询极慢；</p>
+<p>不支持范围查询高效遍历：需额外排序或全量遍历，无法满足MySQL高频范围查询需求。</p>
+<h3 id="优化改进：平衡二叉树（红黑树也是属于平衡树的一种）"><a href="#优化改进：平衡二叉树（红黑树也是属于平衡树的一种）" class="headerlink" title="优化改进：平衡二叉树（红黑树也是属于平衡树的一种）"></a>优化改进：平衡二叉树（红黑树也是属于平衡树的一种）</h3><p>平衡二叉树的特点：在满足二叉搜索树的基础上，左树和右树的高度差绝对值不超过1</p>
+<img src="/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093558873.png" class="" title="image-20260203093558873">
+
+
+
+<p>平衡二叉树可以通过左旋转和右旋转调整树的高度，使其维持基本的平衡，但是还有一个核心的问题还没有解决。树的高度问题，如果数据量过大，还是会导致这棵树的高度过高。</p>
+<h3 id="继续优化：B-tree（B树）"><a href="#继续优化：B-tree（B树）" class="headerlink" title="继续优化：B-tree（B树）"></a>继续优化：B-tree（B树）</h3><p>B树的本质上是一种多路查找树结构，B树的特征点是每一层节点存的都是真实数据。B树的结构如下</p>
+<img src="/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093653416.png" class="" title="image-20260203093653416">
+
+<p>B树的查找流程</p>
+<h4 id="单条数据查找流程（以查找-key-45-为例）"><a href="#单条数据查找流程（以查找-key-45-为例）" class="headerlink" title="单条数据查找流程（以查找 key &#x3D; 45 为例）"></a>单条数据查找流程（以查找 key &#x3D; 45 为例）</h4><ol>
+<li><p><strong>从根节点开始查找</strong><br>根节点包含关键字 <code>[30, 60, 90]</code>。<br>根据 B 树的查找规则：</p>
+<ul>
+<li>45 &gt; 30 且 45 &lt; 60<br>因此沿着 <strong>30 与 60 之间对应的子指针</strong>，进入第二个子节点。</li>
+</ul>
+</li>
+<li><p><strong>在目标子节点中查找数据</strong><br>进入子节点 <code>[35, 45, 55]</code> 后，在该节点内部对关键字进行查找（顺序查找或二分查找）。<br>此时可以直接定位到 key &#x3D; 45，对应的数据记录被成功命中，查找流程结束。</p>
+</li>
+</ol>
+<blockquote>
+<p>可以看到，B 树的单条数据查找过程是一个<strong>自顶向下的逐层定位过程</strong>，当目标 key 出现在某个节点中时，查找即可结束。</p>
+</blockquote>
+<h4 id="范围数据查找流程（以查找-45-100-为例）"><a href="#范围数据查找流程（以查找-45-100-为例）" class="headerlink" title="范围数据查找流程（以查找 45 ~ 100 为例）"></a>范围数据查找流程（以查找 45 ~ 100 为例）</h4><p>范围查询是B树相对容易暴露性能问题的场景。</p>
+<ol>
+<li><p><strong>首先定位范围起点</strong><br>与单条查询类似，按照 B 树的查找规则，从根节点 <code>[30, 60, 90]</code> 出发，最终定位到包含起始 key &#x3D; 45 的子节点 <code>[35, 45, 55]</code>。</p>
+</li>
+<li><p><strong>在起始节点中进行扫描</strong><br>在节点 <code>[35, 45, 55]</code> 中，从 key &#x3D; 45 开始向右扫描，命中符合范围条件的数据：</p>
+<pre><code>[45, 55]
+</code></pre>
+<p>需要注意的是，此时<strong>范围查询不会结束</strong>，因为后续节点中仍然可能存在满足条件的 key。</p>
+</li>
+<li><p><strong>回溯并切换到其他相关节点继续查找</strong><br>扫描完当前子节点后，需要回溯到上层节点 <code>[30, 60, 90]</code>，继续判断：</p>
+<ul>
+<li><p>key &#x3D; 60、90 均落在查询范围内，命中对应数据<br>随后沿着指针切换到右侧子节点 <code>[95, 100, 110]</code>，在该节点中从左向右扫描，继续命中：</p>
+<p>[95, 100]</p>
+</li>
+</ul>
+</li>
+<li><p><strong>遍历结束，范围查询完成</strong><br>当所有可能包含目标范围的数据节点都被访问后，查询结束。<br>最终命中的数据为：<br>[45, 55, 60, 90, 95, 100]</p>
+</li>
+</ol>
+<h4 id="B-树在范围查询中的性能问题"><a href="#B-树在范围查询中的性能问题" class="headerlink" title="B 树在范围查询中的性能问题"></a>B 树在范围查询中的性能问题</h4><p>从上述流程可以明显看出B树的范围查询并非线性顺序扫描，查询过程中需要在子节点、父节点、兄弟节点  之间频繁切换</p>
+<p>在数据库场景下，这种<strong>节点切换往往意味着额外的磁盘 IO</strong></p>
+<ul>
+<li>每一次节点跳转，都可能触发一次新的磁盘页读取</li>
+<li>当数据量较大、树层级较深时，IO 成本会被不断放大</li>
+</ul>
+<p>👉 <strong>这正是 B 树在范围查询场景下的先天劣势，也是 B+ 树设计中重点优化的问题之一。</strong></p>
+<h3 id="最终版-B-Tree"><a href="#最终版-B-Tree" class="headerlink" title="最终版 B+Tree"></a>最终版 B+Tree</h3><p>B+Tree 是针对 B树的改进，先来看看一看B+Tree长什么样子。</p>
+<img src="/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093725079.png" class="" title="image-20260203093725079">
+
+<p>可以看到B+Tree对B-Tree做了以下改进</p>
+<ol>
+<li>数据索引分离，所有的数据都是在叶子节点上，非叶子节点上只是存储地址信息，这样的好处是所有的查询都必须走到叶子节点，因此查询的路径长度固定，时间复杂度稳定为O(logN)，B树的话，叶子节点和非叶子节点都会存数据，有时候查的快有时候查的慢，不稳定。</li>
+<li>叶子节点使用链表连接，极大的提升了范围查找的效率。</li>
+</ol>
+<p>B+Tree的数据查找流程</p>
+<h4 id="单条数据查找流程（以查找-key-45-为例）-1"><a href="#单条数据查找流程（以查找-key-45-为例）-1" class="headerlink" title="单条数据查找流程（以查找 key &#x3D; 45 为例）"></a>单条数据查找流程（以查找 key &#x3D; 45 为例）</h4><ol>
+<li><p><strong>从根节点开始查找</strong><br>根节点中包含索引关键字 <code>[30, 60, 90]</code>。<br>根据 B+ 树的查找规则：</p>
+<ul>
+<li>30 &lt; 45 &lt; 60<br>因此沿着对应的子指针，进入第二个子节点 <code>[35, 45, 55]</code>。</li>
+</ul>
+</li>
+<li><p><strong>在非叶子节点中继续向下定位</strong><br>虽然在节点 <code>[35, 45, 55]</code> 中已经可以看到 key &#x3D; 45，<br>但此时<strong>查找不能停止</strong>，因为该节点是非叶子节点，只保存索引 key 与子节点指针，并不存储真实数据。</p>
+</li>
+<li><p><strong>继续向下，直到叶子节点</strong><br>沿着指针继续向下访问子节点，最终在某个叶子节点中定位到 key &#x3D; 45，对应的数据记录。<br>至此，单条数据查找流程结束。</p>
+</li>
+</ol>
+<blockquote>
+<p>可以看到，B+ 树的单条查询路径是<strong>固定的</strong>：<br><strong>从根节点开始，逐层向下，最终一定到达叶子节点。</strong></p>
+</blockquote>
+<h4 id="范围数据查找流程（以查找-45-100-为例）-1"><a href="#范围数据查找流程（以查找-45-100-为例）-1" class="headerlink" title="范围数据查找流程（以查找 45 ~ 100 为例）"></a>范围数据查找流程（以查找 45 ~ 100 为例）</h4><ol>
+<li><p><strong>先定位范围起点</strong><br>首先查找 key &#x3D; 45，查找过程与单条查询完全一致，最终定位到包含 45 的叶子节点。</p>
+</li>
+<li><p><strong>从起始叶子节点开始顺序扫描</strong><br>在叶子节点中，从 key &#x3D; 45 开始向右遍历，依次命中满足条件的数据。</p>
+</li>
+<li><p><strong>沿叶子节点链表持续遍历</strong><br>B+ 树中的所有叶子节点通过指针形成一个有序链表。<br>因此，当当前叶子节点扫描完成后，可以<strong>直接通过指针访问下一个叶子节点</strong>，无需回到父节点或重新查找。</p>
+</li>
+<li><p><strong>直到超出范围为止</strong><br>当扫描到 key &gt; 100 时，范围查询结束。<br>最终命中的数据为：</p>
+<pre><code>[45, 46, 50, 55, 58, 60, 92, 94, 100]
+</code></pre>
+</li>
+</ol>
+<h4 id="B-树范围查询高效的根本原因"><a href="#B-树范围查询高效的根本原因" class="headerlink" title="B+树范围查询高效的根本原因"></a>B+树范围查询高效的根本原因</h4><p>与 B 树相比，B+ 树在范围查询中的优势非常明显：</p>
+<ul>
+<li>查询路径固定，只需一次自顶向下的定位</li>
+<li>范围扫描发生在<strong>叶子节点层</strong></li>
+<li>叶子节点之间通过链表顺序连接</li>
+<li>避免了频繁在父子节点之间来回切换</li>
+</ul>
+<p>👉 <strong>在数据库场景下，这种顺序扫描方式可以显著减少磁盘 IO 次数，这也是 MySQL 等关系型数据库选择 B+ 树作为索引结构的核心原因之一。</strong></p>
+<h2 id="四、扩展补充-Hash索引"><a href="#四、扩展补充-Hash索引" class="headerlink" title="四、扩展补充 Hash索引"></a>四、扩展补充 Hash索引</h2><p>是一张表，里面有对应的key和value</p>
+<img src="/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093754657.png" class="" title="image-20260203093754657">
+
+<p>查询操作直接通过 get(key) 进行获取，时间复杂度O(1)，好处是检索速度极快，缺点就是支持不了范围查找，还有一个问题就是但是Hash结构如果产生Hash冲突，会导致整个数据散列的不均匀，查找可能会退化成O(n)</p>
+<img src="/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/image-20260203093816918.png" class="" title="image-20260203093816918">
+
+<p>等值查找可以直接get(key)，但是如果想要完成范围查找就又得遍历整个hash表，效率很慢，hash就不合适了。在MySQL这类需要高效支撑大量范围查询的应用场景中，Hash结构并不适用，这也是为什么它未能成为主流数据库索引结构的重要原因。</p>
+<h2 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h2><p>MySQL索引结构的演进，本质上是一场围绕“高效查询、低存储成本、稳定性适配”三大核心诉求的持续优化之旅，每一代结构的迭代都精准解决了前序方案在数据库实际场景中的致命局限，最终沉淀出适配主流业务需求的B+树结构。</p>
+<ul>
+<li><p>早期的二叉查找树凭借有序性实现了基础快速查找，但极易因数据分布失衡退化为单链表，且树高过高导致磁盘IO次数激增，完全无法适配大数据量、磁盘存储的数据库场景。平衡二叉树通过旋转调整机制解决了结构失衡问题，维持了查询时间复杂度的稳定性，但未能突破树高限制，面对海量数据时仍存在IO效率瓶颈。</p>
+</li>
+<li><p>B树作为多路查找树，通过多节点存储特性大幅降低了树高，减少了磁盘IO层级，一定程度上优化了查询效率。但B树的核心缺陷的在于范围查询时需在父子节点、兄弟节点间频繁切换，引发额外磁盘IO，在高频范围查询场景中性能受限，这也为B+树的出现埋下了伏笔。</p>
+</li>
+<li><p>B+树在B树基础上完成了关键性改进，成为MySQL索引的最优解。其一，实现数据与索引分离，非叶子节点仅存储索引指针，叶子节点集中存储所有真实数据，使查询路径固定统一，时间复杂度稳定在O(logN)；其二，叶子节点通过链表有序连接，范围查询只需一次自顶向下定位起点，随后沿链表顺序扫描即可，彻底规避了节点间的频繁切换，大幅降低磁盘IO成本，完美适配数据库等值查询、范围查询、排序等核心业务场景。</p>
+</li>
+<li><p>而Hash索引虽能以O(1)时间复杂度实现等值查询，检索速度极快，但存在天然短板：无法支持范围查询，且Hash冲突可能导致性能退化为O(n)，难以适配MySQL多样化的查询需求，因此仅适用于特定等值查询场景，无法成为主流索引结构。</p>
+</li>
+</ul>
+<p>总而言之MySQL索引结构的演进并非偶然，而是从场景需求出发，不断弥补前序结构缺陷、平衡各项性能指标的过程。B+树之所以成为主流，核心在于其精准契合了磁盘存储特性与数据库高频查询场景，在查询效率、稳定性与适配性上达到了最优平衡，而其他结构或因场景局限、或因性能短板，最终沦为特定场景的补充方案。这一演进逻辑也启示我们，索引结构的选择本质是对业务场景与性能需求的精准匹配。</p>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%8CMySQL/" title="数据库，MySQL" data-aos="zoom-in">数据库，MySQL</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%8CMySQL/" rel="tag" title="数据库，MySQL">数据库，MySQL</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="MySQL事务基础知识点" class="lazyload">
+        <a href="/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E4%BA%8B%E5%8A%A1%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E7%82%B9/" aria-label="前一篇: MySQL事务基础知识点" title="前一篇: MySQL事务基础知识点"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            MySQL事务基础知识点
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="一文讲透MySQL回表" class="lazyload">
+      <a href="/2026/02/02/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8FMySQL%E5%9B%9E%E8%A1%A8/" aria-label="后一篇: 一文讲透MySQL回表"  title="后一篇: 一文讲透MySQL回表"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          一文讲透MySQL回表
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      牛小聪
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        11.3k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        00:44
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%BC%95%E8%A8%80"><span class="toc-text">一、引言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%A0%B8%E5%BF%83%E8%AF%89%E6%B1%82"><span class="toc-text">二、索引结构的设计核心诉求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%BC%94%E8%BF%9B%E8%84%89%E7%BB%9C"><span class="toc-text">三、演进脉络</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E4%BB%A3%E7%BB%93%E6%9E%84%EF%BC%88%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91%EF%BC%89"><span class="toc-text">第一代结构（二叉查找树）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%94%B9%E8%BF%9B%EF%BC%9A%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%88%E7%BA%A2%E9%BB%91%E6%A0%91%E4%B9%9F%E6%98%AF%E5%B1%9E%E4%BA%8E%E5%B9%B3%E8%A1%A1%E6%A0%91%E7%9A%84%E4%B8%80%E7%A7%8D%EF%BC%89"><span class="toc-text">优化改进：平衡二叉树（红黑树也是属于平衡树的一种）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%A7%E7%BB%AD%E4%BC%98%E5%8C%96%EF%BC%9AB-tree%EF%BC%88B%E6%A0%91%EF%BC%89"><span class="toc-text">继续优化：B-tree（B树）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%95%E6%9D%A1%E6%95%B0%E6%8D%AE%E6%9F%A5%E6%89%BE%E6%B5%81%E7%A8%8B%EF%BC%88%E4%BB%A5%E6%9F%A5%E6%89%BE-key-45-%E4%B8%BA%E4%BE%8B%EF%BC%89"><span class="toc-text">单条数据查找流程（以查找 key &#x3D; 45 为例）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8C%83%E5%9B%B4%E6%95%B0%E6%8D%AE%E6%9F%A5%E6%89%BE%E6%B5%81%E7%A8%8B%EF%BC%88%E4%BB%A5%E6%9F%A5%E6%89%BE-45-100-%E4%B8%BA%E4%BE%8B%EF%BC%89"><span class="toc-text">范围数据查找流程（以查找 45 ~ 100 为例）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#B-%E6%A0%91%E5%9C%A8%E8%8C%83%E5%9B%B4%E6%9F%A5%E8%AF%A2%E4%B8%AD%E7%9A%84%E6%80%A7%E8%83%BD%E9%97%AE%E9%A2%98"><span class="toc-text">B 树在范围查询中的性能问题</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E7%BB%88%E7%89%88-B-Tree"><span class="toc-text">最终版 B+Tree</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%95%E6%9D%A1%E6%95%B0%E6%8D%AE%E6%9F%A5%E6%89%BE%E6%B5%81%E7%A8%8B%EF%BC%88%E4%BB%A5%E6%9F%A5%E6%89%BE-key-45-%E4%B8%BA%E4%BE%8B%EF%BC%89-1"><span class="toc-text">单条数据查找流程（以查找 key &#x3D; 45 为例）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8C%83%E5%9B%B4%E6%95%B0%E6%8D%AE%E6%9F%A5%E6%89%BE%E6%B5%81%E7%A8%8B%EF%BC%88%E4%BB%A5%E6%9F%A5%E6%89%BE-45-100-%E4%B8%BA%E4%BE%8B%EF%BC%89-1"><span class="toc-text">范围数据查找流程（以查找 45 ~ 100 为例）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#B-%E6%A0%91%E8%8C%83%E5%9B%B4%E6%9F%A5%E8%AF%A2%E9%AB%98%E6%95%88%E7%9A%84%E6%A0%B9%E6%9C%AC%E5%8E%9F%E5%9B%A0"><span class="toc-text">B+树范围查询高效的根本原因</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%89%A9%E5%B1%95%E8%A1%A5%E5%85%85-Hash%E7%B4%A2%E5%BC%95"><span class="toc-text">四、扩展补充 Hash索引</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E6%80%BB%E7%BB%93"><span class="toc-text">五、总结</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="牛小聪" class="lazyload">
+  <div class="sidebar-author-name">牛小聪</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  
+<script src="/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "牛小聪",
+          title: "MySQL索引结构的演进与设计逻辑",
+          url: "https://niuxiaocong.github.io/2026/02/03/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91/",
+          excerpt: "",
+          description: "",
+          stripContent: "一、引言索引并非与生俱来就是B+树结构，但大多数人与MySQL打交道时，都默认了索引&amp;#x3D;B+树的认知。我们往往记住了最终的结论，却忽略了背后的迭代历程——它为何会从早期的查找树，一步步演化成如今的B+树？每一次迭代都在解决什么核心痛点，今天我们就来拆解MySQL索引结构的演变。 二、索引结构的设计核心诉求在追溯演进前，我们先明确一个核心前提：所有索引结构的设计，都围绕三大核心诉求平衡展开，这也是判断结构优劣的关键标尺。  高效查询：核心是减少磁盘IO次数，既要支持等值查询，也要适配范围查",
+          date: "Tue Feb 03 2026 09:29:16 GMT+0800",
+          updated: "Tue Feb 03 2026 09:42:52 GMT+0800",
+          cover: "/images/banner.webp",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.11.2' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>
