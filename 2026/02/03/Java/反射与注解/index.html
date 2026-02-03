@@ -1,0 +1,659 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_4k4bc36ef96';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://niuxiaocong.github.io';</script>
+  <title>
+    注解与反射 | 牛小聪
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_4k4bc36ef96.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/css/loader.css">
+
+    <meta name="description" content="1、反射1.1、反射是什么，能干嘛反射机制的核心就是在程序运行时候动态加载类并获取类的详细信息，然后操作类中的属性和方法。本质上是jvm的得到class对象以后，再通过class对象进行反编译。 Java的加载过程 .java文件先编译 —-&gt; 形成 .class 文件 —–&gt; 然后加载到内存中，此时内存中就有了一个class对象。 1.2、反射的优缺点缺点： 反射会消耗一定的系统资源">
+<meta property="og:type" content="article">
+<meta property="og:title" content="注解与反射">
+<meta property="og:url" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/index.html">
+<meta property="og:site_name" content="牛小聪">
+<meta property="og:description" content="1、反射1.1、反射是什么，能干嘛反射机制的核心就是在程序运行时候动态加载类并获取类的详细信息，然后操作类中的属性和方法。本质上是jvm的得到class对象以后，再通过class对象进行反编译。 Java的加载过程 .java文件先编译 —-&gt; 形成 .class 文件 —–&gt; 然后加载到内存中，此时内存中就有了一个class对象。 1.2、反射的优缺点缺点： 反射会消耗一定的系统资源">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234257096.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234309988.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234321357.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234334151.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234354225.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234417027.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234429285.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234443746.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234507905.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234534305.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234545257.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234554729.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234609908.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234819573.png">
+<meta property="article:published_time" content="2026-02-03T15:40:00.000Z">
+<meta property="article:modified_time" content="2026-02-03T15:50:48.191Z">
+<meta property="article:author" content="牛小聪">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234257096.png">
+    <link rel="alternate" href="/atom.xml" title="牛小聪" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </span>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/images/banner.webp" alt="注解与反射">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">注解与反射</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%E3%80%81%E5%8F%8D%E5%B0%84"><span class="toc-text">1、反射</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1%E3%80%81%E5%8F%8D%E5%B0%84%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%8C%E8%83%BD%E5%B9%B2%E5%98%9B"><span class="toc-text">1.1、反射是什么，能干嘛</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2%E3%80%81%E5%8F%8D%E5%B0%84%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="toc-text">1.2、反射的优缺点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3%E3%80%81%E8%8E%B7%E5%8F%96class%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="toc-text">1.3、获取class对象的几种方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4%E3%80%81%E6%93%8D%E4%BD%9C%E6%9E%84%E9%80%A0%E5%99%A8"><span class="toc-text">1.4、操作构造器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5%E3%80%81%E9%80%9A%E8%BF%87%E5%8F%8D%E5%B0%84%E6%8B%BF%E5%88%B0%E5%AF%B9%E8%B1%A1"><span class="toc-text">1.5、通过反射拿到对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6%E3%80%81%E6%93%8D%E4%BD%9C%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F"><span class="toc-text">1.6、操作成员变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-7%E3%80%81%E6%93%8D%E4%BD%9C%E6%88%90%E5%91%98%E6%96%B9%E6%B3%95"><span class="toc-text">1.7、操作成员方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81%E6%B3%A8%E8%A7%A3"><span class="toc-text">2、注解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E3%80%81%E6%B3%A8%E8%A7%A3%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%8C%E8%83%BD%E5%B9%B2%E5%98%9B"><span class="toc-text">2.1、注解是什么，能干嘛</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E3%80%81%E5%85%83%E6%B3%A8%E8%A7%A3"><span class="toc-text">2.2、元注解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3%E3%80%81%E6%B3%A8%E8%A7%A3%E7%9A%84%E8%A7%A3%E6%9E%90"><span class="toc-text">2.3、注解的解析</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="牛小聪" class="lazyload">
+  <div class="sidebar-author-name">牛小聪</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">16</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/niuxiaocong itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-bilibili sidebar-social-icon">
+      <a href=https://space.bilibili.com/352487678 itemprop="url" target="_blank" aria-label="bilibili" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-juejin sidebar-social-icon">
+      <a href=https://juejin.cn/user/1324234125087575 itemprop="url" target="_blank" aria-label="juejin" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-Java/反射与注解" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-02-03T15:40:00.000Z" itemprop="datePublished">2026-02-03</time>
+    <time style="display: none;" id="post-update-time">2026-02-03</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h2 id="1、反射"><a href="#1、反射" class="headerlink" title="1、反射"></a>1、反射</h2><h3 id="1-1、反射是什么，能干嘛"><a href="#1-1、反射是什么，能干嘛" class="headerlink" title="1.1、反射是什么，能干嘛"></a>1.1、反射是什么，能干嘛</h3><p>反射机制的核心就是在程序运行时候动态加载类并获取类的详细信息，然后操作类中的属性和方法。本质上是jvm的得到class对象以后，再通过class对象进行反编译。</p>
+<p>Java的加载过程 .java文件先编译 —-&gt; 形成 .class 文件 —–&gt; 然后加载到内存中，此时内存中就有了一个class对象。</p>
+<h3 id="1-2、反射的优缺点"><a href="#1-2、反射的优缺点" class="headerlink" title="1.2、反射的优缺点"></a>1.2、反射的优缺点</h3><p><strong>缺点：</strong> 反射会消耗一定的系统资源，所有如果不需要动态地创建一个对象，那么就不要使用反射；其次反射可以忽略安全检查，破环封装性从而导致安全的问题。</p>
+<h3 id="1-3、获取class对象的几种方式"><a href="#1-3、获取class对象的几种方式" class="headerlink" title="1.3、获取class对象的几种方式"></a>1.3、获取class对象的几种方式</h3><ul>
+<li>通过类名.class 示例：Student.class</li>
+<li>通过class.forName(“包路径”) 的方式 示例：class.forName(“com.code.reflection.bean.Student”)</li>
+<li>通过对象.getClass()的方式 示例：Student stu &#x3D; new Student(); stu.getClass();</li>
+</ul>
+<h3 id="1-4、操作构造器"><a href="#1-4、操作构造器" class="headerlink" title="1.4、操作构造器"></a>1.4、操作构造器</h3><ul>
+<li>getConstructors() 获取全部的构造器，注意只能获取到构造器是public类型修饰的</li>
+</ul>
+<img src="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234257096.png" class="" title="image-20260203234257096">
+
+<ul>
+<li>getDeclaredConstructors() 获取全部的构造器，可以拿到任意修饰类型的构造器</li>
+</ul>
+<img src="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234309988.png" class="" title="image-20260203234309988">
+
+<ul>
+<li>getConstructor() 获取指定类型的构造器，只可以获取public修饰的</li>
+</ul>
+<img src="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234321357.png" class="" title="image-20260203234321357">
+
+<ul>
+<li>getDeclaredConstructor() 获取指定类型的构造器，可以获取任意修饰类型的</li>
+</ul>
+<img src="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234334151.png" class="" title="image-20260203234334151">
+
+<h3 id="1-5、通过反射拿到对象"><a href="#1-5、通过反射拿到对象" class="headerlink" title="1.5、通过反射拿到对象"></a>1.5、通过反射拿到对象</h3><ul>
+<li>newInstance 完成对象的初始化并且返回</li>
+<li>setAccessible(Boolean flag) 设置成true，表示禁止检查访问控制（暴力反射）</li>
+</ul>
+<img src="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234354225.png" class="" title="image-20260203234354225">
+
+<h3 id="1-6、操作成员变量"><a href="#1-6、操作成员变量" class="headerlink" title="1.6、操作成员变量"></a>1.6、操作成员变量</h3><ul>
+<li>getFields() 获取所有的属性（只能获取public修饰的）</li>
+</ul>
+<img src="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234417027.png" class="" title="image-20260203234417027">
+
+<ul>
+<li>getDeclaredFields() getDeclaredFields 获取所有的属性（可以获取任意权限修饰的属性）</li>
+</ul>
+<img src="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234429285.png" class="" title="image-20260203234429285">
+
+<ul>
+<li>getField(“属性名”) 获取某个特定的属性 (只能获取public修饰的)</li>
+</ul>
+<img src="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234443746.png" class="" title="image-20260203234443746">
+
+<ul>
+<li>getDeclaredField(“属性名”) 获取所有的属性（可以获取任意权限修饰的属性）</li>
+</ul>
+<img src="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234507905.png" class="" title="image-20260203234507905">
+
+
+
+<h3 id="1-7、操作成员方法"><a href="#1-7、操作成员方法" class="headerlink" title="1.7、操作成员方法"></a>1.7、操作成员方法</h3><ul>
+<li>getMethods() 获取类的全部成员方法（只能获取public修饰的）</li>
+</ul>
+<img src="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234534305.png" class="" title="image-20260203234534305">
+
+<ul>
+<li>getDeclaredMethods() 获取类的全部成员方法，可以获取到任意权限修饰</li>
+</ul>
+<img src="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234545257.png" class="" title="image-20260203234545257">
+
+<ul>
+<li>getMethod(String name, Class… paramterType) 获取类的成员方法，只能获取public修饰的</li>
+</ul>
+<img src="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234554729.png" class="" title="image-20260203234554729">
+
+<ul>
+<li>getDeclaredMethod(String name, Class… paramterType) 获取类的成员方法，可以获取任意权限修饰的属性</li>
+</ul>
+<img src="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234609908.png" class="" title="image-20260203234609908">
+
+
+
+<h2 id="2、注解"><a href="#2、注解" class="headerlink" title="2、注解"></a>2、注解</h2><h3 id="2-1、注解是什么，能干嘛"><a href="#2-1、注解是什么，能干嘛" class="headerlink" title="2.1、注解是什么，能干嘛"></a>2.1、注解是什么，能干嘛</h3><p>注解就是一个标签，这个标签可以标注在方法上、类上、属性上。然后通过反射去判断这个类上、方法上、属性上是否含有某个标签，然后根据不同的标签去执行不同的动作。</p>
+<p>自定义注解</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> 注解名称 &#123;</span><br><span class="line">    <span class="keyword">public</span> 属性类型 属性名 <span class="keyword">default</span> 默认值;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注解中的特殊属性value，如果注解中只有这一个属性，那么在使用注解的时候就可以不写这个名字，如果有多个属性则必须写上这个名字。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> MyAnnotation &#123;</span><br><span class="line">    String <span class="title function_">value</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注解的本质，注解的本质就是一个接口，其中所有的接口都是继承了annotation的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Override</span> <span class="keyword">extends</span> <span class="title class_">Annotation</span>&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注解内部的数据实质上是一个接口方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> String <span class="title function_">test</span><span class="params">()</span> <span class="keyword">default</span> <span class="string">&quot;&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2、元注解"><a href="#2-2、元注解" class="headerlink" title="2.2、元注解"></a>2.2、元注解</h3><p>修饰注解的注解</p>
+<img src="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/image-20260203234819573.png" class="" title="image-20260203234819573">
+
+<p>最常见的两个元注解</p>
+<ul>
+<li>@Target 作用：声明被修饰的注解只能应用在哪些位置上使用。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ElementType.TYPE 类上、接口上</span><br><span class="line">ElementType.FIELD 成员变量上</span><br><span class="line">ElementType.METHOD 方法上</span><br><span class="line">ElementType.PARAMETER 方法参数上</span><br><span class="line">ElementType.CONSTRUCTOR 构造器上</span><br><span class="line">ElementType.VARIABLE 局部变量上</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>@Retention作用：声明注解的保留周期</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">RetentionPolicy.SOURCE 只作用在源码阶段，编译成字节码以后就不存在了</span><br><span class="line">RetentionPolicy.CLASS (默认) 保留到字节码文件阶段，运行阶段不存在</span><br><span class="line">RetentionPolicy.RUNTIME (开发常用) 一直保留到运行阶段</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-3、注解的解析"><a href="#2-3、注解的解析" class="headerlink" title="2.3、注解的解析"></a>2.3、注解的解析</h3><p>注解的解析就是将类上、方法上、属性上的注解信息给解析出来</p>
+<p>遵循一个解析的原则：要解析谁就要拿到谁</p>
+<p>注解解析示例</p>
+<p>MyAnnotation注解</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target(&#123;ElementType.FIELD, ElementType.METHOD,ElementType.TYPE&#125;)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> MyAnnotation &#123;</span><br><span class="line">    String <span class="title function_">name</span><span class="params">()</span> <span class="keyword">default</span> <span class="string">&quot;niuxiaoniu&quot;</span>;</span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">isWork</span><span class="params">()</span> <span class="keyword">default</span> <span class="literal">false</span>;</span><br><span class="line">    String[] stuName();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>MyAnnotationDemo类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@MyAnnotation(name = &quot;lxl&quot;,stuName = &#123;&quot;邯郸&quot;,&quot;唐山&quot;&#125;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyAnnotationDemo</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@MyAnnotation(name = &quot;zzy&quot;,stuName = &#123;&quot;邯郸&quot;,&quot;北京&quot;&#125;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test1</span><span class="params">()</span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>AnalysAnnotation类去解析MyAnnotationDemo上面标注的注解</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AnalysAnnotation</span> &#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">analys</span><span class="params">()</span> <span class="keyword">throws</span> NoSuchMethodException &#123;</span><br><span class="line">        Class&lt;MyAnnotationDemo&gt; myAnnotationDemoClass = MyAnnotationDemo.class;</span><br><span class="line">        <span class="keyword">if</span> (myAnnotationDemoClass.isAnnotationPresent(MyAnnotation.class))&#123;</span><br><span class="line">            <span class="type">MyAnnotation</span> <span class="variable">declaredAnnotation</span> <span class="operator">=</span> myAnnotationDemoClass.getDeclaredAnnotation(MyAnnotation.class);</span><br><span class="line">            System.out.println(declaredAnnotation.name());</span><br><span class="line">            System.out.println(declaredAnnotation.isWork());</span><br><span class="line">            System.out.println(Arrays.toString(declaredAnnotation.stuName()));</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">&quot;---------- 开始解析方法上的注解 -----------&quot;</span>);</span><br><span class="line">        <span class="type">Method</span> <span class="variable">m</span> <span class="operator">=</span> myAnnotationDemoClass.getMethod(<span class="string">&quot;test1&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (m.isAnnotationPresent(MyAnnotation.class))&#123;</span><br><span class="line">            <span class="type">MyAnnotation</span> <span class="variable">declaredAnnotationMethod</span> <span class="operator">=</span> m.getDeclaredAnnotation(MyAnnotation.class);</span><br><span class="line">            System.out.println(declaredAnnotationMethod.name());</span><br><span class="line">            System.out.println(declaredAnnotationMethod.isWork());</span><br><span class="line">            System.out.println(Arrays.toString(declaredAnnotationMethod.stuName()));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>isAnnotationPresent(Class<Annotation> annotationClass) 判断对象上是否存在某个注解</li>
+<li>getDeclaredAnnotation(Class<T> annotationClass) 获取指定的注解对象</li>
+<li>getDeclaredAnnotations() 获取当前对象上面的注解</li>
+</ul>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E5%90%8E%E7%AB%AF/" title="后端" data-aos="zoom-in">后端</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/Java/" rel="tag" title="Java">Java</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="Java泛型" class="lazyload">
+        <a href="/2026/02/03/Java/Java%E6%B3%9B%E5%9E%8B/" aria-label="前一篇: Java泛型" title="前一篇: Java泛型"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            Java泛型
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="IO流" class="lazyload">
+      <a href="/2026/02/03/Java/IO%E6%B5%81/" aria-label="后一篇: IO流"  title="后一篇: IO流"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          IO流
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      牛小聪
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        34.7k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        02:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%E3%80%81%E5%8F%8D%E5%B0%84"><span class="toc-text">1、反射</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1%E3%80%81%E5%8F%8D%E5%B0%84%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%8C%E8%83%BD%E5%B9%B2%E5%98%9B"><span class="toc-text">1.1、反射是什么，能干嘛</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2%E3%80%81%E5%8F%8D%E5%B0%84%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="toc-text">1.2、反射的优缺点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3%E3%80%81%E8%8E%B7%E5%8F%96class%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="toc-text">1.3、获取class对象的几种方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4%E3%80%81%E6%93%8D%E4%BD%9C%E6%9E%84%E9%80%A0%E5%99%A8"><span class="toc-text">1.4、操作构造器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5%E3%80%81%E9%80%9A%E8%BF%87%E5%8F%8D%E5%B0%84%E6%8B%BF%E5%88%B0%E5%AF%B9%E8%B1%A1"><span class="toc-text">1.5、通过反射拿到对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6%E3%80%81%E6%93%8D%E4%BD%9C%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F"><span class="toc-text">1.6、操作成员变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-7%E3%80%81%E6%93%8D%E4%BD%9C%E6%88%90%E5%91%98%E6%96%B9%E6%B3%95"><span class="toc-text">1.7、操作成员方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81%E6%B3%A8%E8%A7%A3"><span class="toc-text">2、注解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E3%80%81%E6%B3%A8%E8%A7%A3%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%8C%E8%83%BD%E5%B9%B2%E5%98%9B"><span class="toc-text">2.1、注解是什么，能干嘛</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E3%80%81%E5%85%83%E6%B3%A8%E8%A7%A3"><span class="toc-text">2.2、元注解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3%E3%80%81%E6%B3%A8%E8%A7%A3%E7%9A%84%E8%A7%A3%E6%9E%90"><span class="toc-text">2.3、注解的解析</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="牛小聪" class="lazyload">
+  <div class="sidebar-author-name">牛小聪</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">16</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/niuxiaocong itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-bilibili sidebar-social-icon">
+      <a href=https://space.bilibili.com/352487678 itemprop="url" target="_blank" aria-label="bilibili" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-juejin sidebar-social-icon">
+      <a href=https://juejin.cn/user/1324234125087575 itemprop="url" target="_blank" aria-label="juejin" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  
+<script src="/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "牛小聪",
+          title: "注解与反射",
+          url: "https://niuxiaocong.github.io/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/",
+          excerpt: "",
+          description: "",
+          stripContent: "1、反射1.1、反射是什么，能干嘛反射机制的核心就是在程序运行时候动态加载类并获取类的详细信息，然后操作类中的属性和方法。本质上是jvm的得到class对象以后，再通过class对象进行反编译。 Java的加载过程 .java文件先编译 —-&amp;gt; 形成 .class 文件 —–&amp;gt; 然后加载到内存中，此时内存中就有了一个class对象。 1.2、反射的优缺点缺点： 反射会消耗一定的系统资源，所有如果不需要动态地创建一个对象，那么就不要使用反射；其次反射可以忽略安全检查，破环封装性从而导致",
+          date: "Tue Feb 03 2026 23:40:00 GMT+0800",
+          updated: "Tue Feb 03 2026 23:50:48 GMT+0800",
+          cover: "/images/banner.webp",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.11.2' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>
