@@ -1,0 +1,738 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_4k4bc36ef96';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://niuxiaocong.github.io';</script>
+  <title>
+    一文搞懂mvcc | 牛小聪
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_4k4bc36ef96.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/css/loader.css">
+
+    <meta name="description" content="一、引言什么是MVCC？MVCC（Multi-Version Concurrency Control，多版本并发控制）这个词里，其实暗藏了三个关键信息：多版本、并发、控制。 并发，相信大家都不陌生，指的是多个事务在同一时间段内同时执行；但多版本究竟指的是什么？这些版本是如何产生和维护的？ 而所谓的控制，又是在控制什么？是控制并发读写冲突，还是控制事务之间的可见性？ 很多人在学习 MySQL 或 I">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一文搞懂mvcc">
+<meta property="og:url" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/index.html">
+<meta property="og:site_name" content="牛小聪">
+<meta property="og:description" content="一、引言什么是MVCC？MVCC（Multi-Version Concurrency Control，多版本并发控制）这个词里，其实暗藏了三个关键信息：多版本、并发、控制。 并发，相信大家都不陌生，指的是多个事务在同一时间段内同时执行；但多版本究竟指的是什么？这些版本是如何产生和维护的？ 而所谓的控制，又是在控制什么？是控制并发读写冲突，还是控制事务之间的可见性？ 很多人在学习 MySQL 或 I">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260204222005254.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260204223107036.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260206101537082.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205105529706.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205105627255.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205105847608.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205110031298.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205145417211.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260206095844097.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181023618.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181102106.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181123658.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181152537.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181355854.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181431109.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181447925.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181504549.png">
+<meta property="article:published_time" content="2026-02-04T07:38:59.000Z">
+<meta property="article:modified_time" content="2026-02-06T06:40:07.676Z">
+<meta property="article:author" content="牛小聪">
+<meta property="article:tag" content="数据库，MySQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260204222005254.png">
+    <link rel="alternate" href="/atom.xml" title="牛小聪" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </span>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </span>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/images/banner.webp" alt="一文搞懂mvcc">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">一文搞懂mvcc</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%BC%95%E8%A8%80"><span class="toc-text">一、引言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFMVCC%EF%BC%9F"><span class="toc-text">什么是MVCC？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81MVCC%EF%BC%8C%E5%AE%83%E6%9C%89%E4%BB%80%E4%B9%88%E4%BB%B7%E5%80%BC%EF%BC%9F"><span class="toc-text">为什么需要MVCC，它有什么价值？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BE%9D%E9%9D%A0%E9%94%81%E6%9D%A5%E6%8E%A7%E5%88%B6%E4%BA%8B%E7%89%A9%E4%B9%8B%E9%97%B4%E7%9A%84%E8%AF%BB%E5%86%99%E5%86%B2%E7%AA%81"><span class="toc-text">依靠锁来控制事物之间的读写冲突</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8MVCC%E6%9D%A5%E6%8E%A7%E5%88%B6%E4%BA%8B%E7%89%A9%E4%B9%8B%E9%97%B4%E7%9A%84%E8%AF%BB%E5%86%99%E5%86%B2%E7%AA%81"><span class="toc-text">使用MVCC来控制事物之间的读写冲突</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81MVCC%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6"><span class="toc-text">二、MVCC核心原理及其工作机制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E4%B8%89%E5%A4%A7%E7%BB%84%E4%BB%B6"><span class="toc-text">核心三大组件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9A%90%E8%97%8F%E5%AD%97%E6%AE%B5"><span class="toc-text">隐藏字段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%9E%E6%BB%9A%E6%97%A5%E5%BF%97-Undo-Log"><span class="toc-text">回滚日志 (Undo Log)</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#UndoLog-%E7%89%88%E6%9C%AC%E9%93%BE"><span class="toc-text">UndoLog 版本链</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%BB%E8%A7%86%E5%9B%BE%EF%BC%88Read-View%EF%BC%89"><span class="toc-text">读视图（Read View）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8C%E6%95%B4%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6"><span class="toc-text">完整工作机制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%99%E9%87%8C%E4%BB%A5MySQL%E9%BB%98%E8%AE%A4%E7%9A%84%E5%B7%A5%E4%BD%9C%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E4%B8%BA%E4%BE%8B"><span class="toc-text">这里以MySQL默认的工作隔离级别为例</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A1%A5%E5%85%85RC%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E4%B8%8B%E9%9D%A2MVCC%E6%98%AF%E6%80%8E%E4%B9%88%E5%B7%A5%E4%BD%9C%E7%9A%84"><span class="toc-text">补充RC隔离级别下面MVCC是怎么工作的</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E4%B8%8B%E9%9D%A2%E6%9C%89%E6%B2%A1%E6%9C%89%E5%BD%BB%E5%BA%95%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E9%97%AE%E9%A2%98"><span class="toc-text">三、可重复读的隔离级别下面有没有彻底解决幻读问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%80%BB%E7%BB%93"><span class="toc-text">四、总结</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="牛小聪" class="lazyload">
+  <div class="sidebar-author-name">牛小聪</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">17</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/niuxiaocong itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-bilibili sidebar-social-icon">
+      <a href=https://space.bilibili.com/352487678 itemprop="url" target="_blank" aria-label="bilibili" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-juejin sidebar-social-icon">
+      <a href=https://juejin.cn/user/1324234125087575 itemprop="url" target="_blank" aria-label="juejin" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-数据库/一文讲透mvcc" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-02-04T07:38:59.000Z" itemprop="datePublished">2026-02-04</time>
+    <time style="display: none;" id="post-update-time">2026-02-06</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h2 id="一、引言"><a href="#一、引言" class="headerlink" title="一、引言"></a>一、引言</h2><h3 id="什么是MVCC？"><a href="#什么是MVCC？" class="headerlink" title="什么是MVCC？"></a>什么是MVCC？</h3><p>MVCC（Multi-Version Concurrency Control，多版本并发控制）这个词里，其实暗藏了三个关键信息：<strong>多版本、并发、控制</strong>。</p>
+<p>并发，相信大家都不陌生，指的是多个事务在同一时间段内同时执行；但<strong>多版本究竟指的是什么？这些版本是如何产生和维护的？</strong><br> 而所谓的<strong>控制</strong>，又是在控制什么？是控制并发读写冲突，还是控制事务之间的可见性？</p>
+<p>很多人在学习 MySQL 或 InnoDB 时，都会听到 MVCC，却对它“只闻其名，不知其意”。<br> 这一篇文章，我们就从这三个词本身出发，<strong>拆解 MVCC 的设计动机与底层原理</strong>，一步步揭开它的神秘面纱。</p>
+<h3 id="为什么需要MVCC，它有什么价值？"><a href="#为什么需要MVCC，它有什么价值？" class="headerlink" title="为什么需要MVCC，它有什么价值？"></a>为什么需要MVCC，它有什么价值？</h3><p>为什么数据库一定要引入 MVCC？如果没有 MVCC，会发生什么？</p>
+<p>在高并发场景下，事务之间的读写冲突是不可避免的。最直观、也最简单的解决方式就是<strong>加锁</strong>：读加读锁、写加写锁，甚至直接串行执行。<br> 但锁的代价非常高——<strong>阻塞、等待、死锁、性能下降</strong>，都会随着并发度的提升被无限放大。</p>
+<p>MVCC 的价值，正是在于<strong>用版本换并发</strong>。通过为同一条数据维护多个历史版本，并为每个事务构建一致性视图，数据库可以做到：<strong>读不阻塞写，写不阻塞读</strong>，从而在保证事务隔离性的同时，大幅提升系统整体吞吐量。也正因为如此，MVCC 成为了 InnoDB 实现 <strong>RC、RR 隔离级别</strong> 的核心机制之一。</p>
+<p>案例演示：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> `tb_account`  (</span><br><span class="line">  `account` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span> COMMENT <span class="string">&#x27;账号&#x27;</span>,</span><br><span class="line">  `money` <span class="keyword">double</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span> COMMENT <span class="string">&#x27;金额&#x27;</span></span><br><span class="line">) ENGINE <span class="operator">=</span> InnoDB <span class="keyword">CHARACTER SET</span> <span class="operator">=</span> utf8mb4 <span class="keyword">COLLATE</span> <span class="operator">=</span> utf8mb4_general_ci ROW_FORMAT <span class="operator">=</span> <span class="keyword">Dynamic</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT INTO</span> `tb_account` <span class="keyword">VALUES</span> (<span class="number">10087</span>, <span class="number">2300</span>);</span><br><span class="line"><span class="keyword">INSERT INTO</span> `tb_account` <span class="keyword">VALUES</span> (<span class="number">10086</span>, <span class="number">2000</span>);</span><br><span class="line"><span class="keyword">INSERT INTO</span> `tb_account` <span class="keyword">VALUES</span> (<span class="number">10088</span>, <span class="number">2000</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="依靠锁来控制事物之间的读写冲突"><a href="#依靠锁来控制事物之间的读写冲突" class="headerlink" title="依靠锁来控制事物之间的读写冲突"></a>依靠锁来控制事物之间的读写冲突</h4><img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260204222005254.png" class="" title="image-20260204222005254">
+
+<p>首先，T1 开启事务并修改账号为 <strong>10087</strong> 的这条数据金额；与此同时，T2 也开启事务，尝试读取同一条账号为 <strong>10087</strong> 的数据。由于该行记录已被 T1 的**写锁（排他锁）**占用，T2 无法获取读锁，只能进入等待状态。</p>
+<p>最终导致的结果是：一个看似普通的 <code>SELECT</code> 查询，也可能因为前序写操作而被阻塞，从而使读写操作相互牵制，并发性能急剧下降。</p>
+<p>在高并发场景下，这种纯依赖锁的并发控制方式，往往会使数据库逐渐退化为“串行执行”，严重影响系统的整体吞吐能力。</p>
+<h4 id="使用MVCC来控制事物之间的读写冲突"><a href="#使用MVCC来控制事物之间的读写冲突" class="headerlink" title="使用MVCC来控制事物之间的读写冲突"></a>使用MVCC来控制事物之间的读写冲突</h4><img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260204223107036.png" class="" title="image-20260204223107036">
+
+<p>在这个过程中可以看到：</p>
+<ul>
+<li>T1 在事务中对数据进行更新时，InnoDB 并不会直接覆盖原有记录，而是生成一个<strong>新版本的数据</strong>，并通过 <strong>undo log</strong> 将新旧版本串联起来；</li>
+<li>T2 开启事务并执行 <code>SELECT</code> 时，会创建属于自己的 <strong>Read View（一致性视图）</strong>，并根据该视图判断哪些版本的数据对当前事务可见；</li>
+<li>当 T1 尚未提交时，由 T1 生成的新版本数据对 T2 不可见，T2 读取到的仍然是旧版本 <code>money = 2300</code>；</li>
+<li>直到 T1 提交事务，旧事务结束，新开启的事务才会在新的 Read View 下看到最新的数据 <code>money = 2500</code>。</li>
+</ul>
+<p>也正因为如此，在整个过程中：</p>
+<ul>
+<li><strong>写操作不会阻塞读操作</strong></li>
+<li><strong>读操作也不会阻塞写操作</strong></li>
+<li>并发事务之间既保持了数据一致性，又避免了大量加锁带来的性能损耗</li>
+</ul>
+<p>这正是 MVCC 带来的核心价值。</p>
+<h2 id="二、MVCC核心原理及其工作机制"><a href="#二、MVCC核心原理及其工作机制" class="headerlink" title="二、MVCC核心原理及其工作机制"></a>二、MVCC核心原理及其工作机制</h2><p>MVCC工作的核心思想：为每一行数据保存多个历史版本，事务读取时，根据自身Read View选择“可见的版本”（无需加锁）；事务写入时，生成新的版本（不影响旧版本读取），实现“读不加锁、写不阻塞读”，兼顾并发与一致性。</p>
+<h3 id="核心三大组件"><a href="#核心三大组件" class="headerlink" title="核心三大组件"></a>核心三大组件</h3><h4 id="隐藏字段"><a href="#隐藏字段" class="headerlink" title="隐藏字段"></a>隐藏字段</h4><p>为了实现 MVCC，InnoDB 引擎给每一行都加了三个额外的字段 db_trx_id 和 db_roll_ptr以及db_row_id。</p>
+<ul>
+<li>db_trx_id：事务 ID，也叫做事务版本号。MVCC 里面的 V 指的就是这个数字。每一个事务在开始的时候就会获得一个 ID，然后这个事务内操作的行的事务 ID，都会被修改为这个事务的 ID。</li>
+<li>db_roll_ptr：回滚指针。InnoDB 通过 roll_ptr 把每一行的历史版本串联在一起。</li>
+<li>db_row_id：如果你没有设置任何主键，那么这个列就会被当成主键来使用。但是它其实和 MVCC 没太大的关系。</li>
+</ul>
+<h4 id="回滚日志-Undo-Log"><a href="#回滚日志-Undo-Log" class="headerlink" title="回滚日志 (Undo Log)"></a>回滚日志 (Undo Log)</h4><p>在 InnoDB 中，undo log 是实现 MVCC 的核心组件之一。它本质上是一种<strong>逻辑日志</strong>，记录了数据修改前的状态，既支持事务回滚，也支撑了多版本并发控制机制。可以说，MVCC 让数据库能同时呈现数据的多个版本，而 <strong>undo log 正是这些历史版本的存储基础</strong>。</p>
+<h5 id="UndoLog-版本链"><a href="#UndoLog-版本链" class="headerlink" title="UndoLog 版本链"></a>UndoLog 版本链</h5><p>版本链的作用就是<strong>为每一行数据提供一个完整、可追溯的“历史时间线”</strong>，</p>
+<img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260206101537082.png" class="" title="image-20260206101537082">
+
+<h4 id="读视图（Read-View）"><a href="#读视图（Read-View）" class="headerlink" title="读视图（Read View）"></a>读视图（Read View）</h4><p>ReadView的作用：当一个事物发起查询时候，首先它会生成一个ReadView读视图，这个视图确定了当前时刻哪些事务ID是活跃的（即未提交的），从而决定了哪些数据版本对它可见。</p>
+<p>ReadView 的几个参数信息</p>
+<ul>
+<li><p>up_limit_id：最小事务ID（活跃事务列表中最小的事务ID）</p>
+</li>
+<li><p>low_limit_id：最大事务ID（将要分配的下一个事务ID当前系统已经分配的最大事务ID+1）</p>
+</li>
+<li><p>create_trx_id：当前事务ID</p>
+</li>
+<li><p>trx_ids：事务活跃列表（这里是正在运行的未提交的事务）</p>
+</li>
+</ul>
+<p>ReadView 的读取规则</p>
+<p>规则1、 DB_TRX_ID小于最小事务ID可以被读取，因为最小事务Id之前的数据肯定都是已经被提交了的数据。</p>
+<img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205105529706.png" class="" title="image-20260205105529706">
+
+
+
+<p>规则2、DB_TRX_ID在最大事务ID以后的不读（但是也要看具体的隔离级别RR级别下是不可以被读到的，但是在RC级别下可以读到）</p>
+<img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205105627255.png" class="" title="image-20260205105627255">
+
+<p>规则3、DB_TRX_ID和create_trx_id相同，肯定读（一个事务，在自己的事务中生成的数据版本，对自己一定是可见的。）</p>
+<p>规则4、DB_TRX_ID 如果大于最小事务Id，但是小于最大的事务Id，然后在活跃列表中不存在的，肯定读（因为它是已经提交的）</p>
+<img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205105847608.png" class="" title="image-20260205105847608">
+
+<p>规则5、DB_TRX_ID 如果大于最小事务Id，但是小于最大的事务Id，然后在活跃列表中存在的，肯定不读（因为它是未提交的）</p>
+<img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205110031298.png" class="" title="image-20260205110031298">
+
+<h3 id="完整工作机制"><a href="#完整工作机制" class="headerlink" title="完整工作机制"></a>完整工作机制</h3><p>接下来用一个案例演示来体验MVCC一整个的工作机制。</p>
+<p>数据准备</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> `tb_account`  (</span><br><span class="line">  `account` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span> COMMENT <span class="string">&#x27;账号&#x27;</span>,</span><br><span class="line">  `money` <span class="keyword">double</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span> COMMENT <span class="string">&#x27;金额&#x27;</span></span><br><span class="line">) ENGINE <span class="operator">=</span> InnoDB <span class="keyword">CHARACTER SET</span> <span class="operator">=</span> utf8mb4 <span class="keyword">COLLATE</span> <span class="operator">=</span> utf8mb4_general_ci ROW_FORMAT <span class="operator">=</span> <span class="keyword">Dynamic</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT INTO</span> `tb_account` <span class="keyword">VALUES</span> (<span class="number">10087</span>, <span class="number">2300</span>);</span><br><span class="line"><span class="keyword">INSERT INTO</span> `tb_account` <span class="keyword">VALUES</span> (<span class="number">10086</span>, <span class="number">2000</span>);</span><br><span class="line"><span class="keyword">INSERT INTO</span> `tb_account` <span class="keyword">VALUES</span> (<span class="number">10088</span>, <span class="number">2000</span>);</span><br></pre></td></tr></table></figure>
+
+<h4 id="这里以MySQL默认的工作隔离级别为例"><a href="#这里以MySQL默认的工作隔离级别为例" class="headerlink" title="这里以MySQL默认的工作隔离级别为例"></a>这里以MySQL默认的工作隔离级别为例</h4><img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205145417211.png" class="" title="image-20260205145417211">
+
+<p>Step1：T1事物开启，并执行update更新账号为10087这条数据，生成新的版本链（版本链的指针记录db_trx_id为10）</p>
+<p>Step2：T2开启事物，读取账号为10087的这条数据，此时开始创建ReadView读视图</p>
+<ul>
+<li><p>ReadView读视图内容</p>
+<ul>
+<li><p><code>up_limit_id</code>（最小活跃事务ID）：10</p>
+</li>
+<li><p><code>low_limit_id</code>（最大事务ID）：21</p>
+</li>
+<li><p><code>create_tx_id</code>（T2自身事务ID）：20</p>
+</li>
+<li><p><code>trx_ids</code>（活跃事务列表）：[10]</p>
+</li>
+</ul>
+</li>
+<li><p>判断版本可见性</p>
+<p>最新版本 <code>db_trx_id:10</code> 在活跃列表中 → <strong>不可见</strong>，通过db_roll_ptr找到上一个版本db_trx_id:8，db_trx_id:8 &lt; up_limit_id所以可见，获取到的结果money &#x3D; 2300</p>
+</li>
+</ul>
+<p>Step3：T1事物提交，版本链最终版本为db_trx_id &#x3D; 10</p>
+<p>Step4：T2事物尚未提交，在T1事物提交以后再次读取账号为10087的这条数据，获取到的结果仍然为money&#x3D;2300，这是因为RR隔离级别下面ReadView只在第一次查询的时候生成，后续复用第一次生成的视图。</p>
+<p>Step5：T2事物提交，提交以后再次开启事物读取账号为10087的这条数据，此时ReadView会重新生成。</p>
+<ul>
+<li><p>ReadView读视图内容</p>
+<ul>
+<li><p><code>up_limit_id</code>（最小活跃事务ID）：空</p>
+</li>
+<li><p><code>low_limit_id</code>（最大事务ID）：21</p>
+</li>
+<li><p><code>create_tx_id</code>（T2自身事务ID）：30</p>
+</li>
+<li><p><code>trx_ids</code>（活跃事务列表）：[]</p>
+</li>
+</ul>
+</li>
+<li><p>可见性判断</p>
+<ul>
+<li>因为db_trx_id不在活跃事物列表中，所以可见，读取到的数据就是更新以后的数据money&#x3D;2500</li>
+</ul>
+</li>
+</ul>
+<p>到此整个工作流程结束。</p>
+<h4 id="补充RC隔离级别下面MVCC是怎么工作的"><a href="#补充RC隔离级别下面MVCC是怎么工作的" class="headerlink" title="补充RC隔离级别下面MVCC是怎么工作的"></a>补充RC隔离级别下面MVCC是怎么工作的</h4><img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260206095844097.png" class="" title="image-20260206095844097">
+
+<p>Step1：T1事物开启，并执行update更新账号为10087这条数据，生成新的版本链（版本链的指针记录db_trx_id为10）</p>
+<p>Step2：T2开启事物，读取账号为10087的这条数据，此时开始创建ReadView读视图</p>
+<ul>
+<li><p>ReadView读视图内容</p>
+<ul>
+<li><p><code>up_limit_id</code>（最小活跃事务ID）：10</p>
+</li>
+<li><p><code>low_limit_id</code>（最大事务ID）：21</p>
+</li>
+<li><p><code>create_tx_id</code>（T2自身事务ID）：20</p>
+</li>
+<li><p><code>trx_ids</code>（活跃事务列表）：[10]</p>
+</li>
+</ul>
+</li>
+<li><p>判断版本可见性</p>
+<p>最新版本 <code>db_trx_id:10</code> 在活跃列表中 → <strong>不可见</strong>，通过db_roll_ptr找到上一个版本db_trx_id:8，db_trx_id:8 &lt; up_limit_id所以可见，获取到的结果money &#x3D; 2300</p>
+</li>
+</ul>
+<p>Step3：T1事物提交，版本链最终版本为db_trx_id &#x3D; 10</p>
+<p>Strp4：T2事物再一次进行select查询，此时会生成新的ReadView读视图</p>
+<ul>
+<li><p>ReadView读视图内容</p>
+<ul>
+<li><p><code>up_limit_id</code>（最小活跃事务ID）：空</p>
+</li>
+<li><p><code>low_limit_id</code>（最大事务ID）：21</p>
+</li>
+<li><p><code>create_tx_id</code>（T2自身事务ID）：20</p>
+</li>
+<li><p><code>trx_ids</code>（活跃事务列表）：[]</p>
+</li>
+</ul>
+</li>
+<li><p>可见性判断</p>
+<ul>
+<li>因为db_trx_id不在活跃事物列表中，所以可见，读取到的数据就是更新以后的数据money&#x3D;2500</li>
+</ul>
+</li>
+</ul>
+<p>到此整个工作流程结束。</p>
+<p>RC隔离级别下每一条快照读SQL都会生成新的ReadView，同一个事物内多次SELECT可能看到的数据不同；</p>
+<p>RR隔离级别下ReadView只在第一次快照读的时候创建，后续SELECT复用同一个ReadView，同一个事物内，读到的数据始终是一致的</p>
+<h2 id="三、可重复读的隔离级别下面有没有彻底解决幻读问题"><a href="#三、可重复读的隔离级别下面有没有彻底解决幻读问题" class="headerlink" title="三、可重复读的隔离级别下面有没有彻底解决幻读问题"></a>三、可重复读的隔离级别下面有没有彻底解决幻读问题</h2><p>快照读（普通的select语句），是通过MVCC的方式解决了幻读，在RR级别下，ReadView只是生成一次，select的时候复用这个ReadView，即使中途有其他事物插入数据此时这个时候也是查不到的。</p>
+<p>当前读（select … for update、update、insert、delete 等语句），是通过临界锁的方式解决幻读，执行select … for update 的时候，会加上next-key lock 如果其他事物在next-key lock这个锁范围内插入了一条记录，此时这个语句会阻塞。</p>
+<p>这两个解决方案在很大程度上解决了幻读问题，但是没有办法完全避免幻读</p>
+<p><strong>产生幻读情况1</strong>：事物A使用快照读（普通的select查询），事物B插入新的数据并进行提交，然后事物A更新事物B提交的那条记录，然后事物A再次使用快照读，就可以看到事物B新增的那条数据</p>
+<img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181023618.png" class="" title="image-20260205181023618">
+
+
+
+<p>案例演示</p>
+<p>会话1：</p>
+<img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181102106.png" class="" title="image-20260205181102106">
+
+<p>会话2：</p>
+<img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181123658.png" class="" title="image-20260205181123658">
+
+<p>会话1：</p>
+<img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181152537.png" class="" title="image-20260205181152537">
+
+<p>这种情况产生幻读的原因：因为快照读不会加锁，所以事物B可以插入成功，事物A在对id &#x3D; 4这条记录进行更新以后，这个时候trx_id 的值会变成事物A的id，根据ReadView的读取规则当前事物是可以被读取到的，所以在update之后的快照读取可以看到id&#x3D;4的这条数据。</p>
+<p>**产生幻读情况2：**事物A不使用当前读，事物B插入数据以后并提交，事物A在使用当前读，此时就会产生幻读</p>
+<img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181355854.png" class="" title="image-20260205181355854">
+
+
+
+<p>案例演示</p>
+<p>会话1</p>
+<img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181431109.png" class="" title="image-20260205181431109">
+
+<p>会话2</p>
+<img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181447925.png" class="" title="image-20260205181447925">
+
+<p>会话1</p>
+<img src="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/image-20260205181504549.png" class="" title="image-20260205181504549">
+
+<p>这种情况产生的原因：快照读不生成next-key lock，导致其他的事物可以插入本次事物查询范围内的行记录，所以，当其他事务插入数据后再执行当前读，就能查到新的记录，从而产生幻读问题。</p>
+<h2 id="四、总结"><a href="#四、总结" class="headerlink" title="四、总结"></a>四、总结</h2><p>在文章开头，我们提出了三个关键问题：</p>
+<ul>
+<li><strong>多版本</strong>：数据在 MVCC 中如何产生和维护？</li>
+<li><strong>并发</strong>：MVCC 如何实现高并发下的高效访问？</li>
+<li><strong>控制</strong>：MVCC 究竟在控制什么？</li>
+</ul>
+<p><strong>多版本</strong>的本质是一条数据的更新变化时间线，通过 <strong>Undo Log</strong> 实现对数据历史版本的完整管理。<br><strong>并发</strong>体现在读写的完美解耦，MVCC 通过 <strong>版本可见性规则</strong> 实现真正的读写并行，读不阻塞写，写不阻塞读。<br><strong>控制</strong>的核心是数据可见性的精准管理，通过 <strong>ReadView（读视图）</strong> 及一系列判断规则，决定哪个版本对当前事务可见。需特别注意，在 RR（可重复读）和 RC（读已提交）隔离级别下，ReadView 的生成时机与更新策略不同，这也直接影响了事务的隔离行为。</p>
+<p>深入解析了 MVCC 的核心原理与工作机制，重点介绍了其三大组件：<strong>隐藏字段、回滚日志（Undo Log）和读视图（ReadView）</strong>，并对比了 RR 与 RC 隔离级别下 MVCC 的工作流程与差异。</p>
+<p>最后，我们探讨了一个关键问题：MVCC 是否彻底解决了幻读？答案是否定的——<strong>MVCC 并未完全解决幻读</strong>，它在快照读层面通过一致性视图缓解了幻读现象，但在当前读或特定更新场景下，幻读仍可能发生。</p>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%8CMySQL/" title="数据库，MySQL" data-aos="zoom-in">数据库，MySQL</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%8CMySQL/" rel="tag" title="数据库，MySQL">数据库，MySQL</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="Java枚举" class="lazyload">
+      <a href="/2026/02/03/Java/Java%E6%9E%9A%E4%B8%BE/" aria-label="后一篇: Java枚举"  title="后一篇: Java枚举"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          Java枚举
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      牛小聪
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        38.1k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        02:47
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%BC%95%E8%A8%80"><span class="toc-text">一、引言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFMVCC%EF%BC%9F"><span class="toc-text">什么是MVCC？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81MVCC%EF%BC%8C%E5%AE%83%E6%9C%89%E4%BB%80%E4%B9%88%E4%BB%B7%E5%80%BC%EF%BC%9F"><span class="toc-text">为什么需要MVCC，它有什么价值？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BE%9D%E9%9D%A0%E9%94%81%E6%9D%A5%E6%8E%A7%E5%88%B6%E4%BA%8B%E7%89%A9%E4%B9%8B%E9%97%B4%E7%9A%84%E8%AF%BB%E5%86%99%E5%86%B2%E7%AA%81"><span class="toc-text">依靠锁来控制事物之间的读写冲突</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8MVCC%E6%9D%A5%E6%8E%A7%E5%88%B6%E4%BA%8B%E7%89%A9%E4%B9%8B%E9%97%B4%E7%9A%84%E8%AF%BB%E5%86%99%E5%86%B2%E7%AA%81"><span class="toc-text">使用MVCC来控制事物之间的读写冲突</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81MVCC%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6"><span class="toc-text">二、MVCC核心原理及其工作机制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E4%B8%89%E5%A4%A7%E7%BB%84%E4%BB%B6"><span class="toc-text">核心三大组件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9A%90%E8%97%8F%E5%AD%97%E6%AE%B5"><span class="toc-text">隐藏字段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%9E%E6%BB%9A%E6%97%A5%E5%BF%97-Undo-Log"><span class="toc-text">回滚日志 (Undo Log)</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#UndoLog-%E7%89%88%E6%9C%AC%E9%93%BE"><span class="toc-text">UndoLog 版本链</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%BB%E8%A7%86%E5%9B%BE%EF%BC%88Read-View%EF%BC%89"><span class="toc-text">读视图（Read View）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8C%E6%95%B4%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6"><span class="toc-text">完整工作机制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%99%E9%87%8C%E4%BB%A5MySQL%E9%BB%98%E8%AE%A4%E7%9A%84%E5%B7%A5%E4%BD%9C%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E4%B8%BA%E4%BE%8B"><span class="toc-text">这里以MySQL默认的工作隔离级别为例</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A1%A5%E5%85%85RC%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E4%B8%8B%E9%9D%A2MVCC%E6%98%AF%E6%80%8E%E4%B9%88%E5%B7%A5%E4%BD%9C%E7%9A%84"><span class="toc-text">补充RC隔离级别下面MVCC是怎么工作的</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E4%B8%8B%E9%9D%A2%E6%9C%89%E6%B2%A1%E6%9C%89%E5%BD%BB%E5%BA%95%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E9%97%AE%E9%A2%98"><span class="toc-text">三、可重复读的隔离级别下面有没有彻底解决幻读问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%80%BB%E7%BB%93"><span class="toc-text">四、总结</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="牛小聪" class="lazyload">
+  <div class="sidebar-author-name">牛小聪</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">17</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/niuxiaocong itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-bilibili sidebar-social-icon">
+      <a href=https://space.bilibili.com/352487678 itemprop="url" target="_blank" aria-label="bilibili" rel="noopener nofollow noreferrer"></a>
+    </div>
+    <div class="icon-juejin sidebar-social-icon">
+      <a href=https://juejin.cn/user/1324234125087575 itemprop="url" target="_blank" aria-label="juejin" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  
+<script src="/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "牛小聪",
+          title: "一文搞懂mvcc",
+          url: "https://niuxiaocong.github.io/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/",
+          excerpt: "",
+          description: "",
+          stripContent: "一、引言什么是MVCC？MVCC（Multi-Version Concurrency Control，多版本并发控制）这个词里，其实暗藏了三个关键信息：多版本、并发、控制。 并发，相信大家都不陌生，指的是多个事务在同一时间段内同时执行；但多版本究竟指的是什么？这些版本是如何产生和维护的？ 而所谓的控制，又是在控制什么？是控制并发读写冲突，还是控制事务之间的可见性？ 很多人在学习 MySQL 或 InnoDB 时，都会听到 MVCC，却对它“只闻其名，不知其意”。 这一篇文章，我们就从这三个词本身",
+          date: "Wed Feb 04 2026 15:38:59 GMT+0800",
+          updated: "Fri Feb 06 2026 14:40:07 GMT+0800",
+          cover: "/images/banner.webp",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.11.2' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>
