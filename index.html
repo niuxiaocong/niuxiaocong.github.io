@@ -125,7 +125,7 @@
 <header id="header" aria-label="Site header">
       <picture>
       </picture>
-        <img  fetchpriority="high" src="/images/banner.webp" alt="">
+        <img  fetchpriority="high" src="/images/banner.avif" alt="">
   <div id="header-outer">
     <div id="header-title">
           <span id="logo">
@@ -150,7 +150,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">17</div>
+    <div class="sidebar-state-number">22</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
@@ -212,8 +212,138 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/" aria-label="一文搞懂mvcc" title="一文搞懂mvcc"></a>
+      <a class="post-link" href="/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%BA%94%E3%80%81%E7%BA%BF%E7%A8%8B%E6%B1%A0/" aria-label="" title=""></a>
     <div class="post-cover left">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-10-26</span>
+        <span><span class="icon-pencil"></span>3.1k 字</span>
+        <span><span class="icon-clock"></span>14 分钟</span>
+      </div>
+      <h2 class="post-title"></h2>
+      <article class="post-article">
+          1234title: 五、线程池date: 2026-02-03 10:34:44categories: [并发编程]tags: [并发编程]
+
+基本概述线程池：一个可以容纳多个线程的容器，容器种的线程可以复用，节省了频繁创建和销毁对象的操作。
+线程池的作用：
+
+降低资源消耗，减少创建和销毁线程的次数，每个线程都可以被复用，可执行多个任务。
+提高响应速度，当任务到达时，如果有空闲线程则可以直接使用，不会让系统等待
+提高线程的可管理性，如果无限制的创建线程，不仅会消耗系统资源，还会降低稳定性，使用线程池可以进行统一的分配、调优和监控
+
+线程池思想：线程复用，同一个线程可以被重复使用，来处理多个任
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E5%9B%9B%E3%80%81%E6%97%A0%E9%94%81%E5%B9%B6%E5%8F%91/" aria-label="" title=""></a>
+    <div class="post-cover right">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-10-26</span>
+        <span><span class="icon-pencil"></span>1.7k 字</span>
+        <span><span class="icon-clock"></span>9 分钟</span>
+      </div>
+      <h2 class="post-title"></h2>
+      <article class="post-article">
+          1234title: 四、无锁并发date: 2026-02-03 10:34:44categories: [并发编程]tags: [并发编程]
+
+账户转款案例账户初始金额是10000元，启动1000个线程每个线程取10块，最终账户余额应该为0元。此时共享资源就是账户里面的金额。
+解决这个线程安全问题可以使用Synchronized和CAS
+12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%89%E3%80%81JMM%EF%BC%88Java%20Memory%20Model%EF%BC%89/" aria-label="" title=""></a>
+    <div class="post-cover left">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-10-26</span>
+        <span><span class="icon-pencil"></span>1.8k 字</span>
+        <span><span class="icon-clock"></span>8 分钟</span>
+      </div>
+      <h2 class="post-title"></h2>
+      <article class="post-article">
+          1234title: 三、JMM（Java Memory Model）date: 2026-02-03 10:34:44categories: [并发编程]tags: [并发编程]
+
+JMM(Java Memory Model) Java 内存模型。Java层面抽象出来的概念，定义了主存、工作内存。
+JMM 体现在如下几个方面：
+
+原子性（保证指令不会受到线程上下文切换的影响）
+可见性（保证指令不会受cpu缓存的影响）
+有序性（保证指令不会受cpu指令并优化的影响）
+
+Java 内存模型的样子如下图。
+
+工作方式，所有的共享变量都在主存中进行存储，然后每个线程都有自己的工作内存。它们在运行的时
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%BA%8C%E3%80%81%E5%B9%B6%E5%8F%91%E4%B9%8B%E5%85%B1%E4%BA%AB%E6%A8%A1%E5%9E%8B/" aria-label="" title=""></a>
+    <div class="post-cover right">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-10-26</span>
+        <span><span class="icon-pencil"></span>8.2k 字</span>
+        <span><span class="icon-clock"></span>37 分钟</span>
+      </div>
+      <h2 class="post-title"></h2>
+      <article class="post-article">
+          1234title: 一、并发之共享模型date: 2026-02-03 10:34:44categories: [并发编程]tags: [并发编程]
+
+问题分析有两个线程t1和t2，t1线程做自增，t2线程做自减，这两个线程分别做5w次，查看结果，理想的结果应该是0
+12345678910111213141516171819202122232425@Slf4jpublic class SwitchContext &amp;#123;        static int counter = 0;    public static void main(String[] args) throws Inte
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" aria-label="" title=""></a>
+    <div class="post-cover left">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-10-26</span>
+        <span><span class="icon-pencil"></span>1.6k 字</span>
+        <span><span class="icon-clock"></span>7 分钟</span>
+      </div>
+      <h2 class="post-title"></h2>
+      <article class="post-article">
+          1234title: 一、线程基础知识date: 2026-02-03 10:34:44categories: [并发编程]tags: [并发编程]
+
+概念**进程：**一个正在运行的程序就是一个进程，进程中分成多个线程，进程主要管理资源的分配。可以把进程理解成就是一个工厂。
+**线程：**是进程中的一个实体，是系统独立调度的基本单位，可以把线程理解成是工厂里面的工人。
+**并发(concurrent)：**多个任务在同一时间段内交替执行，主要是在切换处理多个任务。
+**并行(parallel)：**多个任务在统一时刻同时执行，通常需要多个CPU内核或者多个执行单元。
+
+
+**同步：**等待当
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/" aria-label="一文搞懂mvcc" title="一文搞懂mvcc"></a>
+    <div class="post-cover right">
           <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="一文搞懂mvcc" class="lazyload">
     </div>
     <div class="post-info">
@@ -233,9 +363,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/2026/02/03/Java/Java%E6%9E%9A%E4%B8%BE/" aria-label="Java枚举" title="Java枚举"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="Java枚举" class="lazyload">
     </div>
     <div class="post-info">
@@ -253,9 +383,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/2026/02/03/Java/Java%E6%B3%9B%E5%9E%8B/" aria-label="Java泛型" title="Java泛型"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="Java泛型" class="lazyload">
     </div>
     <div class="post-info">
@@ -276,9 +406,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/2026/02/03/Java/%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3/" aria-label="注解与反射" title="注解与反射"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="注解与反射" class="lazyload">
     </div>
     <div class="post-info">
@@ -299,9 +429,9 @@ Java的加载过程 .java文件先编译 —-&amp;gt; 形成 .class 文件 —�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/2026/02/03/Java/IO%E6%B5%81/" aria-label="IO流" title="IO流"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="IO流" class="lazyload">
     </div>
     <div class="post-info">
@@ -323,128 +453,8 @@ IO流的操作主要在java.io包中，这个包下有4个顶级类，分别是I
     </div>
   </div>
 </div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/2026/02/03/Java/Java%E6%AF%94%E8%BE%83%E5%99%A8/" aria-label="Java比较器" title="Java比较器"></a>
-    <div class="post-cover right">
-          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="Java比较器" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-02-03</span>
-        <span><span class="icon-pencil"></span>496 字</span>
-        <span><span class="icon-clock"></span>3 分钟</span>
-      </div>
-      <h2 class="post-title">Java比较器</h2>
-      <article class="post-article">
-          比较器类型两种分别是Comparable（自然排序） 和 Comparator（定制排序）
-Comparable 自然排序Comparable是一个接口，如果想要实现比较需要实现这个接口并且重写里面的compareTo方法，实现两个对象的大小比较，即this当前对象和要比较的对象。
-如果当前对象this大于形参对象obj返回正数，当前对象this小于形参对象obj返回负数，如果两个对象相等则返回0。
-自定义类实现Comparable自然排序
-12345678910111213141516171819202122232425262728293031323334353637383940public
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/2026/02/03/Java/Java%E5%BC%82%E5%B8%B8%E6%9C%BA%E5%88%B6/" aria-label="Java异常机制" title="Java异常机制"></a>
-    <div class="post-cover left">
-          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="Java异常机制" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-02-03</span>
-        <span><span class="icon-pencil"></span>1.7k 字</span>
-        <span><span class="icon-clock"></span>6 分钟</span>
-      </div>
-      <h2 class="post-title">Java异常机制</h2>
-      <article class="post-article">
-          介绍
-Java 中的异常处理机制用来处理程序中出现异常的代码，让异常处理和正常业务逻辑分离。异常机制通过5个关键字try、catch、 finally、throw和throws完成。
-异常的体系结构
-
-
-
-所有的异常类都继承自Throwable
-Throwable 下面分成了两个子类分别是 Error 和 Exception。
-Error：表示系统级别的错误，是严重的、不可恢复的错误，Error错误必然会导致程序中断。所以，没有必要捕获Error对象。
-Exception：是指在程序正常运行过程中，可以预料的意外情况，可以事先捕获并且处理。
-Exception 异常又分成了两类：分别是RunT
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/2026/02/03/Java/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E9%80%9F%E6%9F%A5/" aria-label="Lambda 表达式速查" title="Lambda 表达式速查"></a>
-    <div class="post-cover right">
-          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="Lambda 表达式速查" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-02-03</span>
-        <span><span class="icon-pencil"></span>3.7k 字</span>
-        <span><span class="icon-clock"></span>19 分钟</span>
-      </div>
-      <h2 class="post-title">Lambda 表达式速查</h2>
-      <article class="post-article">
-          介绍Lambda 是JDK1.8中的新特性，使用Lambda 表达式可以使代码更加紧凑简洁、但是也增加了阅读、代码调试的难度。
-Lambda 实际上是 由匿名函数改造而来，看下面例子，开启一个线程 使用传统写法和使用Lambda的写法有何不同。
-传统写法：
-12345678910111213public class Lambda &amp;#123;    public static void main(String[] args) &amp;#123;        // 传统写法        Runnable runnable = new Runnable() &amp;#123;            @Ov
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/2026/02/03/WebChat/%E9%83%A8%E7%BD%B2%E7%AF%87-Webchat%E9%A1%B9%E7%9B%AEDocker%E9%83%A8%E7%BD%B2/" aria-label="部署篇-Webchat项目Docker部署" title="部署篇-Webchat项目Docker部署"></a>
-    <div class="post-cover left">
-          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="部署篇-Webchat项目Docker部署" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-02-03</span>
-        <span><span class="icon-pencil"></span>3.8k 字</span>
-        <span><span class="icon-clock"></span>20 分钟</span>
-      </div>
-      <h2 class="post-title">部署篇-Webchat项目Docker部署</h2>
-      <article class="post-article">
-          DockerFile编写webchat-act 服务1234567891011121314# jdkFROM eclipse-temurin:17-jre-jammy#作者信息（可选）LABEL maintainer=&amp;quot;nyc&amp;quot;# 设置工作目录WORKDIR /app# 复制已打包好的 Spring Boot jarCOPY webchat-act.jar /app/webchat-act.jar# JVM 参数优化（可根据实际服务器内存调整）ENV JAVA_OPTS=&amp;quot;-Xms192m -Xmx192m -Xss1m -XX:MaxMetaspaceSize=
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/" aria-label="三、WebChat项目注册+SSO单点" title="三、WebChat项目注册+SSO单点"></a>
-    <div class="post-cover right">
-          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="三、WebChat项目注册+SSO单点" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-02-03</span>
-        <span><span class="icon-pencil"></span>3.4k 字</span>
-        <span><span class="icon-clock"></span>15 分钟</span>
-      </div>
-      <h2 class="post-title">三、WebChat项目注册+SSO单点</h2>
-      <article class="post-article">
-          一、注册功能业务流程
-
-
-
-业务实现验证码生成分布式部署的情况下每一个Jvm的Session是不会共享的，那为什么再这里还会用Session？
-是因为验证码有以下几个天然属性：验证码只属于当前用户、生命周期段、无需跨用户共享；
-
-
-验证码生成工具类1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677public class PicValidCodeUtil &amp;
-      </article>
-    </div>
-  </div>
-</div>
   <nav id="page-nav" aria-label="Pagination navigation" data-aos="fade-up">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
   </nav>
 
 </section>
@@ -466,10 +476,10 @@ Lambda 实际上是 由匿名函数改造而来，看下面例子，开启一个
       </div>
       <div>
         <span class="icon-brush"></span>
-        38.1k
+        54.6k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        02:47
+        04:02
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -497,7 +507,7 @@ Lambda 实际上是 由匿名函数改造而来，看下面例子，开启一个
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">17</div>
+    <div class="sidebar-state-number">22</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
