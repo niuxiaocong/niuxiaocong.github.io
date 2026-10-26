@@ -9,7 +9,7 @@
   
   <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_4k4bc36ef96';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://niuxiaocong.github.io';</script>
   <title>
-    牛小聪
+    三、JMM（Java Memory Model） | 牛小聪
   </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
@@ -17,21 +17,22 @@
     
 <link rel="stylesheet" href="/css/loader.css">
 
-    <meta name="description" content="1234title: 三、JMM（Java Memory Model）date: 2026-02-03 10:34:44categories: [并发编程]tags: [并发编程]  JMM(Java Memory Model) Java 内存模型。Java层面抽象出来的概念，定义了主存、工作内存。 JMM 体现在如下几个方面：  原子性（保证指令不会受到线程上下文切换的影响） 可见性（保证指令不">
+    <meta name="description" content="JMM(Java Memory Model) Java 内存模型。Java层面抽象出来的概念，定义了主存、工作内存。 JMM 体现在如下几个方面：  原子性（保证指令不会受到线程上下文切换的影响） 可见性（保证指令不会受cpu缓存的影响） 有序性（保证指令不会受cpu指令并优化的影响）  Java 内存模型的样子如下图。  工作方式，所有的共享变量都在主存中进行存储，然后每个线程都有自己的工作内存">
 <meta property="og:type" content="article">
-<meta property="og:title" content="牛小聪">
-<meta property="og:url" content="https://niuxiaocong.github.io/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%89%E3%80%81JMM%EF%BC%88Java%20Memory%20Model%EF%BC%89/index.html">
+<meta property="og:title" content="三、JMM（Java Memory Model）">
+<meta property="og:url" content="https://niuxiaocong.github.io/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%89%E3%80%81JMM%EF%BC%88Java%20Memory%20Model%EF%BC%89/index.html">
 <meta property="og:site_name" content="牛小聪">
-<meta property="og:description" content="1234title: 三、JMM（Java Memory Model）date: 2026-02-03 10:34:44categories: [并发编程]tags: [并发编程]  JMM(Java Memory Model) Java 内存模型。Java层面抽象出来的概念，定义了主存、工作内存。 JMM 体现在如下几个方面：  原子性（保证指令不会受到线程上下文切换的影响） 可见性（保证指令不">
+<meta property="og:description" content="JMM(Java Memory Model) Java 内存模型。Java层面抽象出来的概念，定义了主存、工作内存。 JMM 体现在如下几个方面：  原子性（保证指令不会受到线程上下文切换的影响） 可见性（保证指令不会受cpu缓存的影响） 有序性（保证指令不会受cpu指令并优化的影响）  Java 内存模型的样子如下图。  工作方式，所有的共享变量都在主存中进行存储，然后每个线程都有自己的工作内存">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/12477403/1792996933623-cf121665-e667-4317-ba1e-de0bb066e373.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/12477403/1780824938191-cf41d31c-3c5e-4a31-aa04-7ad9ea103507.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/12477403/1780825084021-13bf499d-be9f-433d-8226-0fe2193c53d8.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/12477403/1792997154637-b2493255-72a4-4f7f-b464-768aa60cabdd.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/12477403/1792999680112-bcd351ab-ed16-423c-a0e4-6f6dfa09180f.png">
-<meta property="article:published_time" content="2026-10-26T07:31:53.993Z">
-<meta property="article:modified_time" content="2026-10-26T07:55:04.500Z">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%89%E3%80%81JMM%EF%BC%88Java%20Memory%20Model%EF%BC%89/image-20261026164428925.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%89%E3%80%81JMM%EF%BC%88Java%20Memory%20Model%EF%BC%89/image-20261026164445678.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%89%E3%80%81JMM%EF%BC%88Java%20Memory%20Model%EF%BC%89/image-20261026164506997.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%89%E3%80%81JMM%EF%BC%88Java%20Memory%20Model%EF%BC%89/image-20261026164535514.png">
+<meta property="article:published_time" content="2026-02-03T02:34:44.000Z">
+<meta property="article:modified_time" content="2026-10-26T08:54:45.072Z">
 <meta property="article:author" content="牛小聪">
+<meta property="article:tag" content="并发编程">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2026/png/12477403/1792996933623-cf121665-e667-4317-ba1e-de0bb066e373.png">
     <link rel="alternate" href="/atom.xml" title="牛小聪" type="application/atom+xml">
@@ -133,11 +134,11 @@
 <header id="header" aria-label="Site header">
         <picture>
         </picture>
-          <img  fetchpriority="high" src="/images/banner.avif" alt="">
+          <img  fetchpriority="high" src="/images/banner.avif" alt="三、JMM（Java Memory Model）">
   <div id="header-outer">
     <div id="header-title">
           <span id="logo">
-            <h1 data-aos="slide-up">牛小聪</h1>
+            <h1 data-aos="slide-up">三、JMM（Java Memory Model）</h1>
           </span>
         <h2 id="subtitle-wrap" data-aos="slide-down">
         </h2>
@@ -152,7 +153,7 @@
     <div class="sidebar-wrap" data-aos="fade-up">
           <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
 <div class="sidebar-toc-wrapper toc-div-class" >
-    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89%E4%B8%AA%E7%89%B9%E6%80%A7"><span class="toc-text">三个特性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AF%E8%A7%81%E6%80%A7"><span class="toc-text">可见性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%89%E5%BA%8F%E6%80%A7"><span class="toc-text">有序性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E5%AD%90%E6%80%A7"><span class="toc-text">原子性</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Volatile-%E5%8E%9F%E7%90%86"><span class="toc-text">Volatile 原理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%8C%E9%87%8D%E6%A3%80%E6%9F%A5%E9%94%81%EF%BC%88Double-Checked-Locking%EF%BC%89"><span class="toc-text">双重检查锁（Double-Checked-Locking）</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Happens-before%E8%A7%84%E5%88%99"><span class="toc-text">Happens-before规则</span></a></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E4%B8%AA%E7%89%B9%E6%80%A7"><span class="toc-text">三个特性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E8%A7%81%E6%80%A7"><span class="toc-text">可见性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E5%BA%8F%E6%80%A7"><span class="toc-text">有序性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%AD%90%E6%80%A7"><span class="toc-text">原子性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Volatile-%E5%8E%9F%E7%90%86"><span class="toc-text">Volatile 原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%8C%E9%87%8D%E6%A3%80%E6%9F%A5%E9%94%81%EF%BC%88Double-Checked-Locking%EF%BC%89"><span class="toc-text">双重检查锁（Double-Checked-Locking）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Happens-before%E8%A7%84%E5%88%99"><span class="toc-text">Happens-before规则</span></a></li></ol>
 </div>
 </div>
           <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
@@ -167,11 +168,11 @@
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
-    <div class="sidebar-state-number">4</div>
+    <div class="sidebar-state-number">5</div>
   </div>
   <div class="sidebar-state-tag">
     <div>标签</div>
-    <div class="sidebar-state-number">4</div>
+    <div class="sidebar-state-number">5</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -232,7 +233,7 @@
     <div class="article-meta">
       <div class="article-date">
   <span class="article-date-link icon-calendar" data-aos="zoom-in">
-    <time datetime="2026-10-26T07:31:53.993Z" itemprop="datePublished">2026-10-26</time>
+    <time datetime="2026-02-03T02:34:44.000Z" itemprop="datePublished">2026-02-03</time>
     <time style="display: none;" id="post-update-time">2026-10-26</time>
   </span>
 </div>
@@ -242,9 +243,7 @@
     <div class="hr-line"></div>
     
     <div class="e-content article-entry" itemprop="articleBody">
-        <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">title: 三、JMM（Java Memory Model）</span><br><span class="line">date: 2026-02-03 10:34:44</span><br><span class="line">categories: [并发编程]</span><br><span class="line">tags: [并发编程]</span><br></pre></td></tr></table></figure>
-
-<p>JMM(Java Memory Model) Java 内存模型。Java层面抽象出来的概念，定义了主存、工作内存。</p>
+        <p>JMM(Java Memory Model) Java 内存模型。Java层面抽象出来的概念，定义了主存、工作内存。</p>
 <p>JMM 体现在如下几个方面：</p>
 <ul>
 <li>原子性（保证指令不会受到线程上下文切换的影响）</li>
@@ -254,10 +253,12 @@
 <p>Java 内存模型的样子如下图。</p>
 <p><img src="https://cdn.nlark.com/yuque/0/2026/png/12477403/1792996933623-cf121665-e667-4317-ba1e-de0bb066e373.png" alt="img"></p>
 <p>工作方式，所有的共享变量都在主存中进行存储，然后每个线程都有自己的工作内存。它们在运行的时候从主存中读取变量到自己的工作内存中，然后对这个变量进行修改，修改之后在刷回去主存。</p>
-<h1 id="三个特性"><a href="#三个特性" class="headerlink" title="三个特性"></a>三个特性</h1><h2 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h2><p>可见性问题</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/12477403/1780824938191-cf41d31c-3c5e-4a31-aa04-7ad9ea103507.png" alt="img"></p>
+<h2 id="三个特性"><a href="#三个特性" class="headerlink" title="三个特性"></a>三个特性</h2><h3 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h3><p>可见性问题</p>
+<img src="/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%89%E3%80%81JMM%EF%BC%88Java%20Memory%20Model%EF%BC%89/image-20261026164428925.png" class="" title="image-20261026164428925">
+
 <p>导致可见性问题的原因</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/12477403/1780825084021-13bf499d-be9f-433d-8226-0fe2193c53d8.png" alt="img"></p>
+<img src="/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%89%E3%80%81JMM%EF%BC%88Java%20Memory%20Model%EF%BC%89/image-20261026164445678.png" class="" title="image-20261026164445678">
+
 <p>解决办法</p>
 <ul>
 <li>使用volatile（注意：volatile只是解决可见性，没有解决原子性）</li>
@@ -267,25 +268,26 @@
 <p>volatile 适合用在一个线程写，其余的线程都是读的情况下。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Code01_Visit</span> &#123;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="variable">run</span> <span class="operator">=</span> <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException &#123;</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">while</span>(run)&#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,<span class="string">&quot;t1&quot;</span>).start();</span><br><span class="line">        Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        log.debug(<span class="string">&quot;停止t1线程&quot;</span>);</span><br><span class="line">        run = <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h2><p>JVM会在不影响结果的正确性的前提下会做指令的重排序，这样就会导致代码的执行顺序不一样，CPU层面并行执行，为了提升执行的效率，串行执行的时候会并行执行多条指令，提升执行效率。</p>
+<h3 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h3><p>JVM会在不影响结果的正确性的前提下会做指令的重排序，这样就会导致代码的执行顺序不一样，CPU层面并行执行，为了提升执行的效率，串行执行的时候会并行执行多条指令，提升执行效率。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">num</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"><span class="type">boolean</span> <span class="variable">ready</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 线程1执行</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">actor1</span><span class="params">(I_Result r)</span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(ready)&#123;</span><br><span class="line">        r.r1 = num + num;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        r.r1 = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 线程2执行</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">actor2</span><span class="params">(I_Result r)</span>&#123;</span><br><span class="line">    num = <span class="number">2</span>;</span><br><span class="line">    ready = <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>Java的JIT编译器可能会进行指令的重排序，导致三种结果的出现 1 ，4，0，如果不想要指令的重排序，直接使用volatile关键字即可。</p>
-<h2 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h2><p>在程序代码执行的时候，各个线程之间独立的去运行，不会相互的干扰。</p>
-<h1 id="Volatile-原理"><a href="#Volatile-原理" class="headerlink" title="Volatile 原理"></a>Volatile 原理</h1><p>Volatile保证可见和有序性但是保障不了原子，Volatile底层原理实现是内存屏障机制 Memory Barrier（Memory Fence）</p>
+<h3 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h3><p>在程序代码执行的时候，各个线程之间独立的去运行，不会相互的干扰。</p>
+<h2 id="Volatile-原理"><a href="#Volatile-原理" class="headerlink" title="Volatile 原理"></a>Volatile 原理</h2><p>Volatile保证可见和有序性但是保障不了原子，Volatile底层原理实现是内存屏障机制 Memory Barrier（Memory Fence）</p>
 <p>针对volatile变量的写指令后面会加入写屏障，不会将写屏障之前的代码排在写屏障之后。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">actor2</span><span class="params">(I_Result r)</span>&#123;</span><br><span class="line">    num = <span class="number">2</span>;</span><br><span class="line">	ready = <span class="literal">true</span>;</span><br><span class="line">	<span class="comment">// 写屏障</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>针对volatile变量的读指令前面会加入读屏障，不会将读屏障之后的代码排在读屏障之前。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">actor1</span><span class="params">(I_Result r)</span>&#123;</span><br><span class="line">	<span class="comment">// 读屏障</span></span><br><span class="line">    <span class="keyword">if</span>(ready)&#123;</span><br><span class="line">        r.r1 = num + num;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        r.r1 = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h1 id="双重检查锁（Double-Checked-Locking）"><a href="#双重检查锁（Double-Checked-Locking）" class="headerlink" title="双重检查锁（Double-Checked-Locking）"></a>双重检查锁（Double-Checked-Locking）</h1><p>双重检查锁没有添加volatile产生的问题</p>
+<h2 id="双重检查锁（Double-Checked-Locking）"><a href="#双重检查锁（Double-Checked-Locking）" class="headerlink" title="双重检查锁（Double-Checked-Locking）"></a>双重检查锁（Double-Checked-Locking）</h2><p>双重检查锁没有添加volatile产生的问题</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">Singleton</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">Singleton</span><span class="params">()</span>&#123;&#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">Singleton</span> <span class="variable">INSTANCE</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title function_">getInstance</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(INSTANCE == <span class="literal">null</span>)&#123;</span><br><span class="line">            <span class="comment">// 首次访问会同步，而之后的没有使用 synchronized</span></span><br><span class="line">            <span class="keyword">synchronized</span>(Singleton.class)&#123;</span><br><span class="line">                <span class="keyword">if</span>(。 == <span class="literal">null</span>)&#123;</span><br><span class="line">                    INSTANCE = <span class="keyword">new</span> <span class="title class_">Singleton</span>();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> INSTANCE;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>字节码信息</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0</span>: 	getstatic 		#<span class="number">2</span> 		<span class="comment">// Field INSTANCE:Ltest/Singleton;</span></span><br><span class="line"><span class="number">3</span>: 	ifnonnull 		<span class="number">37</span></span><br><span class="line"><span class="number">6</span>: 	ldc 			#<span class="number">3</span> 		<span class="comment">// class test/Singleton</span></span><br><span class="line"><span class="number">8</span>: 	dup</span><br><span class="line"><span class="number">9</span>: 	astore_0</span><br><span class="line"><span class="number">10</span>: monitorenter</span><br><span class="line"><span class="number">11</span>: getstatic 		#<span class="number">2</span> 		<span class="comment">// Field INSTANCE:Ltest/Singleton;</span></span><br><span class="line"><span class="number">14</span>: ifnonnull <span class="number">27</span></span><br><span class="line"><span class="number">17</span>: <span class="keyword">new</span> 			#<span class="number">3</span> 		<span class="comment">// class test/Singleton</span></span><br><span class="line"><span class="number">20</span>: dup</span><br><span class="line"><span class="number">21</span>: invokespecial 	#<span class="number">4</span> 		<span class="comment">// Method &quot;&lt;init&gt;&quot;:()V</span></span><br><span class="line"><span class="number">24</span>: putstatic 		#<span class="number">2</span> 		<span class="comment">// Field INSTANCE:Ltest/Singleton;</span></span><br><span class="line"><span class="number">27</span>: aload_0</span><br><span class="line"><span class="number">28</span>: monitorexit</span><br><span class="line"><span class="number">29</span>: <span class="keyword">goto</span> <span class="number">37</span></span><br><span class="line"><span class="number">32</span>: astore_1</span><br><span class="line"><span class="number">33</span>: aload_0</span><br><span class="line"><span class="number">34</span>: monitorexit</span><br><span class="line"><span class="number">35</span>: aload_1</span><br><span class="line"><span class="number">36</span>: athrow</span><br><span class="line"><span class="number">37</span>: getstatic 		#<span class="number">2</span> 		<span class="comment">// Field INSTANCE:Ltest/Singleton;</span></span><br><span class="line"><span class="number">40</span>: areturn</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/12477403/1792997154637-b2493255-72a4-4f7f-b464-768aa60cabdd.png" alt="img"></p>
+<img src="/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%89%E3%80%81JMM%EF%BC%88Java%20Memory%20Model%EF%BC%89/image-20261026164506997.png" class="" title="image-20261026164506997">
+
 <ul>
 <li>t1线程开始创建Singleton这个实例</li>
 <li>t1线程复制一遍自己的引用</li>
@@ -297,8 +299,9 @@
 <p>解决办法就是加上volatile</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">Singleton</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">Singleton</span><span class="params">()</span>&#123;&#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">volatile</span> <span class="type">Singleton</span> <span class="variable">INSTANCE</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title function_">getInstance</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(INSTANCE == <span class="literal">null</span>)&#123;</span><br><span class="line">            <span class="comment">// 首次访问会同步，而之后的没有使用 synchronized</span></span><br><span class="line">            <span class="keyword">synchronized</span>(Singleton.class)&#123;</span><br><span class="line">                <span class="keyword">if</span>(INSTANCE == <span class="literal">null</span>)&#123;</span><br><span class="line">                    INSTANCE = <span class="keyword">new</span> <span class="title class_">Singleton</span>();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> INSTANCE;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/12477403/1792999680112-bcd351ab-ed16-423c-a0e4-6f6dfa09180f.png" alt="img"></p>
-<h1 id="Happens-before规则"><a href="#Happens-before规则" class="headerlink" title="Happens-before规则"></a>Happens-before规则</h1><p>happens-before规定了对共享变量的写操作对其他线程的读操作可见，是一套可见性和有序性的一套规则的总结。</p>
+<img src="/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%89%E3%80%81JMM%EF%BC%88Java%20Memory%20Model%EF%BC%89/image-20261026164535514.png" class="" title="image-20261026164535514">
+
+<h2 id="Happens-before规则"><a href="#Happens-before规则" class="headerlink" title="Happens-before规则"></a>Happens-before规则</h2><p>happens-before规定了对共享变量的写操作对其他线程的读操作可见，是一套可见性和有序性的一套规则的总结。</p>
 <p><strong>规则一</strong></p>
 <p>线程解锁m之前对变量的写，对于接下来对m加锁的其他线程对该变量的读可见。</p>
 <p>一个线程在放开 m 锁之前改过的变量，别的线程之后只要再拿到 m 这把锁，就一定能看到这些改动。</p>
@@ -330,25 +333,27 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Code08_happensBefore06</span> &#123;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="keyword">static</span> <span class="type">int</span> x;</span><br><span class="line">    <span class="keyword">static</span> <span class="type">int</span> y;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(()-&gt;&#123;</span><br><span class="line">            y = <span class="number">10</span>;</span><br><span class="line">            x = <span class="number">20</span>;</span><br><span class="line">        &#125;,<span class="string">&quot;t1&quot;</span>).start();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(()-&gt;&#123;</span><br><span class="line">            <span class="comment">// x=20 对 t2 可见, 同时 y=10 也对 t2 可见</span></span><br><span class="line">            System.out.println(x);</span><br><span class="line">        &#125;,<span class="string">&quot;t2&quot;</span>).start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
     </div>
     <footer class="article-footer">
-      
-      
+        <a class="article-category-link" href="/categories/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" title="并发编程" data-aos="zoom-in">并发编程</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag" title="并发编程">并发编程</a></li></ul>
+
     </footer>
   </div>
     <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
       <div class="article-nav-link-wrap left">
-            <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="" class="lazyload">
-        <a href="/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E5%9B%9B%E3%80%81%E6%97%A0%E9%94%81%E5%B9%B6%E5%8F%91/" aria-label="前一篇: no title" title="前一篇: no title"></a>
+            <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="二、Webchat项目微服务拆分思想" class="lazyload">
+        <a href="/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/" aria-label="前一篇: 二、Webchat项目微服务拆分思想" title="前一篇: 二、Webchat项目微服务拆分思想"></a>
         <div class="article-nav-caption">前一篇</div>
         <h3 class="article-nav-title">
-            (no title)
+            二、Webchat项目微服务拆分思想
         </h3>
       </div>
     <div class="article-nav-link-wrap right">
-          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="" class="lazyload">
-      <a href="/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%BA%8C%E3%80%81%E5%B9%B6%E5%8F%91%E4%B9%8B%E5%85%B1%E4%BA%AB%E6%A8%A1%E5%9E%8B/" aria-label="后一篇: no title"  title="后一篇: no title"></a>
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="五、线程池" class="lazyload">
+      <a href="/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%BA%94%E3%80%81%E7%BA%BF%E7%A8%8B%E6%B1%A0/" aria-label="后一篇: 五、线程池"  title="后一篇: 五、线程池"></a>
       <div class="article-nav-caption">后一篇</div>
       <h3 class="article-nav-title">
-          (no title)
+          五、线程池
       </h3>
     </div>
   </nav>
@@ -375,10 +380,10 @@
       </div>
       <div>
         <span class="icon-brush"></span>
-        54.6k
+        54.4k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        04:02
+        04:01
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -400,7 +405,7 @@
   <div class="sidebar-wrap">
         <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
 <div class="sidebar-toc-wrapper toc-div-class" >
-    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89%E4%B8%AA%E7%89%B9%E6%80%A7"><span class="toc-text">三个特性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AF%E8%A7%81%E6%80%A7"><span class="toc-text">可见性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%89%E5%BA%8F%E6%80%A7"><span class="toc-text">有序性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E5%AD%90%E6%80%A7"><span class="toc-text">原子性</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Volatile-%E5%8E%9F%E7%90%86"><span class="toc-text">Volatile 原理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%8C%E9%87%8D%E6%A3%80%E6%9F%A5%E9%94%81%EF%BC%88Double-Checked-Locking%EF%BC%89"><span class="toc-text">双重检查锁（Double-Checked-Locking）</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Happens-before%E8%A7%84%E5%88%99"><span class="toc-text">Happens-before规则</span></a></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E4%B8%AA%E7%89%B9%E6%80%A7"><span class="toc-text">三个特性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E8%A7%81%E6%80%A7"><span class="toc-text">可见性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E5%BA%8F%E6%80%A7"><span class="toc-text">有序性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%AD%90%E6%80%A7"><span class="toc-text">原子性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Volatile-%E5%8E%9F%E7%90%86"><span class="toc-text">Volatile 原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%8C%E9%87%8D%E6%A3%80%E6%9F%A5%E9%94%81%EF%BC%88Double-Checked-Locking%EF%BC%89"><span class="toc-text">双重检查锁（Double-Checked-Locking）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Happens-before%E8%A7%84%E5%88%99"><span class="toc-text">Happens-before规则</span></a></li></ol>
 </div>
 </div>
         <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
@@ -415,11 +420,11 @@
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
-    <div class="sidebar-state-number">4</div>
+    <div class="sidebar-state-number">5</div>
   </div>
   <div class="sidebar-state-tag">
     <div>标签</div>
-    <div class="sidebar-state-number">4</div>
+    <div class="sidebar-state-number">5</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -531,13 +536,13 @@
       <script data-pjax>
         window.REIMU_POST = {
           author: "牛小聪",
-          title: "",
-          url: "https://niuxiaocong.github.io/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%89%E3%80%81JMM%EF%BC%88Java%20Memory%20Model%EF%BC%89/",
+          title: "三、JMM（Java Memory Model）",
+          url: "https://niuxiaocong.github.io/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%89%E3%80%81JMM%EF%BC%88Java%20Memory%20Model%EF%BC%89/",
           excerpt: "",
           description: "",
-          stripContent: "1234title: 三、JMM（Java Memory Model）date: 2026-02-03 10:34:44categories: [并发编程]tags: [并发编程]  JMM(Java Memory Model) Java 内存模型。Java层面抽象出来的概念，定义了主存、工作内存。 JMM 体现在如下几个方面：  原子性（保证指令不会受到线程上下文切换的影响） 可见性（保证指令不会受cpu缓存的影响） 有序性（保证指令不会受cpu指令并优化的影响）  Java 内存模型的样子如",
-          date: "Mon Oct 26 2026 15:31:53 GMT+0800",
-          updated: "Mon Oct 26 2026 15:55:04 GMT+0800",
+          stripContent: "JMM(Java Memory Model) Java 内存模型。Java层面抽象出来的概念，定义了主存、工作内存。 JMM 体现在如下几个方面：  原子性（保证指令不会受到线程上下文切换的影响） 可见性（保证指令不会受cpu缓存的影响） 有序性（保证指令不会受cpu指令并优化的影响）  Java 内存模型的样子如下图。  工作方式，所有的共享变量都在主存中进行存储，然后每个线程都有自己的工作内存。它们在运行的时候从主存中读取变量到自己的工作内存中，然后对这个变量进行修改，修改之后在刷回去主存。",
+          date: "Tue Feb 03 2026 10:34:44 GMT+0800",
+          updated: "Mon Oct 26 2026 16:54:45 GMT+0800",
           cover: "/images/banner.avif",
         };
       </script>

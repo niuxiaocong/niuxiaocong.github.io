@@ -9,7 +9,7 @@
   
   <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_4k4bc36ef96';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://niuxiaocong.github.io';</script>
   <title>
-    牛小聪
+    一、线程基础知识 | 牛小聪
   </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
@@ -17,22 +17,23 @@
     
 <link rel="stylesheet" href="/css/loader.css">
 
-    <meta name="description" content="1234title: 一、线程基础知识date: 2026-02-03 10:34:44categories: [并发编程]tags: [并发编程]  概念**进程：**一个正在运行的程序就是一个进程，进程中分成多个线程，进程主要管理资源的分配。可以把进程理解成就是一个工厂。 **线程：**是进程中的一个实体，是系统独立调度的基本单位，可以把线程理解成是工厂里面的工人。 **并发(concurre">
+    <meta name="description" content="概念**进程：**一个正在运行的程序就是一个进程，进程中分成多个线程，进程主要管理资源的分配。可以把进程理解成就是一个工厂。 **线程：**是进程中的一个实体，是系统独立调度的基本单位，可以把线程理解成是工厂里面的工人。 **并发(concurrent)：**多个任务在同一时间段内交替执行，主要是在切换处理多个任务。 **并行(parallel)：**多个任务在统一时刻同时执行，通常需要多个CPU">
 <meta property="og:type" content="article">
-<meta property="og:title" content="牛小聪">
-<meta property="og:url" content="https://niuxiaocong.github.io/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/index.html">
+<meta property="og:title" content="一、线程基础知识">
+<meta property="og:url" content="https://niuxiaocong.github.io/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/index.html">
 <meta property="og:site_name" content="牛小聪">
-<meta property="og:description" content="1234title: 一、线程基础知识date: 2026-02-03 10:34:44categories: [并发编程]tags: [并发编程]  概念**进程：**一个正在运行的程序就是一个进程，进程中分成多个线程，进程主要管理资源的分配。可以把进程理解成就是一个工厂。 **线程：**是进程中的一个实体，是系统独立调度的基本单位，可以把线程理解成是工厂里面的工人。 **并发(concurre">
+<meta property="og:description" content="概念**进程：**一个正在运行的程序就是一个进程，进程中分成多个线程，进程主要管理资源的分配。可以把进程理解成就是一个工厂。 **线程：**是进程中的一个实体，是系统独立调度的基本单位，可以把线程理解成是工厂里面的工人。 **并发(concurrent)：**多个任务在同一时间段内交替执行，主要是在切换处理多个任务。 **并行(parallel)：**多个任务在统一时刻同时执行，通常需要多个CPU">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://niuxiaocong.github.io/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152114796.png">
-<meta property="og:image" content="https://niuxiaocong.github.io/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152153172.png">
-<meta property="og:image" content="https://niuxiaocong.github.io/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152212912.png">
-<meta property="og:image" content="https://niuxiaocong.github.io/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152237287.png">
-<meta property="article:published_time" content="2026-10-26T07:18:19.318Z">
-<meta property="article:modified_time" content="2026-10-26T07:53:03.722Z">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152114796.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152153172.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152212912.png">
+<meta property="og:image" content="https://niuxiaocong.github.io/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152237287.png">
+<meta property="article:published_time" content="2026-02-03T02:34:44.000Z">
+<meta property="article:modified_time" content="2026-10-26T08:27:42.201Z">
 <meta property="article:author" content="牛小聪">
+<meta property="article:tag" content="并发编程">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://niuxiaocong.github.io/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152114796.png">
+<meta name="twitter:image" content="https://niuxiaocong.github.io/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152114796.png">
     <link rel="alternate" href="/atom.xml" title="牛小聪" type="application/atom+xml">
     <link rel="shortcut icon" href="/images/favicon.ico">
   
@@ -132,11 +133,11 @@
 <header id="header" aria-label="Site header">
         <picture>
         </picture>
-          <img  fetchpriority="high" src="/images/banner.avif" alt="">
+          <img  fetchpriority="high" src="/images/banner.avif" alt="一、线程基础知识">
   <div id="header-outer">
     <div id="header-title">
           <span id="logo">
-            <h1 data-aos="slide-up">牛小聪</h1>
+            <h1 data-aos="slide-up">一、线程基础知识</h1>
           </span>
         <h2 id="subtitle-wrap" data-aos="slide-down">
         </h2>
@@ -166,11 +167,11 @@
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
-    <div class="sidebar-state-number">4</div>
+    <div class="sidebar-state-number">5</div>
   </div>
   <div class="sidebar-state-tag">
     <div>标签</div>
-    <div class="sidebar-state-number">4</div>
+    <div class="sidebar-state-number">5</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -231,7 +232,7 @@
     <div class="article-meta">
       <div class="article-date">
   <span class="article-date-link icon-calendar" data-aos="zoom-in">
-    <time datetime="2026-10-26T07:18:19.318Z" itemprop="datePublished">2026-10-26</time>
+    <time datetime="2026-02-03T02:34:44.000Z" itemprop="datePublished">2026-02-03</time>
     <time style="display: none;" id="post-update-time">2026-10-26</time>
   </span>
 </div>
@@ -241,17 +242,15 @@
     <div class="hr-line"></div>
     
     <div class="e-content article-entry" itemprop="articleBody">
-        <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">title: 一、线程基础知识</span><br><span class="line">date: 2026-02-03 10:34:44</span><br><span class="line">categories: [并发编程]</span><br><span class="line">tags: [并发编程]</span><br></pre></td></tr></table></figure>
-
-<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>**进程：**一个正在运行的程序就是一个进程，进程中分成多个线程，进程主要管理资源的分配。可以把进程理解成就是一个工厂。</p>
+        <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>**进程：**一个正在运行的程序就是一个进程，进程中分成多个线程，进程主要管理资源的分配。可以把进程理解成就是一个工厂。</p>
 <p>**线程：**是进程中的一个实体，是系统独立调度的基本单位，可以把线程理解成是工厂里面的工人。</p>
 <p>**并发(concurrent)：**多个任务在同一时间段内交替执行，主要是在切换处理多个任务。</p>
 <p>**并行(parallel)：**多个任务在统一时刻同时执行，通常需要多个CPU内核或者多个执行单元。</p>
-<img src="/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152114796.png" class="" title="image-20261026152114796">
+<img src="/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152114796.png" class="" title="image-20261026152114796">
 
 <p>**同步：**等待当前任务执行结束返回结果才会继续向下执行。</p>
 <p>**异步：**不用等待当前任务执行结束，可以继续执行下一个任务。</p>
-<img src="/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152153172.png" class="" title="image-20261026152153172">
+<img src="/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152153172.png" class="" title="image-20261026152153172">
 
 <p>**用户线程：**用户线程就是执行具体的任务，例如主程序、网络连接、都是用户线程。</p>
 <p>**守护线程：**为用户线程服务的线程，例如jvm线程，当用户线程结束以后守护线程也会跟着结束不管守护线程有没有运行完毕。</p>
@@ -288,7 +287,7 @@
 <td>run 方法正常退出而死亡，或者因为没有捕获的异常终止了 run 方法而死亡</td>
 </tr>
 </tbody></table>
-<img src="/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152212912.png" class="" title="image-20261026152212912">
+<img src="/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152212912.png" class="" title="image-20261026152212912">
 
 <h2 id="线程的创建方式"><a href="#线程的创建方式" class="headerlink" title="线程的创建方式"></a>线程的创建方式</h2><p>方式1：通过Thread类</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CreateThreadM1</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">Thread</span> <span class="variable">thread</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Thread</span>()&#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;线程启动&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        thread.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -311,7 +310,7 @@
 <li>每个线程只能有一个活动栈帧，对应着当前正在执行的那个方法</li>
 </ul>
 <p>JVM对栈的操作有两个即<strong>入栈</strong>和**出栈，**遵循先进后出原则所以后进来的先出去，每一个方法对应一个栈帧的调用。每一个线程的栈帧都是相互独立的。</p>
-<img src="/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152237287.png" class="" title="image-20261026152237287">
+<img src="/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/image-20261026152237287.png" class="" title="image-20261026152237287">
 
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">m1</span><span class="params">()</span>&#123;</span><br><span class="line">    m2();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">m2</span><span class="params">()</span>&#123;</span><br><span class="line">    m3();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">m3</span><span class="params">()</span>&#123;</span><br><span class="line">    m4();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">m4</span><span class="params">()</span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -400,25 +399,27 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(<span class="literal">true</span>)&#123;</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        Thread.sleep(<span class="number">50</span>);</span><br><span class="line">    &#125;<span class="keyword">catch</span>(InterruptedException e)&#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
     </div>
     <footer class="article-footer">
-      
-      
+        <a class="article-category-link" href="/categories/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" title="并发编程" data-aos="zoom-in">并发编程</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag" title="并发编程">并发编程</a></li></ul>
+
     </footer>
   </div>
     <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
       <div class="article-nav-link-wrap left">
-            <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="" class="lazyload">
-        <a href="/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%BA%8C%E3%80%81%E5%B9%B6%E5%8F%91%E4%B9%8B%E5%85%B1%E4%BA%AB%E6%A8%A1%E5%9E%8B/" aria-label="前一篇: no title" title="前一篇: no title"></a>
+            <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="三、WebChat项目注册+SSO单点" class="lazyload">
+        <a href="/2026/02/03/WebChat/%E4%B8%89%E3%80%81WebChat%E9%A1%B9%E7%9B%AE%E6%B3%A8%E5%86%8C+SSO%E5%8D%95%E7%82%B9/" aria-label="前一篇: 三、WebChat项目注册+SSO单点" title="前一篇: 三、WebChat项目注册+SSO单点"></a>
         <div class="article-nav-caption">前一篇</div>
         <h3 class="article-nav-title">
-            (no title)
+            三、WebChat项目注册+SSO单点
         </h3>
       </div>
     <div class="article-nav-link-wrap right">
-          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="一文搞懂mvcc" class="lazyload">
-      <a href="/2026/02/04/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%80%E6%96%87%E8%AE%B2%E9%80%8Fmvcc/" aria-label="后一篇: 一文搞懂mvcc"  title="后一篇: 一文搞懂mvcc"></a>
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="二、Webchat项目微服务拆分思想" class="lazyload">
+      <a href="/2026/02/03/WebChat/%E4%BA%8C%E3%80%81Webchat%E9%A1%B9%E7%9B%AE%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86%E6%80%9D%E6%83%B3/" aria-label="后一篇: 二、Webchat项目微服务拆分思想"  title="后一篇: 二、Webchat项目微服务拆分思想"></a>
       <div class="article-nav-caption">后一篇</div>
       <h3 class="article-nav-title">
-          一文搞懂mvcc
+          二、Webchat项目微服务拆分思想
       </h3>
     </div>
   </nav>
@@ -445,10 +446,10 @@
       </div>
       <div>
         <span class="icon-brush"></span>
-        54.6k
+        54.4k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        04:02
+        04:01
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -485,11 +486,11 @@
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
-    <div class="sidebar-state-number">4</div>
+    <div class="sidebar-state-number">5</div>
   </div>
   <div class="sidebar-state-tag">
     <div>标签</div>
-    <div class="sidebar-state-number">4</div>
+    <div class="sidebar-state-number">5</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -601,13 +602,13 @@
       <script data-pjax>
         window.REIMU_POST = {
           author: "牛小聪",
-          title: "",
-          url: "https://niuxiaocong.github.io/2026/10/26/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/",
+          title: "一、线程基础知识",
+          url: "https://niuxiaocong.github.io/2026/02/03/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%B8%80%E3%80%81%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/",
           excerpt: "",
           description: "",
-          stripContent: "1234title: 一、线程基础知识date: 2026-02-03 10:34:44categories: [并发编程]tags: [并发编程]  概念**进程：**一个正在运行的程序就是一个进程，进程中分成多个线程，进程主要管理资源的分配。可以把进程理解成就是一个工厂。 **线程：**是进程中的一个实体，是系统独立调度的基本单位，可以把线程理解成是工厂里面的工人。 **并发(concurrent)：**多个任务在同一时间段内交替执行，主要是在切换处理多个任务。 **并行(parallel)",
-          date: "Mon Oct 26 2026 15:18:19 GMT+0800",
-          updated: "Mon Oct 26 2026 15:53:03 GMT+0800",
+          stripContent: "概念**进程：**一个正在运行的程序就是一个进程，进程中分成多个线程，进程主要管理资源的分配。可以把进程理解成就是一个工厂。 **线程：**是进程中的一个实体，是系统独立调度的基本单位，可以把线程理解成是工厂里面的工人。 **并发(concurrent)：**多个任务在同一时间段内交替执行，主要是在切换处理多个任务。 **并行(parallel)：**多个任务在统一时刻同时执行，通常需要多个CPU内核或者多个执行单元。   **同步：**等待当前任务执行结束返回结果才会继续向下执行。 **异步：",
+          date: "Tue Feb 03 2026 10:34:44 GMT+0800",
+          updated: "Mon Oct 26 2026 16:27:42 GMT+0800",
           cover: "/images/banner.avif",
         };
       </script>
